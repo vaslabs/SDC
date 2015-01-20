@@ -4,5 +4,9 @@
     <string name="app_name">SkyDivingCompanion</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_sensors">SensorsActivity</string>
+    <string name="altitude">Altitude</string>
+    <string name="collision_avoidance">Collision Avoidance</string>
+    <string name="positioning_and_sensors">Positioning and Sensors</string>
 
 </resources>

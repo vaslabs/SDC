@@ -8,4 +8,21 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.vaslabs.sdc.MainActivity$PlaceholderFragment" >
 
+    <Button
+        android:id="@+id/collision_avoidance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="@string/collision_avoidance" />
+
+    <Button
+        android:id="@+id/positioning_and_sensors"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="64dp"
+        android:text="@string/positioning_and_sensors" />
+
 </RelativeLayout>
