@@ -13,12 +13,14 @@ import android.test.AndroidTestCase;
 
 public class TestUserPreferences extends AndroidTestCase {
     private static final String USER_INFO_FILE_NAME = "ui.info";
+
     protected void setUp() throws Exception {
         super.setUp();
         FileOutputStream fos = null;
 
         try {
-            fos = this.mContext.openFileOutput( USER_INFO_FILE_NAME,
+            fos =
+                    this.mContext.openFileOutput( USER_INFO_FILE_NAME,
                             Context.MODE_PRIVATE );
             try {
                 fos.write( "".getBytes() );
@@ -37,11 +39,14 @@ public class TestUserPreferences extends AndroidTestCase {
 
         }
     }
+
     public void test_default_user_preferences() {
         UserInformation ui = UserInformation.getUserInfo( this.mContext );
         assertEquals( ui.getMass(), 50f );
-        assertEquals(ui.getSeaLevelCalibration(), SensorManager.PRESSURE_STANDARD_ATMOSPHERE);
+        assertEquals( ui.getSeaLevelCalibration(),
+                SensorManager.PRESSURE_STANDARD_ATMOSPHERE );
     }
+
     public void test_modifying_user_preferences() {
         UserPreferences up = new UserPreferences();
         up.mass = 70f;
@@ -49,7 +54,7 @@ public class TestUserPreferences extends AndroidTestCase {
         UserInformation.setUserPreferences( this.mContext, up );
         UserInformation ui = UserInformation.getUserInfo( this.mContext );
         assertEquals( ui.getMass(), 70f );
-        assertEquals(ui.getSeaLevelCalibration(), 1000f);
-        
+        assertEquals( ui.getSeaLevelCalibration(), 1000f );
+
     }
 }

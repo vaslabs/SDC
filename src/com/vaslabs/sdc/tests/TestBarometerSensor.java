@@ -7,27 +7,26 @@ import android.test.AndroidTestCase;
 
 public class TestBarometerSensor extends AndroidTestCase {
 
-    
     protected void setUp() throws Exception {
         super.setUp();
     }
-    
+
     public void test_barometer_is_initialised() {
-        BarometerSensor bs = new BarometerSensor(this.mContext);
+        BarometerSensor bs = new BarometerSensor( this.mContext );
         try {
             Thread.sleep( 1000 );
         } catch ( InterruptedException e ) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        assertNotNull( bs.getValue());
-        assertTrue(bs.getValue().hasBeenInitialised());
+        assertNotNull( bs.getValue() );
+        assertTrue( bs.getValue().hasBeenInitialised() );
         double rawValue = bs.getValue().getRawValue();
-        assertTrue(rawValue > 0);
+        assertTrue( rawValue > 0 );
     }
-    
+
     public void test_barometer_converts_hPa_to_meters() {
-        BarometerSensor bs = new BarometerSensor(this.mContext);
+        BarometerSensor bs = new BarometerSensor( this.mContext );
         try {
             Thread.sleep( 1000 );
         } catch ( InterruptedException e ) {
@@ -35,7 +34,7 @@ public class TestBarometerSensor extends AndroidTestCase {
             e.printStackTrace();
         }
         MetersSensorValue msv = bs.getAltitude();
-        assertTrue(msv.getRawValue() > 0);
+        assertTrue( msv.getRawValue() > 0 );
     }
 
 }

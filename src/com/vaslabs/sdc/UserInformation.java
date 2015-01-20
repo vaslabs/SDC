@@ -65,7 +65,8 @@ public class UserInformation {
 
     private void save( Context context ) {
         String data =
-                String.format( "%.2f , %.2f", ui.mass, ui.seaLevelCalibration.getRawValue() );
+                String.format( "%.2f , %.2f", ui.mass,
+                        ui.seaLevelCalibration.getRawValue() );
 
         FileOutputStream fos = null;
 
@@ -88,8 +89,8 @@ public class UserInformation {
             }
         } catch ( FileNotFoundException e1 ) {
             // this shouldn't be thrown but if everything goes wrong
-            //if save fails, default data will be used but will be
-            //volatile
+            // if save fails, default data will be used but will be
+            // volatile
         }
 
     }
@@ -108,7 +109,7 @@ public class UserInformation {
         // TODO Auto-generated method stub
         return mass;
     }
-    
+
     public float getSeaLevelCalibration() {
         return seaLevelCalibration.getRawValue();
     }

@@ -8,38 +8,41 @@ import android.hardware.SensorManager;
 
 /**
  * @author Vasilis Nicolaou
- *
+ * 
  */
-public class BarometerSensor extends SDSensor<HPASensorValue> implements SensorEventListener {
-    
+public class BarometerSensor extends SDSensor<HPASensorValue> implements
+        SensorEventListener {
+
     private Sensor hwSensor;
     private HPASensorValue value;
     private HPASensorValue seaLevelPressureValue;
-    public BarometerSensor(Context c) {
-        
-        SensorManager sm = SDSensorManager.getInstance(c);
+
+    public BarometerSensor( Context c ) {
+
+        SensorManager sm = SDSensorManager.getInstance( c );
         hwSensor = sm.getDefaultSensor( Sensor.TYPE_PRESSURE );
-        if (hwSensor == null) {
+        if ( hwSensor == null ) {
             throw new NoBarometerException();
         }
         sm.registerListener( this, hwSensor, SensorManager.SENSOR_DELAY_NORMAL );
         seaLevelPressureValue = new HPASensorValue();
-        seaLevelPressureValue.setRawValue( SensorManager.PRESSURE_STANDARD_ATMOSPHERE );
+        seaLevelPressureValue
+                .setRawValue( SensorManager.PRESSURE_STANDARD_ATMOSPHERE );
     }
-    
-    public void calibrate(float seaLevel) {
+
+    public void calibrate( float seaLevel ) {
         this.seaLevelPressureValue.setRawValue( seaLevel );
     }
-    
+
     @Override
     public HPASensorValue getValue() {
         return value;
     }
-    
+
     public MetersSensorValue getAltitude() {
-        float meters = SensorManager.getAltitude( 
-                seaLevelPressureValue.getRawValue(), 
-                value.getRawValue() );
+        float meters =
+                SensorManager.getAltitude( seaLevelPressureValue.getRawValue(),
+                        value.getRawValue() );
         MetersSensorValue altitudeValue = new MetersSensorValue();
         altitudeValue.setRawValue( meters );
         return altitudeValue;
@@ -53,20 +56,20 @@ public class BarometerSensor extends SDSensor<HPASensorValue> implements SensorE
     @Override
     public void onSensorChanged( SensorEvent sensorEvent ) {
         float[] sensorValues = sensorEvent.values;
-        if (sensorValues.length == 0)
+        if ( sensorValues.length == 0 )
             return;
-        if (value == null) {
+        if ( value == null ) {
             value = new HPASensorValue();
         }
-        
-        value.setRawValue(sensorValues[0]);
-                
+
+        value.setRawValue( sensorValues[0] );
+
     }
-    
+
     @Override
     public void finalize() {
         SensorManager sm = SDSensorManager.getInstance();
         sm.unregisterListener( this );
     }
-    
+
 }
