@@ -14,7 +14,7 @@ public class BarometerSensor extends SDSensor<HPASensorValue> implements SensorE
     
     private Sensor hwSensor;
     private HPASensorValue value;
-    
+    private HPASensorValue seaLevelPressureValue;
     public BarometerSensor(Context c) {
         
         SensorManager sm = SDSensorManager.getInstance(c);
@@ -23,12 +23,26 @@ public class BarometerSensor extends SDSensor<HPASensorValue> implements SensorE
             throw new NoBarometerException();
         }
         sm.registerListener( this, hwSensor, SensorManager.SENSOR_DELAY_NORMAL );
-        
+        seaLevelPressureValue = new HPASensorValue();
+        seaLevelPressureValue.setRawValue( SensorManager.PRESSURE_STANDARD_ATMOSPHERE );
+    }
+    
+    public void calibrate(float seaLevel) {
+        this.seaLevelPressureValue.setRawValue( seaLevel );
     }
     
     @Override
     public HPASensorValue getValue() {
         return value;
+    }
+    
+    public MetersSensorValue getAltitude() {
+        float meters = SensorManager.getAltitude( 
+                seaLevelPressureValue.getRawValue(), 
+                value.getRawValue() );
+        MetersSensorValue altitudeValue = new MetersSensorValue();
+        altitudeValue.setRawValue( meters );
+        return altitudeValue;
     }
 
     @Override
