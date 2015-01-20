@@ -9,7 +9,7 @@ import android.hardware.SensorManager;
  *
  */
 public class SDSensorManager {
-    Context context;
+    private static Context context;
     private static SensorManager sensorManager;
     private static SDSensorManager sdSensorManager;
     
@@ -17,11 +17,21 @@ public class SDSensorManager {
         sensorManager = (SensorManager)context.getSystemService( Context.SENSOR_SERVICE );
     }
     
+    public static SensorManager getInstance(Context c) {
+        context = c;
+        return getInstance();
+    }
+    
     public static SensorManager getInstance() {
+        if (context == null) {
+            throw new RuntimeException();
+        }
         if (sdSensorManager == null) {
             sdSensorManager = new SDSensorManager();
         }
+        
         return sensorManager;
+        
     }
     
 }

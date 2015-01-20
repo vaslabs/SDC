@@ -1,5 +1,6 @@
 package com.vaslabs.sdc.sensors;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,19 +15,19 @@ public class BarometerSensor extends SDSensor<HPASensorValue> implements SensorE
     private Sensor hwSensor;
     private HPASensorValue value;
     
-    public BarometerSensor(Sensor sensor) {
-        if (sensor.getType() == Sensor.TYPE_PRESSURE)
-            this.hwSensor = sensor;
-        else
-            throw new NoBarometerException();
+    public BarometerSensor(Context c) {
         
-        SensorManager sm = SDSensorManager.getInstance();
+        SensorManager sm = SDSensorManager.getInstance(c);
+        hwSensor = sm.getDefaultSensor( Sensor.TYPE_PRESSURE );
+        if (hwSensor == null) {
+            throw new NoBarometerException();
+        }
         sm.registerListener( this, hwSensor, SensorManager.SENSOR_DELAY_NORMAL );
         
     }
     
     @Override
-    protected HPASensorValue getValue() {
+    public HPASensorValue getValue() {
         return value;
     }
 
@@ -46,6 +47,12 @@ public class BarometerSensor extends SDSensor<HPASensorValue> implements SensorE
         
         value.setRawValue(sensorValues[0]);
                 
+    }
+    
+    @Override
+    public void finalize() {
+        SensorManager sm = SDSensorManager.getInstance();
+        sm.unregisterListener( this );
     }
     
 }
