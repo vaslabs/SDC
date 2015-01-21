@@ -1,20 +1,20 @@
 package com.vaslabs.sdc.sensors;
 
-public abstract class SensorValue {
+public abstract class SensorValue<V> {
 
-    private float raw_value;
+    private V raw_value;
     private boolean isInitialised = false;
 
     public boolean hasBeenInitialised() {
         return isInitialised;
     }
 
-    public void setRawValue( float value ) {
+    public void setRawValue( V value ) {
         raw_value = value;
         isInitialised = true;
     }
 
-    public float getRawValue() {
+    public V getRawValue() {
         return raw_value;
     }
 }

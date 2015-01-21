@@ -16,7 +16,7 @@ public class BarometerSensor extends SDSensor<HPASensorValue> implements
     private Sensor hwSensor;
     private HPASensorValue value;
     private HPASensorValue seaLevelPressureValue;
-
+    
     public BarometerSensor( Context c ) {
 
         SensorManager sm = SDSensorManager.getInstance( c );
