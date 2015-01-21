@@ -35,7 +35,7 @@ public class TestUserPreferences extends AndroidTestCase {
                     e.printStackTrace();
                 }
             }
-        } catch ( FileNotFoundException e1 ) {
+        } catch ( FileNotFoundException e1 ) { 
 
         }
     }
