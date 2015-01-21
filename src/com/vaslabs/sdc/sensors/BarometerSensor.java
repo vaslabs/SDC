@@ -10,17 +10,19 @@ import android.hardware.SensorManager;
  * @author Vasilis Nicolaou
  * 
  */
-public class BarometerSensor extends SDSensor<HPASensorValue> implements
-        SensorEventListener {
+public class BarometerSensor extends SDSensor<HPASensorValue>  {
 
-    private Sensor hwSensor;
+    
     private HPASensorValue value;
     private HPASensorValue seaLevelPressureValue;
     
     public BarometerSensor( Context c ) {
 
-        SensorManager sm = SDSensorManager.getInstance( c );
-        hwSensor = sm.getDefaultSensor( Sensor.TYPE_PRESSURE );
+        super(Sensor.TYPE_PRESSURE, c);
+
+        SensorManager sm = SDSensorManager.getInstance();
+        
+        Sensor hwSensor = getSensor();
         if ( hwSensor == null ) {
             throw new NoBarometerException();
         }
