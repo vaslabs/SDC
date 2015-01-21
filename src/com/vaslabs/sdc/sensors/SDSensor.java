@@ -12,7 +12,7 @@ public abstract class SDSensor<T extends SensorValue<? extends Object>>
 
     protected SDSensor( int sensorType, Context c ) {
         SensorManager sm = SDSensorManager.getInstance( c );
-        sm.getDefaultSensor( Sensor.TYPE_PRESSURE );
+        hwSensor = sm.getDefaultSensor( sensorType );
 
     }
 
