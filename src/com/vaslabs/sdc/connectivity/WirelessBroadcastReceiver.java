@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
+import android.view.View;
 
 public class WirelessBroadcastReceiver extends BroadcastReceiver {
 
@@ -21,10 +22,12 @@ public class WirelessBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive( Context context, Intent intent ) {
         String action = intent.getAction();
-        ConnectivityActionResponder actionResponder = ActionResponderFactory.getResponder(action);
+        ConnectivityActionResponder<? extends View> actionResponder = 
+                ActionResponderFactory.getResponder(action, this.context);
         
         actionResponder.manageAction(context, intent);
-
+        
+        
     }
 
 }

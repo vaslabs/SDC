@@ -2,6 +2,8 @@ package com.vaslabs.sdc.connectivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.p2p.WifiP2pManager;
+import android.widget.ListView;
 
 /**
  * Manages changes on the discoverable list of peers.
@@ -10,12 +12,17 @@ import android.content.Intent;
  *
  */
 public class PeersChangedConnectivityActionResponder extends
-        ConnectivityActionResponder {
+        ConnectivityActionResponder<ListView> {
 
     @Override
     public void manageAction( Context context, Intent intent ) {
-        // TODO Auto-generated method stub
         
+    }
+
+    @Override
+    public ListView getView() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
