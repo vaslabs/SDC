@@ -2,7 +2,6 @@ package com.vaslabs.sdc.connectivity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.widget.ListView;
 
 /**
