@@ -9,7 +9,6 @@ import android.content.Context;
 import android.hardware.SensorManager;
 
 import com.vaslabs.sdc.sensors.HPASensorValue;
-import com.vaslabs.sdc.sensors.MetersSensorValue;
 
 public class UserInformation {
     private float mass;
@@ -26,6 +25,10 @@ public class UserInformation {
         this.mass = mass;
         seaLevelCalibration = new HPASensorValue();
         seaLevelCalibration.setRawValue( seaLevel );
+    }
+    
+    public static UserInformation getUserInformationClone(UserInformation ui) {
+        return new UserInformation(ui.getMass(), ui.getSeaLevelCalibration());
     }
 
     public static UserInformation getUserInfo( Context context ) {
