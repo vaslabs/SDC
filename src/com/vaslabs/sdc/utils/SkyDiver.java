@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.vaslabs.sdc.UserInformation;
 import com.vaslabs.sdc.UserPreferences;
+import com.vaslabs.sdc.sensors.HPASensorValue;
 import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
@@ -22,7 +23,7 @@ public class SkyDiver implements PositionalUpdate {
         try {
             name = mainFields[0];
             String valuesField = mainFields[1];
-            String[] values = valuesField.split( "|" );
+            String[] values = valuesField.split( "\\|" );
             
             massValue = values[0];
             seaLevelValue = values[1];
@@ -38,7 +39,7 @@ public class SkyDiver implements PositionalUpdate {
         float alt, seaLevel, mass;
         double lng, lat;
         try {
-            alt = Float.parseFloat( massValue );
+            alt = Float.parseFloat( altValue );
             lat = Double.parseDouble( latValue );
             lng = Double.parseDouble( lngValue );
             mass = Float.parseFloat( massValue );
@@ -145,6 +146,18 @@ public class SkyDiver implements PositionalUpdate {
             return false;
         }
         return true;
+    }
+
+    public float getCustomSeaLevelCalibration() {
+        return userInformation.getSeaLevelCalibration();
+    }
+
+    public float getMass() {
+        return userInformation.getMass();
+    }
+
+    public String getName() {
+        return userInformation.getName();
     }
     
     

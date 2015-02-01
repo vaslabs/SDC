@@ -44,4 +44,19 @@ public class TestSkyDiverSerialisation extends AndroidTestCase {
 
     }
 
+    public void test_that_skydiver_string_is_serialised_into_skydiver_object() {
+        String deserialisedString = "Joe:50.00|1014.12|202.121|102.131|1000.00";
+        SkyDiver sd = SkyDiver.serialiseSkyDiverFromString( deserialisedString );
+        assertNotNull(sd);
+        assertEquals("Joe", sd.getName());
+        Position skyDiverPosition = sd.getPosition();
+        assertEquals( 50, sd.getMass(), 0.001);
+        assertEquals(1014.12, sd.getCustomSeaLevelCalibration(), 0.001);
+        assertEquals(202.121, skyDiverPosition.getLat().getRawValue(), 0.001);
+        assertEquals(102.131, skyDiverPosition.getLng().getRawValue(), 0.001);
+
+        assertEquals(1000, skyDiverPosition.getAlt().getRawValue(), 0.001);
+
+    }
+
 }
