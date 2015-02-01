@@ -53,8 +53,8 @@ public class TestUserPreferences extends AndroidTestCase {
         up.seaLevel = 1000f;
         UserInformation.setUserPreferences( this.mContext, up );
         UserInformation ui = UserInformation.getUserInfo( this.mContext );
-        assertEquals( ui.getMass(), 70f );
-        assertEquals( ui.getSeaLevelCalibration(), 1000f );
+        assertEquals(70f, ui.getMass() );
+        assertEquals( 1000f, ui.getSeaLevelCalibration());
 
     }
 }

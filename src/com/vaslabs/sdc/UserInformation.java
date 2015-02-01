@@ -42,14 +42,35 @@ public class UserInformation {
             fos.close();
             String entry = new String( buffer );
             String[] entryValues = entry.split( UI_ENTRY_SEPARATOR );
-            String massEntry = entryValues[UserEntries.MASS.ordinal()];
-            String seaLevelCalibrationEntry =
-                    entryValues[UserEntries.SEA_LEVEL.ordinal()];
-            String name = entryValues[UserEntries.NAME.ordinal()];
 
-            float mass = Float.parseFloat( massEntry );
-            float seaLevel = Float.parseFloat( seaLevelCalibrationEntry );
-            ui = new UserInformation( mass, seaLevel, name );
+            String massEntry =
+                    getEntryValueSafely( entryValues,
+                            UserEntries.MASS.ordinal() );
+            String seaLevelCalibrationEntry =
+                    getEntryValueSafely( entryValues,
+                            UserEntries.SEA_LEVEL.ordinal() );
+
+            String name =
+                    getEntryValueSafely( entryValues,
+                            UserEntries.NAME.ordinal() );
+            float mass = -1f;
+            if ( massEntry != null ) {
+                try {
+                    mass = Float.parseFloat( massEntry );
+                } catch ( NumberFormatException nfe ) {
+                }
+            }
+            float seaLevel = -1f;
+            if ( seaLevelCalibrationEntry != null ) {
+                try {
+                    seaLevel = Float.parseFloat( seaLevelCalibrationEntry );
+                } catch ( NumberFormatException nfe ) {
+                }
+            }
+            if ( mass < 0 || seaLevel < 0 || name == null )
+                initialiseFirstTime( context );
+            else
+                ui = new UserInformation( mass, seaLevel, name );
 
         } catch ( FileNotFoundException fnfe ) {
             initialiseFirstTime( context );
@@ -62,6 +83,15 @@ public class UserInformation {
         return ui;
     }
 
+    private static String
+            getEntryValueSafely( String[] entryValues, int ordinal ) {
+        if ( ordinal >= 0 && ordinal < entryValues.length ) {
+            return entryValues[ordinal];
+        }
+
+        return null;
+    }
+
     private static void initialiseFirstTime( Context context ) {
         float mass = 50f;
         float seaLevel = SensorManager.PRESSURE_STANDARD_ATMOSPHERE;
@@ -71,7 +101,8 @@ public class UserInformation {
 
     private void save( Context context ) {
         String data =
-                String.format( "%s, %.2f , %.2f", ui.name, ui.mass,
+                String.format( "%s%s%.2f%s%.2f", ui.name, UI_ENTRY_SEPARATOR,
+                        ui.mass, UI_ENTRY_SEPARATOR,
                         ui.seaLevelCalibration.getRawValue() );
 
         FileOutputStream fos = null;
@@ -112,7 +143,6 @@ public class UserInformation {
     }
 
     public float getMass() {
-        // TODO Auto-generated method stub
         return mass;
     }
 
