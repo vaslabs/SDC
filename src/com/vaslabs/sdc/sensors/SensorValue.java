@@ -17,4 +17,6 @@ public abstract class SensorValue<V> {
     public V getRawValue() {
         return raw_value;
     }
+    
+    public abstract String toString();
 }

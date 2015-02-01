@@ -1,7 +1,6 @@
 package com.vaslabs.sdc.utils;
 
 import com.vaslabs.sdc.sensors.LatitudeSensorValue;
-import com.vaslabs.sdc.sensors.LocationSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
 
