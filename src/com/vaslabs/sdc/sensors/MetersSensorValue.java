@@ -5,7 +5,7 @@ public class MetersSensorValue extends SensorValue<Float> {
     @Override
     public String toString() {
         // TODO Auto-generated method stub
-        return null;
+        return String.format( "%2.f", this.getRawValue() );
     }
 
 }
