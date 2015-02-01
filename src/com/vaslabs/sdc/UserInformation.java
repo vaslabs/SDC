@@ -16,19 +16,22 @@ public class UserInformation {
     private static UserInformation ui;
     private static final String USER_INFO_FILE_NAME = "ui.info";
     private static final String UI_ENTRY_SEPARATOR = " , ";
+    private final String name;
 
     public enum UserEntries {
-        MASS, SEA_LEVEL
+        NAME, MASS, SEA_LEVEL
     };
 
-    private UserInformation( float mass, float seaLevel ) {
+    private UserInformation( float mass, float seaLevel, String name ) {
         this.mass = mass;
         seaLevelCalibration = new HPASensorValue();
         seaLevelCalibration.setRawValue( seaLevel );
+        this.name = name;
     }
-    
-    public static UserInformation getUserInformationClone(UserInformation ui) {
-        return new UserInformation(ui.getMass(), ui.getSeaLevelCalibration());
+
+    public static UserInformation getUserInformationClone( UserInformation ui ) {
+        return new UserInformation( ui.getMass(), ui.getSeaLevelCalibration(),
+                ui.getName() );
     }
 
     public static UserInformation getUserInfo( Context context ) {
@@ -42,10 +45,11 @@ public class UserInformation {
             String massEntry = entryValues[UserEntries.MASS.ordinal()];
             String seaLevelCalibrationEntry =
                     entryValues[UserEntries.SEA_LEVEL.ordinal()];
+            String name = entryValues[UserEntries.NAME.ordinal()];
 
             float mass = Float.parseFloat( massEntry );
             float seaLevel = Float.parseFloat( seaLevelCalibrationEntry );
-            ui = new UserInformation( mass, seaLevel );
+            ui = new UserInformation( mass, seaLevel, name );
 
         } catch ( FileNotFoundException fnfe ) {
             initialiseFirstTime( context );
@@ -61,14 +65,13 @@ public class UserInformation {
     private static void initialiseFirstTime( Context context ) {
         float mass = 50f;
         float seaLevel = SensorManager.PRESSURE_STANDARD_ATMOSPHERE;
-
-        ui = new UserInformation( mass, seaLevel );
+        ui = new UserInformation( mass, seaLevel, null );
         ui.save( context );
     }
 
     private void save( Context context ) {
         String data =
-                String.format( "%.2f , %.2f", ui.mass,
+                String.format( "%s, %.2f , %.2f", ui.name, ui.mass,
                         ui.seaLevelCalibration.getRawValue() );
 
         FileOutputStream fos = null;
@@ -100,7 +103,7 @@ public class UserInformation {
 
     public static void setUserPreferences( Context c, UserPreferences up ) {
         if ( ui == null ) {
-            ui = new UserInformation( up.mass, up.seaLevel );
+            ui = new UserInformation( up.mass, up.seaLevel, up.name );
         } else {
             ui.mass = up.mass;
             ui.seaLevelCalibration.setRawValue( up.seaLevel );
@@ -115,6 +118,10 @@ public class UserInformation {
 
     public float getSeaLevelCalibration() {
         return seaLevelCalibration.getRawValue();
+    }
+
+    public String getName() {
+        return this.name;
     }
 
 }
