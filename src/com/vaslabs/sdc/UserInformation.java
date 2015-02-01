@@ -34,6 +34,11 @@ public class UserInformation {
                 ui.getName() );
     }
 
+    public static UserInformation getUserInformationFromUserPreferences(
+            UserPreferences up ) {
+        return new UserInformation( up.mass, up.seaLevel, up.name );
+    }
+
     public static UserInformation getUserInfo( Context context ) {
         try {
             FileInputStream fos = context.openFileInput( USER_INFO_FILE_NAME );
@@ -152,6 +157,50 @@ public class UserInformation {
 
     public String getName() {
         return this.name;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Float.floatToIntBits( mass );
+        result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
+        return result;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals( Object obj ) {
+        if ( this == obj ) {
+            return true;
+        }
+        if ( obj == null ) {
+            return false;
+        }
+        if ( ! ( obj instanceof UserInformation ) ) {
+            return false;
+        }
+        UserInformation other = (UserInformation) obj;
+        if ( Float.floatToIntBits( mass ) != Float.floatToIntBits( other.mass ) ) {
+            return false;
+        }
+        if ( name == null ) {
+            if ( other.name != null ) {
+                return false;
+            }
+        } else if ( !name.equals( other.name ) ) {
+            return false;
+        }
+        return true;
     }
 
 }
