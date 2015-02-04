@@ -1,4 +1,4 @@
-package com.vaslabs.sdc;
+package com.vaslabs.sdc.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
