@@ -16,6 +16,7 @@ public class TestSpeechCommunicationManager extends AndroidTestCase {
             @Override
             public void onSuccess() {
                 scm.getProximityWarning( mContext );
+                scm.getProximityWarning( mContext );
                 talked = true;
             }
             
