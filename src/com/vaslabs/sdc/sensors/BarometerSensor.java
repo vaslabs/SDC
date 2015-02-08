@@ -14,7 +14,7 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
     
     private HPASensorValue value;
     private HPASensorValue seaLevelPressureValue;
-    
+    private BarometerListener listener = null;
     public BarometerSensor( Context c ) {
 
         super(Sensor.TYPE_PRESSURE, c);
@@ -33,6 +33,10 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
 
     public void calibrate( float seaLevel ) {
         this.seaLevelPressureValue.setRawValue( seaLevel );
+    }
+    
+    public void registerListener(BarometerListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -64,6 +68,9 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
         }
 
         value.setRawValue( sensorValues[0] );
+        if (listener != null) {
+            listener.onHPASensorValueChange( value );
+        }
 
     }
 

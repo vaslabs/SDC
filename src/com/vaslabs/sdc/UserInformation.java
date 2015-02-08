@@ -16,7 +16,7 @@ public class UserInformation {
     private static UserInformation ui;
     private static final String USER_INFO_FILE_NAME = "ui.info";
     private static final String UI_ENTRY_SEPARATOR = " , ";
-    private final String name;
+    private String name;
 
     public enum UserEntries {
         NAME, MASS, SEA_LEVEL
@@ -143,6 +143,7 @@ public class UserInformation {
         } else {
             ui.mass = up.mass;
             ui.seaLevelCalibration.setRawValue( up.seaLevel );
+            ui.name = up.name;
         }
         ui.save( c );
     }

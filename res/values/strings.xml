@@ -8,8 +8,14 @@
     <string name="altitude">Altitude</string>
     <string name="collision_avoidance">Collision Avoidance</string>
     <string name="positioning_and_sensors">Positioning and Sensors</string>
-
     <string name="proximity_warning">A Skydiver has been detected near you</string>
     <string name="connection_engaged" formatted="false">Connection engaged with remote skydiver %s</string>
     <string name="distance_warning" formatted="false">You are %d away from %s</string>
+    <string name="pref_title_sea_level_pressure">Sea level pressure</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="prompt_set_current_barometer_value">Set current barometer value as sea level</string>
+    <string name="unknown_value">Unavailable</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
 </resources>

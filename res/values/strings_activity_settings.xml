@@ -1,13 +1,11 @@
 <resources>
 
-    <string name="title_activity_settings">Settings</string>
-
     <!-- Strings related to Settings -->
 
 
     <!-- Example General settings -->
     <string name="pref_header_personal">General</string>
-    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_title_display_name">User name</string>
     <string name="pref_title_mass">Mass</string>
     <string name="pref_default_display_name">Android user</string>
 
@@ -16,5 +14,6 @@
     <!-- Example settings for Notifications -->
     <string name="pref_header_sensors">Sensor defaults</string>
     <string name="pref_default_mass">50</string>
+    <string name="pref_title_altimeter_warning">Altitude warning</string>
     
 </resources>
