@@ -65,6 +65,10 @@ public class SpeechCommunicationManager implements TextToSpeech.OnInitListener, 
         }
         
     }
+
+    public boolean isTalking() {
+        return this.textToSpeech.isSpeaking();
+    }
     
 }
 

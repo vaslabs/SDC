@@ -35,5 +35,19 @@ public class TestSpeechCommunicationManager extends AndroidTestCase {
                 e.printStackTrace();
             }
         }
+        try {
+            Thread.sleep( 1000 );
+        } catch ( InterruptedException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        while (scm.isTalking()) {
+            try {
+                Thread.sleep( 1000 );
+            } catch ( InterruptedException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 }
