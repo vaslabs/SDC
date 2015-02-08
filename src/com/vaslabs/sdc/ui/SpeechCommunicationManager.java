@@ -69,6 +69,10 @@ public class SpeechCommunicationManager implements TextToSpeech.OnInitListener, 
     public boolean isTalking() {
         return this.textToSpeech.isSpeaking();
     }
+
+    public void getTalkingAvailable(Context c) {
+        messagesQueue.append( c.getString( R.string.scm_success) );
+    }
     
 }
 
