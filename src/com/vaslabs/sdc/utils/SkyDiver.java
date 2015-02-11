@@ -9,12 +9,20 @@ import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
 
-public class SkyDiver implements PositionalUpdate {
+public class SkyDiver implements PositionalUpdate, Comparable<SkyDiver> {
     private UserInformation userInformation;
     private Position lastKnownPosition;
-    
+    private SDConnectivity connectivityStrength;
     public SkyDiver( UserInformation ui ) {
         userInformation = UserInformation.getUserInformationClone( ui );
+    }
+    
+    public synchronized void setConnectivityStrength(SDConnectivity connectivity) {
+        this.connectivityStrength = connectivity;
+    }
+    
+    public synchronized int getConnectivityStrengthAsInt() {
+        return connectivityStrength.ordinal();
     }
 
     public static SkyDiver serialiseSkyDiverFromString(String skydiverDeserialisedString) {
@@ -158,6 +166,12 @@ public class SkyDiver implements PositionalUpdate {
 
     public String getName() {
         return userInformation.getName();
+    }
+
+    @Override
+    public int compareTo( SkyDiver another ) {
+        //TODO
+        return 0;
     }
     
     
