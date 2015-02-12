@@ -36,6 +36,17 @@ public class TestGeoUtils extends AndroidTestCase {
         
         assertEquals(6, distance, 0.1);
         
+        latB.setRawValue( 41.758701 );
+        lngB.setRawValue( 87.973307 );
+        altB.setRawValue( 198.0f );
+        
+        b = new Position(lngB, latB, altB);
+        distance = GeoUtils.calculateDistance( a, b );
+        
+        assertEquals(567, distance, 1);
+
+        
+        
     }
     
 }
