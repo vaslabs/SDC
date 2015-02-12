@@ -58,5 +58,15 @@ public class TestSkyDiverSerialisation extends AndroidTestCase {
         assertEquals(1000, skyDiverPosition.getAlt().getRawValue(), 0.001);
 
     }
+    
+    public void test_that_skydiver_string_is_serialised_into_skydiver_object_edge_case() {
+        String deserialisedString = "Joe:50.00|1014.12|null|null|null";
+        SkyDiver sd = SkyDiver.serialiseSkyDiverFromString( deserialisedString );
+        assertNotNull(sd);
+        assertEquals("Joe", sd.getName());
+        Position skyDiverPosition = sd.getPosition();
+        assertNull( skyDiverPosition);
+        
+    }
 
 }

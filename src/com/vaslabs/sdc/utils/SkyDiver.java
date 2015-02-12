@@ -1,15 +1,17 @@
 package com.vaslabs.sdc.utils;
 
+import android.hardware.SensorManager;
 import android.util.Log;
 
 import com.vaslabs.sdc.UserInformation;
 import com.vaslabs.sdc.UserPreferences;
+import com.vaslabs.sdc.sensors.BarometerSensor;
 import com.vaslabs.sdc.sensors.HPASensorValue;
 import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
 
-public class SkyDiver implements PositionalUpdate, Comparable<SkyDiver> {
+public class SkyDiver implements PositionalUpdate {
     private UserInformation userInformation;
     private Position lastKnownPosition;
     private SDConnectivity connectivityStrength;
@@ -44,18 +46,29 @@ public class SkyDiver implements PositionalUpdate, Comparable<SkyDiver> {
             Log.d( "InvalidSkyDiverString", skydiverDeserialisedString );
             return null;
         }
-        float alt, seaLevel, mass;
+        float alt, seaLevel = SensorManager.PRESSURE_STANDARD_ATMOSPHERE, mass = 50;
         double lng, lat;
+        MetersSensorValue altitude = null;
+        LongitudeSensorValue longitude = null;
+        LatitudeSensorValue latitude = null;
+        Position position = null;
         try {
             alt = Float.parseFloat( altValue );
+            altitude = new MetersSensorValue();
+            altitude.setRawValue( alt );
             lat = Double.parseDouble( latValue );
+            latitude = new LatitudeSensorValue();
+            latitude.setRawValue( lat );
             lng = Double.parseDouble( lngValue );
-            mass = Float.parseFloat( massValue );
+            longitude = new LongitudeSensorValue();
+            longitude.setRawValue( lng );
             seaLevel = Float.parseFloat( seaLevelValue );
+            position = new Position(longitude, latitude, altitude);
+            mass = Float.parseFloat( massValue );
+
         }
         catch (NumberFormatException nfe) {
             Log.d( "InvalidSkyDiverStringValues", skydiverDeserialisedString );
-            return null;
         }
         
         UserPreferences up = new UserPreferences();
@@ -68,15 +81,11 @@ public class SkyDiver implements PositionalUpdate, Comparable<SkyDiver> {
         
         SkyDiver sd = new SkyDiver(ui);
         
-        MetersSensorValue altitude = new MetersSensorValue();
-        altitude.setRawValue( alt );
-        LatitudeSensorValue latitude = new LatitudeSensorValue();
-        latitude.setRawValue( lat );
-        LongitudeSensorValue longitude = new LongitudeSensorValue();
-        longitude.setRawValue( lng );
-        Position position = new Position(longitude, latitude, altitude);
-        sd.updatePositionInformation( position );
         
+        
+        
+        if (position != null)
+            sd.updatePositionInformation( position );
         return sd;
     }
     
@@ -168,12 +177,6 @@ public class SkyDiver implements PositionalUpdate, Comparable<SkyDiver> {
         return userInformation.getName();
     }
 
-    @Override
-    public int compareTo( SkyDiver another ) {
-        //TODO
-        return 0;
-    }
-    
     
 
 }
