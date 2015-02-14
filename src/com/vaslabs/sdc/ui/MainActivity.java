@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 public class MainActivity extends Activity {
 
@@ -20,6 +21,8 @@ public class MainActivity extends Activity {
             getFragmentManager().beginTransaction()
                     .add( R.id.container, new PlaceholderFragment() ).commit();
         }
+        
+        
     }
 
     @Override
@@ -49,6 +52,7 @@ public class MainActivity extends Activity {
      */
     public static class PlaceholderFragment extends Fragment {
 
+        private Button skyDivingSessionButton;
         public PlaceholderFragment() {
         }
 
@@ -57,6 +61,18 @@ public class MainActivity extends Activity {
                 Bundle savedInstanceState ) {
             View rootView =
                     inflater.inflate( R.layout.fragment_main, container, false );
+            
+            skyDivingSessionButton = (Button) rootView.findViewById( R.id.skyDivingSessionButton );
+            
+            skyDivingSessionButton.setOnClickListener( new View.OnClickListener() {
+                
+                @Override
+                public void onClick( View v ) {
+                    Intent intent = new Intent(v.getContext(), SkyDivingSessionActivity.class);
+                    startActivity( intent );
+                }
+            } );
+            
             return rootView;
         }
     }

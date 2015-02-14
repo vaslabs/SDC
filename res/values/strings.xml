@@ -19,7 +19,5 @@
     <string name="cancel">Cancel</string>
     <string name="scm_success">Speech interface has been successfully initialised.</string>
     <string name="title_activity_sky_diving_session">SkyDivingSessionActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-
+    <string name="skydivingsession">Start skydiving session</string>
 </resources>
