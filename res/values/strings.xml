@@ -21,4 +21,6 @@
     <string name="title_activity_sky_diving_session">SkyDivingSessionActivity</string>
     <string name="skydivingsession">Start skydiving session</string>
     <string name="mock_skydiver_addition">Simulation: add skydiver</string>
+    <string name="mock_skydiver_disconnect">Simulation: Disconnect skydiver</string>
+    <string name="disconnected_warning">"Connection lost with skydiver that had a %s connection before"</string>
 </resources>

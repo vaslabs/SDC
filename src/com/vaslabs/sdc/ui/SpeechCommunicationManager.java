@@ -4,6 +4,7 @@ package com.vaslabs.sdc.ui;
 import com.vaslabs.sdc.utils.DynamicQueue;
 import com.vaslabs.sdc.utils.EventBasedDynamicQueue;
 import com.vaslabs.sdc.utils.OnEventAddedListener;
+import com.vaslabs.sdc.utils.SDConnectivity;
 
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
@@ -78,6 +79,12 @@ public class SpeechCommunicationManager implements TextToSpeech.OnInitListener, 
 
     public void shutdown() {
         textToSpeech.shutdown();
+    }
+
+    public void informAboutdisconnection( SDConnectivity sdConnectivity, Context c ) {
+        String textMessage = String.format( c.getString( R.string.disconnected_warning ), 
+                sdConnectivity.toString().replace( "_", " " ) );
+        messagesQueue.append( textMessage );
     }
     
 }

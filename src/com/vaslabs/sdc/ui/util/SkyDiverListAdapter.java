@@ -10,6 +10,7 @@ import com.vaslabs.sdc.sensors.HPASensorValue;
 import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
+import com.vaslabs.sdc.ui.SpeechCommunicationManager;
 import com.vaslabs.sdc.utils.SDConnectivity;
 import com.vaslabs.sdc.utils.SkyDiver;
 import com.vaslabs.sdc.utils.SkyDiverEnvironmentUpdate;
@@ -17,6 +18,7 @@ import com.vaslabs.sdc.utils.SkyDiverPersonalUpdates;
 import com.vaslabs.sdc.utils.SkyDiverPositionalComparator;
 
 import android.R.color;
+import android.content.Context;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.view.View;
@@ -31,7 +33,8 @@ public class SkyDiverListAdapter extends BaseAdapter implements SkyDiverEnvironm
     private SkyDiver me;
     private int[] colors;
     private int defaultColor = Color.CYAN;
-    public SkyDiverListAdapter(SkyDiver me) {
+    private Context context;
+    public SkyDiverListAdapter(SkyDiver me, Context c) {
         knownSkyDivers = new HashMap<String, SkyDiver>();
         knownSkyDiversList = new ArrayList<SkyDiver>();
         this.me = me;
@@ -40,6 +43,7 @@ public class SkyDiverListAdapter extends BaseAdapter implements SkyDiverEnvironm
         colors[SDConnectivity.WEAK.ordinal()] = Color.YELLOW;
         colors[SDConnectivity.MEDIUM.ordinal()] = Color.MAGENTA;
         colors[SDConnectivity.STRONG.ordinal()] = Color.RED;
+        context = c;
     }
     
     
@@ -79,14 +83,16 @@ public class SkyDiverListAdapter extends BaseAdapter implements SkyDiverEnvironm
         } else {
             knownSkyDivers.put( skydiver.getName(), skydiver );
             knownSkyDiversList.add( skydiver );
-            Collections.sort( this.knownSkyDiversList, new SkyDiverPositionalComparator( me )  );;
+            Collections.sort( this.knownSkyDiversList, new SkyDiverPositionalComparator( me )  );
+            SpeechCommunicationManager scm = SpeechCommunicationManager.getInstance();
+            scm.getProximityWarning( context );
         }
         this.notifyDataSetChanged();
     }
 
     @Override
     public synchronized void onSkydiverInfoUpdate( SkyDiver skydiver ) {
-        if (!this.knownSkyDivers.containsKey( skydiver )) {
+        if (!this.knownSkyDivers.containsKey( skydiver.getName() )) {
             onNewSkydiverInfo( skydiver );
         } else {
             SkyDiver previouslyKnownSkyDiver = this.knownSkyDivers.get( skydiver.getName());
@@ -115,6 +121,8 @@ public class SkyDiverListAdapter extends BaseAdapter implements SkyDiverEnvironm
             }
         }
         
+        Collections.sort( this.knownSkyDiversList, new SkyDiverPositionalComparator( me )  );
+        
     }
 
 
@@ -123,8 +131,9 @@ public class SkyDiverListAdapter extends BaseAdapter implements SkyDiverEnvironm
     public synchronized void onLooseConnection( SkyDiver skydiver ) {
         SkyDiver sd = knownSkyDivers.get( skydiver.getName() );
         if (sd != null) {
+            SpeechCommunicationManager.getInstance().informAboutdisconnection(
+                    SDConnectivity.values()[sd.getConnectivityStrengthAsInt()], context);
             sd.setConnectivityStrength( SDConnectivity.CONNECTION_LOST );
-            //possibly do a warning implementation here.
         }
     }
 

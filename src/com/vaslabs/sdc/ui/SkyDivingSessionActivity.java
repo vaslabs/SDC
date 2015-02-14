@@ -1,5 +1,8 @@
 package com.vaslabs.sdc.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.vaslabs.sdc.UserInformation;
 import com.vaslabs.sdc.sensors.HPASensorValue;
 import com.vaslabs.sdc.ui.util.SkyDiverListAdapter;
@@ -31,6 +34,8 @@ public class SkyDivingSessionActivity extends Activity implements EnvironmentUpd
     private TextView altimeterTextView;
     private TextView gpsPositionTextView;
     private SkyDiverListAdapter sdListAdapter;
+    private Button mockDisconnectSkydiverButton;
+    private List<SkyDiver> skyDiversMock;
     private static final boolean AUTO_HIDE = true;
 
 
@@ -48,11 +53,11 @@ public class SkyDivingSessionActivity extends Activity implements EnvironmentUpd
         super.onCreate( savedInstanceState );
 
         setContentView( R.layout.activity_sky_diving_session );        
-        
+        skyDiversMock = new ArrayList<SkyDiver>();
         
         connectedSkydiversListView = (ListView)findViewById( R.id.skydiversListView );
         mockAddSkydiverButton = (Button)findViewById(R.id.mockAddingSkydiver);
-        sdListAdapter = new SkyDiverListAdapter( new SkyDiver(UserInformation.getUserInfo( this )) );
+        sdListAdapter = new SkyDiverListAdapter( new SkyDiver(UserInformation.getUserInfo( this )), this );
         connectedSkydiversListView.setAdapter( sdListAdapter );
         
         SpeechCommunicationManager scm = SpeechCommunicationManager.getInstance();
@@ -67,10 +72,26 @@ public class SkyDivingSessionActivity extends Activity implements EnvironmentUpd
                 SkyDiver sd = SkyDiver.serialiseSkyDiverFromString( id + ":50.00|1014.12|null|null|null" );
                 sd.setConnectivityStrength( connectivityValues[connectivity] );
                 onNewSkydiverInfo( sd );
+                skyDiversMock.add( sd );
+            }
+        } );
+        
+        mockDisconnectSkydiverButton = (Button) findViewById( R.id.mockDisconnectSkydiver );
+        mockDisconnectSkydiverButton.setOnClickListener( new View.OnClickListener() {
+            
+            @Override
+            public void onClick( View v ) {
+                int index = (int)(Math.random()*skyDiversMock.size());
+                if (index < skyDiversMock.size()) {
+                    SkyDiver sd = skyDiversMock.get( index );
+                    SkyDiver newInfoSD = SkyDiver.serialiseSkyDiverFromString( sd.toString() );
+                    newInfoSD.setConnectivityStrength( SDConnectivity.CONNECTION_LOST );
+                    onNewSkydiverInfo( newInfoSD );
+                    skyDiversMock.set( index, newInfoSD );
+                }
                 
             }
         } );
-
     }
 
     @Override
@@ -83,8 +104,7 @@ public class SkyDivingSessionActivity extends Activity implements EnvironmentUpd
     @Override
     public void onNewSkydiverInfo( SkyDiver skydiver ) {
         sdListAdapter.onNewSkydiverInfo( skydiver );
-        SpeechCommunicationManager scm = SpeechCommunicationManager.getInstance();
-        scm.getProximityWarning( this );
+        
     }
 
     @Override

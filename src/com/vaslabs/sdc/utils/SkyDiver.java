@@ -92,6 +92,8 @@ public class SkyDiver implements PositionalUpdate {
     @Override
     public synchronized void updatePositionInformation( Position newPosition ) {
 
+        if (newPosition == null)
+            return;
         if ( lastKnownPosition == null ) {
             lastKnownPosition =
                     new Position( newPosition.getLng(), newPosition.getLat(),
