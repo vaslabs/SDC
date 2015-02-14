@@ -16,7 +16,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:keepScreenOn="true" />
+        android:keepScreenOn="true">
+        
+        <ListView 
+            android:id="@+id/skydiversListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>       
+        </RelativeLayout>
 
     <!--
          This FrameLayout insets its children based on system windows using
