@@ -1,5 +1,6 @@
 package com.vaslabs.sdc.ui.util;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,19 +16,30 @@ import com.vaslabs.sdc.utils.SkyDiverEnvironmentUpdate;
 import com.vaslabs.sdc.utils.SkyDiverPersonalUpdates;
 import com.vaslabs.sdc.utils.SkyDiverPositionalComparator;
 
+import android.R.color;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
 
 public class SkyDiverListAdapter extends BaseAdapter implements SkyDiverEnvironmentUpdate, SkyDiverPersonalUpdates {
 
     private Map<String, SkyDiver> knownSkyDivers;
     private List<SkyDiver> knownSkyDiversList;
     private SkyDiver me;
+    private int[] colors;
+    private int defaultColor = Color.CYAN;
     public SkyDiverListAdapter(SkyDiver me) {
         knownSkyDivers = new HashMap<String, SkyDiver>();
+        knownSkyDiversList = new ArrayList<SkyDiver>();
         this.me = me;
+        colors = new int[SDConnectivity.values().length];
+        colors[SDConnectivity.CONNECTION_LOST.ordinal()] = Color.GRAY;
+        colors[SDConnectivity.WEAK.ordinal()] = Color.YELLOW;
+        colors[SDConnectivity.MEDIUM.ordinal()] = Color.MAGENTA;
+        colors[SDConnectivity.STRONG.ordinal()] = Color.RED;
     }
     
     
@@ -37,20 +49,25 @@ public class SkyDiverListAdapter extends BaseAdapter implements SkyDiverEnvironm
     }
 
     @Override
-    public Object getItem( int position ) {
-        return null;
+    public SkyDiver getItem( int position ) {
+        return knownSkyDiversList.get( position );
     }
 
     @Override
     public long getItemId( int position ) {
         // TODO Auto-generated method stub
-        return 0;
+        return knownSkyDiversList.get( position ).hashCode();
     }
 
     @Override
     public View getView( int position, View convertView, ViewGroup parent ) {
-        // TODO Auto-generated method stub
-        return null;
+        TextView tv = new TextView(parent.getContext());
+        int connectivity = getItem(position).getConnectivityStrengthAsInt();
+        int color = connectivity < colors.length ? colors[connectivity] : defaultColor;
+        tv.setBackgroundColor( color );
+        tv.setText( getItem(position).getName() );
+        
+        return tv;
     }
 
 
@@ -61,8 +78,10 @@ public class SkyDiverListAdapter extends BaseAdapter implements SkyDiverEnvironm
             onSkydiverInfoUpdate( skydiver );
         } else {
             knownSkyDivers.put( skydiver.getName(), skydiver );
+            knownSkyDiversList.add( skydiver );
+            Collections.sort( this.knownSkyDiversList, new SkyDiverPositionalComparator( me )  );;
         }
-        
+        this.notifyDataSetChanged();
     }
 
     @Override

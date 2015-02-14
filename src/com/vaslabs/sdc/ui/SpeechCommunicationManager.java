@@ -29,9 +29,7 @@ public class SpeechCommunicationManager implements TextToSpeech.OnInitListener, 
     
     public void initialiseTextToSpeech(Context c, OnSpeechSuccessListener listener) {
         this.successListener = listener;
-        if (textToSpeech == null) {
-            textToSpeech = new TextToSpeech( c, this );
-        }
+        textToSpeech = new TextToSpeech( c, this );
     }
     
     public void getProximityWarning(Context c) {
@@ -72,6 +70,14 @@ public class SpeechCommunicationManager implements TextToSpeech.OnInitListener, 
 
     public void getTalkingAvailable(Context c) {
         messagesQueue.append( c.getString( R.string.scm_success) );
+    }
+    
+    protected void finalize() {
+        textToSpeech.shutdown();
+    }
+
+    public void shutdown() {
+        textToSpeech.shutdown();
     }
     
 }

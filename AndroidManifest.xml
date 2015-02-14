@@ -49,7 +49,7 @@
             android:name=".SkyDivingSessionActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_sky_diving_session"
-            android:theme="@style/FullscreenTheme" >
+             >
         </activity>
     </application>
 

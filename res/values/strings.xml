@@ -20,4 +20,5 @@
     <string name="scm_success">Speech interface has been successfully initialised.</string>
     <string name="title_activity_sky_diving_session">SkyDivingSessionActivity</string>
     <string name="skydivingsession">Start skydiving session</string>
+    <string name="mock_skydiver_addition">Simulation: add skydiver</string>
 </resources>
