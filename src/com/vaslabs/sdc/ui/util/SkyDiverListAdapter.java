@@ -1,20 +1,33 @@
-package com.vaslabs.sdc.utils;
+package com.vaslabs.sdc.ui.util;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.vaslabs.sdc.sensors.HPASensorValue;
+import com.vaslabs.sdc.sensors.LatitudeSensorValue;
+import com.vaslabs.sdc.sensors.LongitudeSensorValue;
+import com.vaslabs.sdc.sensors.MetersSensorValue;
+import com.vaslabs.sdc.utils.SDConnectivity;
+import com.vaslabs.sdc.utils.SkyDiver;
+import com.vaslabs.sdc.utils.SkyDiverEnvironmentUpdate;
+import com.vaslabs.sdc.utils.SkyDiverPersonalUpdates;
+import com.vaslabs.sdc.utils.SkyDiverPositionalComparator;
+
+import android.hardware.Sensor;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-public class SkyDiverListAdapter extends BaseAdapter implements SkyDiverEnvironmentUpdate {
+public class SkyDiverListAdapter extends BaseAdapter implements SkyDiverEnvironmentUpdate, SkyDiverPersonalUpdates {
 
     private Map<String, SkyDiver> knownSkyDivers;
     private List<SkyDiver> knownSkyDiversList;
-    
-    public SkyDiverListAdapter() {
-        knownSkyDivers = new HashMap<String, SkyDiver>();    
+    private SkyDiver me;
+    public SkyDiverListAdapter(SkyDiver me) {
+        knownSkyDivers = new HashMap<String, SkyDiver>();
+        this.me = me;
     }
     
     
@@ -62,7 +75,7 @@ public class SkyDiverListAdapter extends BaseAdapter implements SkyDiverEnvironm
                 onConnectivityChange( skydiver );
             } else {
                 previouslyKnownSkyDiver.updatePositionInformation( skydiver.getPosition() );
-                Collections.sort( this.knownSkyDiversList );
+                Collections.sort( this.knownSkyDiversList, new SkyDiverPositionalComparator( me )  );
                 //also speed && direction which are not yet available TODO
             }
         }
@@ -94,6 +107,20 @@ public class SkyDiverListAdapter extends BaseAdapter implements SkyDiverEnvironm
             sd.setConnectivityStrength( SDConnectivity.CONNECTION_LOST );
             //possibly do a warning implementation here.
         }
+    }
+
+
+    @Override
+    public synchronized void onAltitudeUpdate( MetersSensorValue hpa ) {
+        me.getPosition().setAlt( hpa );
+    }
+
+
+    @Override
+    public synchronized void onGPSUpdate( LatitudeSensorValue lat, LongitudeSensorValue lng ) {
+        me.getPosition().setLat( lat );
+        me.getPosition().setLng( lng );
+        
     }
 
 }
