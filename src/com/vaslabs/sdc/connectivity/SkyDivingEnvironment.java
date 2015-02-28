@@ -90,6 +90,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements SkyDivingInform
             SpeechCommunicationManager scm = SpeechCommunicationManager.getInstance();
             scm.getProximityWarning( context );
         }
+        this.notifyDataSetChanged();
     }
 
     @Override
