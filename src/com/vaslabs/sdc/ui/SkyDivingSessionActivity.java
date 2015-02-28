@@ -110,7 +110,7 @@ public class SkyDivingSessionActivity extends Activity {
         mReceiver = new WirelessBroadcastReceiver(mManager, mChannel, this);
         //initialise environment
         SkyDivingEnvironment.getInstance( this );
-        mManager.discoverPeers( mChannel, new WifiActionListener( this ) );
+        mManager.discoverPeers( mChannel, new WifiActionListener( mManager, mChannel ) );
         
     }
     
@@ -125,19 +125,21 @@ public class SkyDivingSessionActivity extends Activity {
 
 class WifiActionListener implements WifiP2pManager.ActionListener {
 
-    private Context context;
-    public WifiActionListener(Context context) {
-        this.context = context;
+    private WifiP2pManager manager;
+    private Channel channel;
+    public WifiActionListener(WifiP2pManager manager, Channel channel) {
+        this.manager = manager;
+        this.channel = channel;
     }
     
     @Override
     public void onFailure( int reason ) {
-        
+        manager.discoverPeers( channel, this );
     }
 
     @Override
     public void onSuccess() {
-        
+        manager.discoverPeers( channel, this );
     }
     
 }

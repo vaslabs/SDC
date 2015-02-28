@@ -15,6 +15,7 @@ public class SpeechCommunicationManager implements TextToSpeech.OnInitListener, 
     private TextToSpeech textToSpeech;
     private DynamicQueue<String> messagesQueue;
     private OnSpeechSuccessListener successListener;
+    private boolean canTalk = false;
     
     private SpeechCommunicationManager() {
         messagesQueue = new EventBasedDynamicQueue<String>( this );
@@ -38,7 +39,7 @@ public class SpeechCommunicationManager implements TextToSpeech.OnInitListener, 
             return;
         }
         String textMessage = c.getString( R.string.proximity_warning );
-        messagesQueue.append( textMessage );
+        messagesQueue.appendInFront( textMessage );
     }
 
     @Override
@@ -54,13 +55,13 @@ public class SpeechCommunicationManager implements TextToSpeech.OnInitListener, 
     }
 
     @Override
-    public <T> void onEventAdded( DynamicQueue<T> queue ) {
+    public synchronized <T> void onEventAdded( DynamicQueue<T> queue ) {
         if (textToSpeech == null) {
-            //warn TODO
             return;
         }
         while (queue.size() > 0) {
-            textToSpeech.speak( queue.pop().toString(), TextToSpeech.QUEUE_ADD, null );
+            if (canTalk)
+                textToSpeech.speak( queue.pop().toString(), TextToSpeech.QUEUE_ADD, null );
         }
         
     }
@@ -70,7 +71,11 @@ public class SpeechCommunicationManager implements TextToSpeech.OnInitListener, 
     }
 
     public void getTalkingAvailable(Context c) {
-        messagesQueue.append( c.getString( R.string.scm_success) );
+        boolean talkedBefore = canTalk;
+        canTalk  = true;
+        
+        if (!talkedBefore)
+            messagesQueue.append( c.getString( R.string.scm_success) );
     }
     
     protected void finalize() {

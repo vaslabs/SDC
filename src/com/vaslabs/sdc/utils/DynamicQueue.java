@@ -34,9 +34,16 @@ public class DynamicQueue<T>{
         return oldHead.getContent();
     }
 
-    public int size() {
+    public synchronized int size() {
         
         return size;
+    }
+
+    public synchronized void appendInFront( T textMessage ) {
+        Node<T> newHead = new Node<T>(textMessage);
+        newHead.setNext( head );
+        head = newHead;
+        size++;
     }
 }
 

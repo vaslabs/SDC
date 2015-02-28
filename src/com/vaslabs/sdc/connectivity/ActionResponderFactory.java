@@ -10,7 +10,7 @@ public class ActionResponderFactory {
     
     public static ConnectivityActionResponder getResponder( String action, Context c ) {
         if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals( action )) {
-            return new StateChangedConnectivityActionResponder();
+            return peersChangedAction;
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             return peersChangedAction;
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {

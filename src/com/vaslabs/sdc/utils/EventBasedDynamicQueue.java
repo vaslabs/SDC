@@ -13,4 +13,10 @@ public class EventBasedDynamicQueue<T> extends DynamicQueue<T> {
         super.append(obj);
         eventListener.onEventAdded(this);
     }
+    
+    @Override
+    public void appendInFront(T obj) {
+        super.appendInFront( obj );
+        eventListener.onEventAdded( this );
+    }
 }

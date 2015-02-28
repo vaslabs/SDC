@@ -112,6 +112,12 @@ public class SkyDivingEnvironment extends BaseAdapter implements
             onLooseConnection( skydiver );
         } else {
             SkyDiver sd = skydivers.get( skydiver.getName() );
+            if (sd.getConnectivityStrengthAsInt() == SDConnectivity.CONNECTION_LOST.ordinal())
+            {
+                SpeechCommunicationManager scm =
+                        SpeechCommunicationManager.getInstance();
+                scm.getProximityWarning( context );   
+            }
             if ( sd != null ) {
                 sd.setConnectivityStrength( SDConnectivity.values()[skydiver
                         .getConnectivityStrengthAsInt()] );
