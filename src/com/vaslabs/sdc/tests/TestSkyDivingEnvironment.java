@@ -1,8 +1,5 @@
 package com.vaslabs.sdc.tests;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import com.vaslabs.sdc.UserInformation;
 import com.vaslabs.sdc.UserPreferences;
@@ -10,7 +7,6 @@ import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
 import com.vaslabs.sdc.ui.SpeechCommunicationManager;
 import com.vaslabs.sdc.utils.SDConnectivity;
 import com.vaslabs.sdc.utils.SkyDiver;
-import com.vaslabs.sdc.utils.SkyDiverPositionalComparator;
 
 import android.test.AndroidTestCase;
 
@@ -44,7 +40,6 @@ public class TestSkyDivingEnvironment extends AndroidTestCase {
     }
     
     public void test_that_skydivers_are_sorted_via_connectivity_strength() {
-        List<SkyDiver> skydivers = new ArrayList<SkyDiver>();
         SkyDiver me = new SkyDiver(UserInformation.getUserInfo( this.mContext ));
         UserPreferences up = new UserPreferences();
         
@@ -54,11 +49,8 @@ public class TestSkyDivingEnvironment extends AndroidTestCase {
         SkyDiver bobSD = SkyDiver.serialiseSkyDiverFromString( "Bob:60.00|1012.12|null|null|null" );
         SkyDiver aliceSD = SkyDiver.serialiseSkyDiverFromString( "Alice:60.00|1012.12|null|null|null" );
         
-        skydivers.add( joeSD );
-        skydivers.add( mikeSD );
-        skydivers.add( nickSD );
-        skydivers.add( bobSD );
-        skydivers.add( aliceSD );
+        SkyDivingEnvironment environment = SkyDivingEnvironment.getInstance( this.mContext );
+        
         
         joeSD.setConnectivityStrength( SDConnectivity.MEDIUM );
         mikeSD.setConnectivityStrength( SDConnectivity.CONNECTION_LOST );
@@ -66,11 +58,16 @@ public class TestSkyDivingEnvironment extends AndroidTestCase {
         bobSD.setConnectivityStrength( SDConnectivity.STRONG );
         aliceSD.setConnectivityStrength( SDConnectivity.STRONG );
         
-        Collections.sort( skydivers, new SkyDiverPositionalComparator(me) );
+        environment.onNewSkydiverInfo( joeSD );
+        environment.onNewSkydiverInfo( mikeSD );
+        environment.onNewSkydiverInfo( nickSD );
+        environment.onNewSkydiverInfo( bobSD );
+        environment.onNewSkydiverInfo( aliceSD );
         
-        for (int i = 1; i < skydivers.size(); i++) {
-            assertTrue(skydivers.get( i-1 ).getConnectivityStrengthAsInt() >= 
-                        skydivers.get( i ).getConnectivityStrengthAsInt());
+        
+        for (int i = 1; i < environment.getCount(); i++) {
+            assertTrue(environment.getItem( i ).getConnectivityStrengthAsInt() >= 
+                        environment.getItem( i ).getConnectivityStrengthAsInt());
         }
         
     }

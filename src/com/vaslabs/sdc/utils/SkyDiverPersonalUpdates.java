@@ -5,6 +5,6 @@ import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
 
 public interface SkyDiverPersonalUpdates {
-    void onAltitudeUpdate(MetersSensorValue hpa);
-    void onGPSUpdate(LatitudeSensorValue lat, LongitudeSensorValue lon);
+    void onMyAltitudeUpdate(MetersSensorValue hpa);
+    void onMyGPSUpdate( LatitudeSensorValue lat, LongitudeSensorValue lng );
 }

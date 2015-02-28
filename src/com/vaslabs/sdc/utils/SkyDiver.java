@@ -14,7 +14,7 @@ import com.vaslabs.sdc.sensors.MetersSensorValue;
 public class SkyDiver implements PositionalUpdate {
     private UserInformation userInformation;
     private Position lastKnownPosition;
-    private SDConnectivity connectivityStrength;
+    private SDConnectivity connectivityStrength = SDConnectivity.CONNECTION_LOST;
     public SkyDiver( UserInformation ui ) {
         userInformation = UserInformation.getUserInformationClone( ui );
     }

@@ -3,10 +3,7 @@ package com.vaslabs.sdc.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vaslabs.sdc.UserInformation;
-import com.vaslabs.sdc.sensors.HPASensorValue;
-import com.vaslabs.sdc.ui.util.SkyDiverListAdapter;
-import com.vaslabs.sdc.utils.Position;
+import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
 import com.vaslabs.sdc.utils.SDConnectivity;
 import com.vaslabs.sdc.utils.SkyDiver;
 
@@ -23,7 +20,7 @@ import android.widget.TextView;
  * 
  * @see SystemUiHider
  */
-public class SkyDivingSessionActivity extends Activity implements EnvironmentUpdate, OnSpeechSuccessListener {
+public class SkyDivingSessionActivity extends Activity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -33,10 +30,9 @@ public class SkyDivingSessionActivity extends Activity implements EnvironmentUpd
     private TextView barometerTextView;
     private TextView altimeterTextView;
     private TextView gpsPositionTextView;
-    private SkyDiverListAdapter sdListAdapter;
+    private SkyDivingEnvironment environment;
     private Button mockDisconnectSkydiverButton;
     private List<SkyDiver> skyDiversMock;
-    private static final boolean AUTO_HIDE = true;
 
 
     @Override
@@ -57,11 +53,11 @@ public class SkyDivingSessionActivity extends Activity implements EnvironmentUpd
         
         connectedSkydiversListView = (ListView)findViewById( R.id.skydiversListView );
         mockAddSkydiverButton = (Button)findViewById(R.id.mockAddingSkydiver);
-        sdListAdapter = new SkyDiverListAdapter( new SkyDiver(UserInformation.getUserInfo( this )), this );
-        connectedSkydiversListView.setAdapter( sdListAdapter );
+        environment = SkyDivingEnvironment.getInstance( this );
+        connectedSkydiversListView.setAdapter( environment );
         
         SpeechCommunicationManager scm = SpeechCommunicationManager.getInstance();
-        scm.initialiseTextToSpeech( this, this );
+        scm.initialiseTextToSpeech( this, environment );
         mockAddSkydiverButton.setOnClickListener( new View.OnClickListener() {
             
             @Override
@@ -71,7 +67,7 @@ public class SkyDivingSessionActivity extends Activity implements EnvironmentUpd
                 int connectivity = (int)(Math.random()*(connectivityValues.length - 1)) + 1;
                 SkyDiver sd = SkyDiver.serialiseSkyDiverFromString( id + ":50.00|1014.12|null|null|null" );
                 sd.setConnectivityStrength( connectivityValues[connectivity] );
-                onNewSkydiverInfo( sd );
+                environment.onNewSkydiverInfo( sd );
                 skyDiversMock.add( sd );
             }
         } );
@@ -86,7 +82,7 @@ public class SkyDivingSessionActivity extends Activity implements EnvironmentUpd
                     SkyDiver sd = skyDiversMock.get( index );
                     SkyDiver newInfoSD = SkyDiver.serialiseSkyDiverFromString( sd.toString() );
                     newInfoSD.setConnectivityStrength( SDConnectivity.CONNECTION_LOST );
-                    onNewSkydiverInfo( newInfoSD );
+                    environment.onNewSkydiverInfo( newInfoSD );
                     skyDiversMock.set( index, newInfoSD );
                 }
                 
@@ -94,60 +90,8 @@ public class SkyDivingSessionActivity extends Activity implements EnvironmentUpd
         } );
     }
 
-    @Override
-    protected void onPostCreate( Bundle savedInstanceState ) {
-        super.onPostCreate( savedInstanceState );
 
-    }
-
-
-    @Override
-    public void onNewSkydiverInfo( SkyDiver skydiver ) {
-        sdListAdapter.onNewSkydiverInfo( skydiver );
-        
-    }
-
-    @Override
-    public void onSkydiverInfoUpdate( SkyDiver skydiver ) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void onConnectivityChange( SkyDiver skydiver ) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void onLooseConnection( SkyDiver skydiver ) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void onBarometerValueChange( HPASensorValue hpaValue ) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void onGPSUpdate( Position newKnownPosition ) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void onSuccess() {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void onFailure() {
-        // TODO Auto-generated method stub
-        
-    }
+    
     
     
 }
