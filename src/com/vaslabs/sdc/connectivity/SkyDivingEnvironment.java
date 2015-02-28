@@ -25,7 +25,7 @@ import com.vaslabs.sdc.utils.SkyDiverEnvironmentUpdate;
 import com.vaslabs.sdc.utils.SkyDiverPersonalUpdates;
 import com.vaslabs.sdc.utils.SkyDiverPositionalComparator;
 
-public class SkyDivingEnvironment extends BaseAdapter implements SkyDivingInformationListener,
+public class SkyDivingEnvironment extends BaseAdapter implements
         OnSpeechSuccessListener, SkyDiverEnvironmentUpdate,
         SkyDiverPersonalUpdates {
     private Map<String, SkyDiver> skydivers;
@@ -35,9 +35,10 @@ public class SkyDivingEnvironment extends BaseAdapter implements SkyDivingInform
     private static SkyDivingEnvironment environmentInstance = null;
     private SpeechCommunicationManager scm;
     private final int[] colors = SkyDiverListAdapterHelper.getColors();
-    private final int defaultColor = SkyDiverListAdapterHelper.getDefaultColor();
-    
-    private SkyDivingEnvironment(Context context) {
+    private final int defaultColor = SkyDiverListAdapterHelper
+            .getDefaultColor();
+
+    private SkyDivingEnvironment( Context context ) {
         skydivers = new HashMap<String, SkyDiver>();
         this.context = context;
         UserInformation ui = UserInformation.getUserInfo( context );
@@ -46,48 +47,37 @@ public class SkyDivingEnvironment extends BaseAdapter implements SkyDivingInform
         scm.initialiseTextToSpeech( context, this );
         skydiversList = new ArrayList<SkyDiver>();
     }
-    
-    public synchronized static SkyDivingEnvironment getInstance(Context c) {
-        if ( environmentInstance == null) {
-            environmentInstance = new SkyDivingEnvironment(c);
+
+    public synchronized static SkyDivingEnvironment getInstance( Context c ) {
+        if ( environmentInstance == null ) {
+            environmentInstance = new SkyDivingEnvironment( c );
         }
         return environmentInstance;
-    }
-    
-    @Override
-    public void onNewSkydiverInformation( SkyDiver skydiver ) {
-        synchronized (skydiver) {
-            if (skydivers.containsKey( skydiver.getName() )) {
-                skydiver.updatePositionInformation( skydiver.getPosition() );
-            } else {
-                skydivers.put(skydiver.getName(), skydiver );
-                skydiversList.add(skydiver);
-                scm.getProximityWarning( context );
-            }
-        }
     }
 
     @Override
     public void onSuccess() {
-        scm.getTalkingAvailable(context);
-        
+        scm.getTalkingAvailable( context );
+
     }
 
     @Override
     public void onFailure() {
         // TODO warning
-        
+
     }
-    
+
     @Override
     public synchronized void onNewSkydiverInfo( SkyDiver skydiver ) {
-        if (skydivers.containsKey( skydiver.getName() )) {
+        if ( skydivers.containsKey( skydiver.getName() ) ) {
             onSkydiverInfoUpdate( skydiver );
         } else {
             skydivers.put( skydiver.getName(), skydiver );
             skydiversList.add( skydiver );
-            Collections.sort( this.skydiversList, new SkyDiverPositionalComparator( myself )  );
-            SpeechCommunicationManager scm = SpeechCommunicationManager.getInstance();
+            Collections.sort( this.skydiversList,
+                    new SkyDiverPositionalComparator( myself ) );
+            SpeechCommunicationManager scm =
+                    SpeechCommunicationManager.getInstance();
             scm.getProximityWarning( context );
         }
         this.notifyDataSetChanged();
@@ -95,67 +85,69 @@ public class SkyDivingEnvironment extends BaseAdapter implements SkyDivingInform
 
     @Override
     public synchronized void onSkydiverInfoUpdate( SkyDiver skydiver ) {
-        if (!this.skydivers.containsKey( skydiver.getName() )) {
+        if ( !this.skydivers.containsKey( skydiver.getName() ) ) {
             onNewSkydiverInfo( skydiver );
         } else {
-            SkyDiver previouslyKnownSkyDiver = this.skydivers.get( skydiver.getName());
-            if (skydiver.getConnectivityStrengthAsInt() != previouslyKnownSkyDiver.getConnectivityStrengthAsInt()) {
+            SkyDiver previouslyKnownSkyDiver =
+                    this.skydivers.get( skydiver.getName() );
+            if ( skydiver.getConnectivityStrengthAsInt() != previouslyKnownSkyDiver
+                    .getConnectivityStrengthAsInt() ) {
                 onConnectivityChange( skydiver );
             } else {
-                previouslyKnownSkyDiver.updatePositionInformation( skydiver.getPosition() );
-                Collections.sort( this.skydiversList, new SkyDiverPositionalComparator( myself )  );
-                //also speed && direction which are not yet available TODO
+                previouslyKnownSkyDiver.updatePositionInformation( skydiver
+                        .getPosition() );
+                Collections.sort( this.skydiversList,
+                        new SkyDiverPositionalComparator( myself ) );
+                // also speed && direction which are not yet available TODO
             }
         }
         this.notifyDataSetChanged();
     }
-
-
 
     @Override
     public synchronized void onConnectivityChange( SkyDiver skydiver ) {
-        
-        if (skydiver.getConnectivityStrengthAsInt() == SDConnectivity.CONNECTION_LOST.ordinal()) {
-            onLooseConnection(skydiver);
+
+        if ( skydiver.getConnectivityStrengthAsInt() == SDConnectivity.CONNECTION_LOST
+                .ordinal() ) {
+            onLooseConnection( skydiver );
         } else {
             SkyDiver sd = skydivers.get( skydiver.getName() );
-            if (sd != null) {
-                sd.setConnectivityStrength( 
-                        SDConnectivity.values()[skydiver.getConnectivityStrengthAsInt()] );
+            if ( sd != null ) {
+                sd.setConnectivityStrength( SDConnectivity.values()[skydiver
+                        .getConnectivityStrengthAsInt()] );
             }
         }
-        
-        Collections.sort( this.skydiversList, new SkyDiverPositionalComparator( myself )  );
+
+        Collections.sort( this.skydiversList, new SkyDiverPositionalComparator(
+                myself ) );
 
         this.notifyDataSetChanged();
     }
-
-
 
     @Override
     public synchronized void onLooseConnection( SkyDiver skydiver ) {
         SkyDiver sd = skydivers.get( skydiver.getName() );
-        if (sd != null) {
+        if ( sd != null ) {
             SpeechCommunicationManager.getInstance().informAboutdisconnection(
-                    SDConnectivity.values()[sd.getConnectivityStrengthAsInt()], context);
+                    SDConnectivity.values()[sd.getConnectivityStrengthAsInt()],
+                    context );
             sd.setConnectivityStrength( SDConnectivity.CONNECTION_LOST );
         }
 
         this.notifyDataSetChanged();
     }
 
-
     @Override
     public synchronized void onMyAltitudeUpdate( MetersSensorValue hpa ) {
         myself.getPosition().setAlt( hpa );
     }
 
-
     @Override
-    public synchronized void onMyGPSUpdate( LatitudeSensorValue lat, LongitudeSensorValue lng ) {
+    public synchronized void onMyGPSUpdate( LatitudeSensorValue lat,
+            LongitudeSensorValue lng ) {
         myself.getPosition().setLat( lat );
         myself.getPosition().setLng( lng );
-        
+
     }
 
     public int getOtherSkyDiversSize() {
@@ -183,12 +175,24 @@ public class SkyDivingEnvironment extends BaseAdapter implements SkyDivingInform
 
     @Override
     public View getView( int position, View convertView, ViewGroup parent ) {
-        TextView tv = new TextView(parent.getContext());
-        int connectivity = getItem(position).getConnectivityStrengthAsInt();
-        int color = connectivity < colors.length ? colors[connectivity] : defaultColor;
+        TextView tv = new TextView( parent.getContext() );
+        int connectivity = getItem( position ).getConnectivityStrengthAsInt();
+        int color =
+                connectivity < colors.length ? colors[connectivity]
+                        : defaultColor;
         tv.setBackgroundColor( color );
-        tv.setText( getItem(position).getName() );
-        
+        tv.setText( getItem( position ).getName() );
+
         return tv;
+    }
+
+    public static SkyDivingEnvironment getInstance() {
+        return environmentInstance;
+    }
+
+    @Override
+    public void onLooseConnection( String skydiverKey ) {
+        SkyDiver sd = skydivers.get( skydiverKey );
+        onLooseConnection( sd );
     }
 }

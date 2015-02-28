@@ -1,12 +1,11 @@
 package com.vaslabs.sdc.utils;
 
 import android.hardware.SensorManager;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.util.Log;
 
 import com.vaslabs.sdc.UserInformation;
 import com.vaslabs.sdc.UserPreferences;
-import com.vaslabs.sdc.sensors.BarometerSensor;
-import com.vaslabs.sdc.sensors.HPASensorValue;
 import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
@@ -179,6 +178,15 @@ public class SkyDiver implements PositionalUpdate {
         return userInformation.getName();
     }
 
-    
+    public static SkyDiver valueOf( WifiP2pDevice device ) {
+        String name = device.deviceName;
+        UserPreferences up = new UserPreferences();
+        up.name = name;
+        UserInformation userInfo = 
+                UserInformation.getUserInformationFromUserPreferences( up );
+        SkyDiver sd = new SkyDiver( userInfo );
+        sd.setConnectivityStrength( SDConnectivity.MEDIUM );
+        return sd;
+    }
 
 }

@@ -1,7 +1,5 @@
 package com.vaslabs.sdc.utils;
 
-import android.location.Location;
-
 public class GeoUtils {
 
     public static double calculateDistance( Position positionA,

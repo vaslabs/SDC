@@ -5,4 +5,5 @@ public interface SkyDiverEnvironmentUpdate {
     void onSkydiverInfoUpdate(SkyDiver skydiver);
     void onConnectivityChange(SkyDiver skydiver);
     void onLooseConnection(SkyDiver skydiver);
+    void onLooseConnection(String skydiverKey);
 }

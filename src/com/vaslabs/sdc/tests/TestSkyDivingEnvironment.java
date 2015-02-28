@@ -19,7 +19,7 @@ public class TestSkyDivingEnvironment extends AndroidTestCase {
         up.name = "Android user";
         
         SkyDiver skydiver = new SkyDiver( UserInformation.getUserInformationFromUserPreferences( up ) );
-        sde.onNewSkydiverInformation( skydiver );
+        sde.onNewSkydiverInfo( skydiver );
         
         try {
             Thread.sleep( 2000 );

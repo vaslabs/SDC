@@ -1,8 +1,5 @@
 package com.vaslabs.sdc.connectivity;
 
-import android.content.Context;
-import android.content.Intent;
-import android.widget.ListView;
 
 /**
  * Manages changes on the discoverable list of peers.
@@ -11,17 +8,7 @@ import android.widget.ListView;
  *
  */
 public class PeersChangedConnectivityActionResponder extends
-        ConnectivityActionResponder<ListView> {
-
-    @Override
-    public void manageAction( Context context, Intent intent ) {
+        ConnectivityActionResponder {
         
-    }
-
-    @Override
-    public ListView getView() {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
 }

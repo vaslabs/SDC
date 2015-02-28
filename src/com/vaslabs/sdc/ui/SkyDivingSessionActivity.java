@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
+import com.vaslabs.sdc.connectivity.WirelessBroadcastReceiver;
 import com.vaslabs.sdc.utils.SDConnectivity;
 import com.vaslabs.sdc.utils.SkyDiver;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pManager;
+import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -33,7 +38,10 @@ public class SkyDivingSessionActivity extends Activity {
     private SkyDivingEnvironment environment;
     private Button mockDisconnectSkydiverButton;
     private List<SkyDiver> skyDiversMock;
-
+    private WifiP2pManager mManager;
+    private Channel mChannel;
+    private WirelessBroadcastReceiver mReceiver;
+    private IntentFilter mIntentFilter;
 
     @Override
     protected void onDestroy() {
@@ -43,6 +51,7 @@ public class SkyDivingSessionActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        unregisterReceiver(mReceiver);
     }
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -88,10 +97,47 @@ public class SkyDivingSessionActivity extends Activity {
                 
             }
         } );
+        
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        
+        
+        mManager = (WifiP2pManager) getSystemService(this.WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+        mReceiver = new WirelessBroadcastReceiver(mManager, mChannel, this);
+        //initialise environment
+        SkyDivingEnvironment.getInstance( this );
+        mManager.discoverPeers( mChannel, new WifiActionListener( this ) );
+        
+    }
+    
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mReceiver, mIntentFilter);
+    }    
+    
+}
+
+class WifiActionListener implements WifiP2pManager.ActionListener {
+
+    private Context context;
+    public WifiActionListener(Context context) {
+        this.context = context;
+    }
+    
+    @Override
+    public void onFailure( int reason ) {
+        
     }
 
-
-    
-    
+    @Override
+    public void onSuccess() {
+        
+    }
     
 }

@@ -17,7 +17,7 @@ import android.widget.ImageButton;
 public class TestWirelessBroadcastReceiverStates extends AndroidTestCase {
 
     public void test_that_correct_instance_is_initialised_from_action() {
-        ConnectivityActionResponder<? extends View> car =
+        ConnectivityActionResponder car =
                 ActionResponderFactory.getResponder(
                         WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION,
                         this.mContext );
@@ -42,34 +42,5 @@ public class TestWirelessBroadcastReceiverStates extends AndroidTestCase {
 
     }
 
-    public void test_on_receive_event_for_wifi_enabled() {
-        ConnectivityActionResponder<? extends View> car =
-                ActionResponderFactory.getResponder(
-                        WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION,
-                        this.mContext );
-        assertFalse( car.stateIsKnown() );
-        Intent intent = new Intent();
-        intent.putExtra( WifiP2pManager.EXTRA_WIFI_STATE,
-                WifiP2pManager.WIFI_P2P_STATE_ENABLED );
-        
-        car.manageAction( mContext, intent );
-        
-        View button = car.getView();
 
-        assertTrue( car.stateIsKnown() );
-        assertTrue( button instanceof ImageButton );
-        
-        Resources resources = button.getResources();
-        try {
-            resources.getDrawable( android.R.drawable.button_onoff_indicator_on );
-        }
-        catch (Resources.NotFoundException nfe) {
-            fail();
-        }
-        try {
-            resources.getDrawable( android.R.drawable.button_onoff_indicator_off );
-        } catch (Resources.NotFoundException nfe) {
-            
-        }
-    }
 }
