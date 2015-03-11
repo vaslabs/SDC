@@ -209,4 +209,8 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         SkyDiver sd = skydivers.get( skydiverKey );
         onLooseConnection( sd );
     }
+
+    public static String getLogFile() {
+        return SkyDivingEnvironmentLogger.LOG_FILE;
+    }
 }
