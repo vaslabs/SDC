@@ -134,12 +134,10 @@ class WifiActionListener implements WifiP2pManager.ActionListener {
     
     @Override
     public void onFailure( int reason ) {
-        manager.discoverPeers( channel, this );
     }
 
     @Override
     public void onSuccess() {
-        manager.discoverPeers( channel, this );
     }
     
 }
