@@ -36,6 +36,7 @@ public class SkyDivingEnvironmentLogger {
         try {
             logStream = context.openFileOutput( LOG_FILE, Context.MODE_APPEND );
             logStream.write( logMsg.getBytes());
+            logStream.write( '\n' );
         } catch ( IOException e ) {
             Log.wtf( LOG_TAG, e.getMessage() );
         } finally {

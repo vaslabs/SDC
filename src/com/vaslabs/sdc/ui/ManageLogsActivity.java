@@ -29,7 +29,7 @@ public class ManageLogsActivity extends Activity {
             StringBuilder content = new StringBuilder(1024);
             String line = null;
             while ((line = reader.readLine()) != null) {
-                content.append( line );
+                content.append( line ).append( '\n' );
             }
             
             logsTextView.setText( content.toString() );
