@@ -40,7 +40,8 @@ public class SkyDivingEnvironmentLogger {
             Log.wtf( LOG_TAG, e.getMessage() );
         } finally {
             try {
-                logStream.close();
+                if (logStream != null)
+                    logStream.close();
             } catch ( IOException e ) {
                 Log.wtf( LOG_TAG, e.getMessage() );
             }
