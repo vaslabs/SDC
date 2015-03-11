@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -28,6 +29,7 @@ import com.vaslabs.sdc.utils.SkyDiverPositionalComparator;
 public class SkyDivingEnvironment extends BaseAdapter implements
         OnSpeechSuccessListener, SkyDiverEnvironmentUpdate,
         SkyDiverPersonalUpdates {
+    private static final String LOG_TAG = "SKYDIVING_ENVIRONMENT";
     private Map<String, SkyDiver> skydivers;
     private List<SkyDiver> skydiversList;
     private SkyDiver myself;
@@ -46,6 +48,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         scm = SpeechCommunicationManager.getInstance();
         scm.initialiseTextToSpeech( context, this );
         skydiversList = new ArrayList<SkyDiver>();
+        SkyDivingEnvironmentLogger.initLogger( context );
     }
 
     public synchronized static SkyDivingEnvironment getInstance( Context c ) {
@@ -71,6 +74,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     public synchronized void onNewSkydiverInfo( SkyDiver skydiver ) {
         if ( skydivers.containsKey( skydiver.getName() ) ) {
             onSkydiverInfoUpdate( skydiver );
+            
         } else {
             skydivers.put( skydiver.getName(), skydiver );
             skydiversList.add( skydiver );
@@ -79,6 +83,8 @@ public class SkyDivingEnvironment extends BaseAdapter implements
             SpeechCommunicationManager scm =
                     SpeechCommunicationManager.getInstance();
             scm.getProximityWarning( context );
+            Log.v( LOG_TAG, "New connection: " + skydiver.toString() );
+            SkyDivingEnvironmentLogger.Log( "New connection: " + skydiver.toString() );
         }
         this.notifyDataSetChanged();
     }
@@ -110,6 +116,8 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         if ( skydiver.getConnectivityStrengthAsInt() == SDConnectivity.CONNECTION_LOST
                 .ordinal() ) {
             onLooseConnection( skydiver );
+            Log.v( LOG_TAG, "Lost connection: " + skydiver.toString() );
+            SkyDivingEnvironmentLogger.Log("Lost connection: " + skydiver.toString());
         } else {
             SkyDiver sd = skydivers.get( skydiver.getName() );
             if (sd.getConnectivityStrengthAsInt() == SDConnectivity.CONNECTION_LOST.ordinal())
