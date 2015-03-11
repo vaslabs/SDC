@@ -48,8 +48,11 @@
         <activity
             android:name=".SkyDivingSessionActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_sky_diving_session"
-             >
+            android:label="@string/title_activity_sky_diving_session" >
+        </activity>
+        <activity
+            android:name=".ManageLogsActivity"
+            android:label="@string/title_activity_manage_logs" >
         </activity>
     </application>
 

@@ -53,6 +53,7 @@ public class MainActivity extends Activity {
     public static class PlaceholderFragment extends Fragment {
 
         private Button skyDivingSessionButton;
+        private Button manageLogsButton;
         public PlaceholderFragment() {
         }
 
@@ -63,6 +64,7 @@ public class MainActivity extends Activity {
                     inflater.inflate( R.layout.fragment_main, container, false );
             
             skyDivingSessionButton = (Button) rootView.findViewById( R.id.skyDivingSessionButton );
+            manageLogsButton = (Button)rootView.findViewById( R.id.manageLogsButton );
             
             skyDivingSessionButton.setOnClickListener( new View.OnClickListener() {
                 
@@ -72,6 +74,15 @@ public class MainActivity extends Activity {
                     startActivity( intent );
                 }
             } );
+            
+            manageLogsButton.setOnClickListener( new View.OnClickListener() {
+                
+                @Override
+                public void onClick( View v ) {
+                    Intent intent = new Intent(v.getContext(), ManageLogsActivity.class);
+                    startActivity(intent);
+                }
+            });
             
             return rootView;
         }
