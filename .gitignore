@@ -24,3 +24,4 @@ proguard/
 
 # Log Files
 *.log
+res/values/uncommited_strings.xml
