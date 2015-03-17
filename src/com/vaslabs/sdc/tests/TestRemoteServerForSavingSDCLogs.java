@@ -1,7 +1,10 @@
 package com.vaslabs.sdc.tests;
 
 
+import org.json.JSONObject;
+
 import com.vaslabs.pwa.CommunicationManager;
+import com.vaslabs.pwa.Response;
 import com.vaslabs.sdc.ui.R;
 
 import android.test.AndroidTestCase;
@@ -20,7 +23,11 @@ public class TestRemoteServerForSavingSDCLogs extends AndroidTestCase {
         CommunicationManager cm = CommunicationManager.getInstance();
         cm.setRemoteHost( mContext.getString( R.string.remote_host ));
         try {
-            cm.signIn( username, password );
+            Response response = cm.signIn( username, password );
+            Object body = response.getBody();
+            assertTrue(body instanceof JSONObject);
+            JSONObject jsBody = (JSONObject)body;
+            assertEquals("INVALID DATA", jsBody.getString( "message" ));
         } catch ( Exception e ) {
            fail(e.toString());
         }
