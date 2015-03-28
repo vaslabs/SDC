@@ -14,7 +14,9 @@ import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -42,6 +44,8 @@ public class SkyDivingSessionActivity extends Activity {
     private Channel mChannel;
     private WirelessBroadcastReceiver mReceiver;
     private IntentFilter mIntentFilter;
+    private int timesBackKeyPressed = 0;
+    private long lastTimeKeyPressed = 0;
 
     @Override
     protected void onDestroy() {
@@ -57,7 +61,8 @@ public class SkyDivingSessionActivity extends Activity {
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
 
-        setContentView( R.layout.activity_sky_diving_session );        
+        setContentView( R.layout.activity_sky_diving_session );
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         skyDiversMock = new ArrayList<SkyDiver>();
         
         connectedSkydiversListView = (ListView)findViewById( R.id.skydiversListView );
@@ -109,9 +114,8 @@ public class SkyDivingSessionActivity extends Activity {
         mChannel = mManager.initialize(this, getMainLooper(), null);
         mReceiver = new WirelessBroadcastReceiver(mManager, mChannel, this);
         //initialise environment
-        SkyDivingEnvironment.getInstance( this );
+        SkyDivingEnvironment.getInstance(this);
         mManager.discoverPeers( mChannel, new WifiActionListener( mManager, mChannel ) );
-        
     }
     
     
@@ -119,7 +123,24 @@ public class SkyDivingSessionActivity extends Activity {
     protected void onResume() {
         super.onResume();
         registerReceiver(mReceiver, mIntentFilter);
-    }    
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            timesBackKeyPressed++;
+            long now = System.currentTimeMillis();
+            if (now - lastTimeKeyPressed < 500 && timesBackKeyPressed >= 3) {
+                finish();
+                return true;
+            } else {
+                lastTimeKeyPressed = now;
+            }
+        }
+
+        return false;
+    }
     
 }
 
