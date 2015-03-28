@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
     <EditText
-        android:id="@+id/username"
+        android:id="@+id/usernameEditText"
         android:inputType="textEmailAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,7 +13,7 @@
         android:layout_marginBottom="4dp"
         android:hint="@string/username_text" />
     <EditText
-        android:id="@+id/password"
+        android:id="@+id/passwordEditText"
         android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
