@@ -16,7 +16,7 @@ public class ActionResponderFactory {
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             return peersChangedAction;
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
-            return new WifiStateChangedConnectivityActionResponder();
+            return peersChangedAction;
         }
         return null;
     }
