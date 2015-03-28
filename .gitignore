@@ -26,4 +26,4 @@ proguard/
 *.log
 res/values/uncommited_strings.xml
 app/src/main/res/values/uncommited_strings.xml
-.idea/workspace.xml
+.idea/
