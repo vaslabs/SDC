@@ -38,7 +38,7 @@ public class TestRemoteServerForSavingSDCLogs extends AndroidTestCase {
     
     public void test_that_logs_can_be_submitted() throws JSONException {
         CommunicationManager cm = CommunicationManager.getInstance();
-        cm.setRemoteHost( mContext.getString( R.string.remote_host ));
+        cm.setRemoteHost( mContext.getString(R.string.remote_host));
         SDCLogManager lm = SDCLogManager.getInstance(mContext);
         try {
             lm.submitLogs(username, password);

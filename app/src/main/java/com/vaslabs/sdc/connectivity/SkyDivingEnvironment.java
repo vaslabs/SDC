@@ -120,16 +120,18 @@ public class SkyDivingEnvironment extends BaseAdapter implements
             SkyDivingEnvironmentLogger.Log("Lost connection: " + skydiver.toString());
         } else {
             SkyDiver sd = skydivers.get( skydiver.getName() );
+            if (sd == null)
+                return;
             if (sd.getConnectivityStrengthAsInt() == SDConnectivity.CONNECTION_LOST.ordinal())
             {
                 SpeechCommunicationManager scm =
                         SpeechCommunicationManager.getInstance();
                 scm.getProximityWarning( context );   
             }
-            if ( sd != null ) {
-                sd.setConnectivityStrength( SDConnectivity.values()[skydiver
-                        .getConnectivityStrengthAsInt()] );
-            }
+
+            sd.setConnectivityStrength( SDConnectivity.values()[skydiver
+                    .getConnectivityStrengthAsInt()] );
+
         }
 
         Collections.sort( this.skydiversList, new SkyDiverPositionalComparator(

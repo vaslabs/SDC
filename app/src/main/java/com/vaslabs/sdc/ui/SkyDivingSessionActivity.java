@@ -14,6 +14,8 @@ import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -46,17 +48,28 @@ public class SkyDivingSessionActivity extends Activity {
     private IntentFilter mIntentFilter;
     private int timesBackKeyPressed = 0;
     private long lastTimeKeyPressed = 0;
+    private PowerManager.WakeLock wakeLock;
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SpeechCommunicationManager.getInstance().shutdown();        
+        try {
+            unregisterReceiver(mReceiver);
+        } catch (RuntimeException re) {
+            Log.d("WirelessReceiver, SDC", re.toString());
+        } finally {
+            try {
+                SpeechCommunicationManager.getInstance().shutdown();
+            } catch (RuntimeException e) {
+                Log.d("Speech, SDC", e.toString());
+            } finally {
+                if (wakeLock != null && wakeLock.isHeld())
+                    wakeLock.release();
+            }
+        }
+
     }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(mReceiver);
-    }
+
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
@@ -116,6 +129,10 @@ public class SkyDivingSessionActivity extends Activity {
         //initialise environment
         SkyDivingEnvironment.getInstance(this);
         mManager.discoverPeers( mChannel, new WifiActionListener( mManager, mChannel ) );
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                "SkyDivingSession");
+        wakeLock.acquire();
     }
     
     
@@ -132,6 +149,10 @@ public class SkyDivingSessionActivity extends Activity {
             timesBackKeyPressed++;
             long now = System.currentTimeMillis();
             if (now - lastTimeKeyPressed < 500 && timesBackKeyPressed >= 3) {
+                unregisterReceiver(mReceiver);
+                SpeechCommunicationManager.getInstance().shutdown();
+                if (wakeLock != null)
+                    wakeLock.release();
                 finish();
                 return true;
             } else {
