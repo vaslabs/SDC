@@ -14,9 +14,14 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.vaslabs.sdc.UserInformation;
+import com.vaslabs.sdc.sensors.BarometerListener;
+import com.vaslabs.sdc.sensors.BarometerSensor;
+import com.vaslabs.sdc.sensors.GPSSensor;
+import com.vaslabs.sdc.sensors.HPASensorValue;
 import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
+import com.vaslabs.sdc.sensors.NoBarometerException;
 import com.vaslabs.sdc.ui.OnSpeechSuccessListener;
 import com.vaslabs.sdc.ui.SpeechCommunicationManager;
 import com.vaslabs.sdc.ui.util.SkyDiverListAdapterHelper;
@@ -25,10 +30,11 @@ import com.vaslabs.sdc.utils.SkyDiver;
 import com.vaslabs.sdc.utils.SkyDiverEnvironmentUpdate;
 import com.vaslabs.sdc.utils.SkyDiverPersonalUpdates;
 import com.vaslabs.sdc.utils.SkyDiverPositionalComparator;
+import com.vaslabs.sdc.logs.PositionGraph;
 
 public class SkyDivingEnvironment extends BaseAdapter implements
         OnSpeechSuccessListener, SkyDiverEnvironmentUpdate,
-        SkyDiverPersonalUpdates {
+        SkyDiverPersonalUpdates, BarometerListener {
     private static final String LOG_TAG = "SKYDIVING_ENVIRONMENT";
     private Map<String, SkyDiver> skydivers;
     private List<SkyDiver> skydiversList;
@@ -36,7 +42,11 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     private Context context;
     private static SkyDivingEnvironment environmentInstance = null;
     private SpeechCommunicationManager scm;
-    private final int[] colors = SkyDiverListAdapterHelper.getColors();
+    private int[] colors = SkyDiverListAdapterHelper.getColors();
+    private BarometerSensor barometerSensor;
+    private GPSSensor gpsSensor;
+    private PositionGraph positionGraph;
+
     private final int defaultColor = SkyDiverListAdapterHelper
             .getDefaultColor();
 
@@ -49,6 +59,8 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         scm.initialiseTextToSpeech( context, this );
         skydiversList = new ArrayList<SkyDiver>();
         SkyDivingEnvironmentLogger.initLogger( context );
+        registerSensors();
+        positionGraph = new PositionGraph();
     }
 
     public synchronized static SkyDivingEnvironment getInstance( Context c ) {
@@ -70,11 +82,28 @@ public class SkyDivingEnvironment extends BaseAdapter implements
 
     }
 
+    private void registerSensors() {
+        try
+        {
+            barometerSensor = new BarometerSensor(this.context);
+            barometerSensor.registerListener(this);
+        } catch (NoBarometerException nbe) {
+            //scm.getNoBarometerWarning();
+        } catch (Exception e) {
+            //scm.getBarometerErrorWarning();
+        }
+        try {
+            gpsSensor = new GPSSensor(this.context);
+        } catch (Exception e) {
+            //scm.getGPSErrorWarning();
+        }
+    }
+
     @Override
     public synchronized void onNewSkydiverInfo( SkyDiver skydiver ) {
         if ( skydivers.containsKey( skydiver.getName() ) ) {
             onSkydiverInfoUpdate( skydiver );
-            
+
         } else {
             skydivers.put( skydiver.getName(), skydiver );
             skydiversList.add( skydiver );
@@ -126,7 +155,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
             {
                 SpeechCommunicationManager scm =
                         SpeechCommunicationManager.getInstance();
-                scm.getProximityWarning( context );   
+                scm.getProximityWarning( context );
             }
 
             sd.setConnectivityStrength( SDConnectivity.values()[skydiver
@@ -214,5 +243,10 @@ public class SkyDivingEnvironment extends BaseAdapter implements
 
     public static String getLogFile() {
         return SkyDivingEnvironmentLogger.LOG_FILE;
+    }
+
+    @Override
+    public void onHPASensorValueChange(HPASensorValue value) {
+        positionGraph.registerValue(value);
     }
 }
