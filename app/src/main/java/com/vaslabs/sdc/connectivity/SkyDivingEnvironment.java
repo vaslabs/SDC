@@ -183,8 +183,8 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     @Override
-    public synchronized void onMyAltitudeUpdate( MetersSensorValue hpa ) {
-        myself.getPosition().setAlt( hpa );
+    public synchronized void onMyAltitudeUpdate( MetersSensorValue altitude ) {
+
     }
 
     @Override
@@ -246,7 +246,8 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     @Override
-    public void onHPASensorValueChange(HPASensorValue value) {
-        positionGraph.registerValue(value);
+    public void onHPASensorValueChange(HPASensorValue pressure, MetersSensorValue altitude) {
+        myself.getPosition().setAlt(altitude);
+        positionGraph.registerBarometerValue(pressure, altitude);
     }
 }

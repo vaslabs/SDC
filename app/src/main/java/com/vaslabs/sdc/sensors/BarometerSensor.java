@@ -69,7 +69,7 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
 
         value.setRawValue( sensorValues[0] );
         if (listener != null) {
-            listener.onHPASensorValueChange( value );
+            listener.onHPASensorValueChange( value, getAltitude() );
         }
 
     }

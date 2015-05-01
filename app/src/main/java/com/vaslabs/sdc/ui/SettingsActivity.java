@@ -5,12 +5,15 @@ import com.vaslabs.sdc.UserPreferences;
 import com.vaslabs.sdc.sensors.BarometerListener;
 import com.vaslabs.sdc.sensors.BarometerSensor;
 import com.vaslabs.sdc.sensors.HPASensorValue;
+import com.vaslabs.sdc.sensors.MetersSensorValue;
+import com.vaslabs.sdc.sensors.NoBarometerException;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class SettingsActivity extends Activity implements BarometerListener {
 
@@ -24,7 +27,7 @@ public class SettingsActivity extends Activity implements BarometerListener {
     private BarometerSensor barometer;
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
-        super.onCreate( savedInstanceState );
+        super.onCreate(savedInstanceState);
         setContentView( R.layout.activity_settings );
         
         massEditText = (EditText) this.findViewById( R.id.massEditText );
@@ -39,9 +42,14 @@ public class SettingsActivity extends Activity implements BarometerListener {
         saveButton = (Button)this.findViewById( R.id.saveButton );
         cancelButton = (Button)this.findViewById( R.id.cancelButton );
         
-        barometer = new BarometerSensor( this );
-        barometer.registerListener( this );
-        
+        try {
+            barometer = new BarometerSensor(this);
+
+            barometer.registerListener(this);
+        }
+        catch (NoBarometerException nbe) {
+            Toast.makeText(this, nbe.toString(), Toast.LENGTH_SHORT).show();
+        }
         saveButton.setOnClickListener( new View.OnClickListener() {
             
             @Override
@@ -93,7 +101,7 @@ public class SettingsActivity extends Activity implements BarometerListener {
     }
 
     @Override
-    public void onHPASensorValueChange( HPASensorValue value ) {
-        currentPressureButton.setText( value.toString() );
+    public void onHPASensorValueChange( HPASensorValue pressure, MetersSensorValue altitude) {
+        currentPressureButton.setText(pressure.toString());
     }
 }

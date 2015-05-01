@@ -4,6 +4,7 @@ import android.test.AndroidTestCase;
 
 import com.vaslabs.sdc.logs.PositionGraph;
 import com.vaslabs.sdc.sensors.HPASensorValue;
+import com.vaslabs.sdc.sensors.MetersSensorValue;
 
 /**
  * Created by vasilis on 04/04/2015.
@@ -17,14 +18,14 @@ public class TestPositionGraph extends AndroidTestCase {
 
 
     public void test_that_values_are_converted_to_byte_stream() {
-        HPASensorValue value = new HPASensorValue();
+        MetersSensorValue value = new MetersSensorValue();
         value.setRawValue(1.0f);
         long currentTime1 = System.currentTimeMillis();
-        positionGraph.registerValue(value);
-        value = new HPASensorValue();
+        positionGraph.registerBarometerValue(new HPASensorValue(), value);
+        value = new MetersSensorValue();
         value.setRawValue(2f);
         long currentTime2 = System.currentTimeMillis();
-        positionGraph.registerValue(value);
+        positionGraph.registerBarometerValue(new HPASensorValue(), value);
         byte[] byteStream = positionGraph.getBarometerData();
         long firstTimeRegistration = 0;
         for (int i = 0; i < 8; i++) {

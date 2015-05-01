@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.HashMap;
 import com.vaslabs.sdc.sensors.HPASensorValue;
 import com.vaslabs.sdc.sensors.LocationSensorValue;
+import com.vaslabs.sdc.sensors.MetersSensorValue;
 
 import java.util.HashMap;
 
@@ -11,16 +12,21 @@ import java.util.HashMap;
  * Created by vasilis on 04/04/2015.
  */
 public final class PositionGraph {
-    private Map<Long, HPASensorValue> barometerValues;
+    //private Map<Long, HPASensorValue> barometerPressureValues;
+    private Map<Long, MetersSensorValue> barometerAltitudeValues;
     private Map<Long, LocationSensorValue> gpsValues;
     public PositionGraph() {
-        barometerValues = new HashMap<Long, HPASensorValue>();
+        barometerAltitudeValues = new HashMap<Long, MetersSensorValue>();
+        //barometerPressureValues = new HashMap<Long, HPASensorValue>();
         gpsValues = new HashMap<Long, LocationSensorValue>();
     }
 
-    public synchronized void registerValue(HPASensorValue sensorValue) {
-        barometerValues.put(System.currentTimeMillis(), sensorValue);
+    public synchronized void registerBarometerValue(HPASensorValue pressure, MetersSensorValue altitude) {
+        long now = System.currentTimeMillis();
+        barometerAltitudeValues.put(now, altitude);
+        //barometerPressureValues.put(now, pressure);
     }
+
 
 
     /**
@@ -30,19 +36,19 @@ public final class PositionGraph {
      point of time
      */
     public synchronized byte[] getBarometerData() {
-        byte[] data = new byte[barometerValues.size()*4*8];
+        byte[] data = new byte[barometerAltitudeValues.size()*4*8];
         int index = 0;
         byte nextByte;
         float sensorValue;
         long ts;
-        for (Long timestamp : barometerValues.keySet()) {
+        for (Long timestamp : barometerAltitudeValues.keySet()) {
             ts = timestamp;
             for (int i = 0; i < 8; i++) {
                 nextByte = (byte) (ts & 0xff);
                 data[index++] = nextByte;
                 ts = ts >>> 8;
             }
-            sensorValue = barometerValues.get(timestamp).getRawValue();
+            sensorValue = barometerAltitudeValues.get(timestamp).getRawValue();
             int sensorValueBits = Float.floatToIntBits(sensorValue);
             for (int i = 0; i < 4; i++) {
                 nextByte = (byte) (sensorValueBits & 0xff);
