@@ -47,6 +47,9 @@ public class SkyDivingSessionActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        SkyDivingEnvironment sde = SkyDivingEnvironment.getInstance();
+        if (sde != null)
+            sde.writeSensorLogs();
         try {
             unregisterReceiver(mReceiver);
         } catch (RuntimeException re) {

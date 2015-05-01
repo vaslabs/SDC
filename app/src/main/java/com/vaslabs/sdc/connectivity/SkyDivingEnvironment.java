@@ -1,10 +1,17 @@
 package com.vaslabs.sdc.connectivity;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import android.content.Context;
 import android.util.Log;
@@ -121,7 +128,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     @Override
     public synchronized void onSkydiverInfoUpdate( SkyDiver skydiver ) {
         if ( !this.skydivers.containsKey( skydiver.getName() ) ) {
-            onNewSkydiverInfo( skydiver );
+            onNewSkydiverInfo(skydiver);
         } else {
             SkyDiver previouslyKnownSkyDiver =
                     this.skydivers.get( skydiver.getName() );
@@ -155,7 +162,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
             {
                 SpeechCommunicationManager scm =
                         SpeechCommunicationManager.getInstance();
-                scm.getProximityWarning( context );
+                scm.getProximityWarning(context);
             }
 
             sd.setConnectivityStrength( SDConnectivity.values()[skydiver
@@ -200,7 +207,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     public SkyDiver getSkyDiver( int position ) {
-        return skydiversList.get( position );
+        return skydiversList.get(position);
     }
 
     @Override
@@ -210,7 +217,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
 
     @Override
     public SkyDiver getItem( int position ) {
-        return skydiversList.get( position );
+        return skydiversList.get(position);
     }
 
     @Override
@@ -249,5 +256,71 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     public void onHPASensorValueChange(HPASensorValue pressure, MetersSensorValue altitude) {
         myself.getPosition().setAlt(altitude);
         positionGraph.registerBarometerValue(pressure, altitude);
+    }
+
+    public void writeSensorLogs() {
+        FileOutputStream logStream = null;
+        try {
+            logStream = context.openFileOutput(PositionGraph.LOG_FILE, Context.MODE_APPEND);
+        } catch (FileNotFoundException fnfe) {
+            return;
+        }
+
+        try {
+            logStream.write(positionGraph.getBarometerData());
+        } catch (IOException ioE) {
+
+        } finally {
+            if (logStream != null)
+                try {
+                    logStream.close();
+                } catch (IOException e) {
+
+                }
+        }
+
+    }
+
+    public List<String> getSensorLogsLinesUncompressed() {
+        FileInputStream logStream = null;
+        try {
+            logStream = context.openFileInput(PositionGraph.LOG_FILE);
+        } catch (FileNotFoundException e) {
+            return null;
+        }
+
+        try {
+            List<String> lines = new ArrayList<String>();
+            int result = 0;
+            byte[] timestampBytes = new byte[8];
+            byte[] meterBytes = new byte[4];
+            while (result >= 0) {
+                //first 8 bytes represent timestamp
+
+                result = logStream.read(timestampBytes, 0, 8);
+                if (result <= 0)
+                    break;
+                long timestamp = timestampBytes[0] << 56 |
+                        timestampBytes[1] << 48 |
+                        timestampBytes[2] << 40 |
+                        timestampBytes[3] << 32 |
+                        timestampBytes[4] << 24 |
+                        timestampBytes[5] << 16 |
+                        timestampBytes[6] << 8 |
+                        timestampBytes[7];
+                result = logStream.read(meterBytes, 0, 4);
+                int meterBits = meterBytes[0] << 24 |
+                                 meterBytes[1] << 16 |
+                                 meterBytes[2] << 8 |
+                                 meterBytes[3];
+                float meterValue = Float.intBitsToFloat(meterBits);
+                lines.add(String.valueOf(timestamp) + ":" + String.valueOf(meterValue));
+
+                return lines;
+            }
+        } catch (IOException ioe) {
+            return null;
+        }
+        return null;
     }
 }

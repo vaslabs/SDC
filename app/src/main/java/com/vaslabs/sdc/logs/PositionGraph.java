@@ -15,6 +15,7 @@ public final class PositionGraph {
     //private Map<Long, HPASensorValue> barometerPressureValues;
     private Map<Long, MetersSensorValue> barometerAltitudeValues;
     private Map<Long, LocationSensorValue> gpsValues;
+    public static final String LOG_FILE = "PositionGraph.log";
     public PositionGraph() {
         barometerAltitudeValues = new HashMap<Long, MetersSensorValue>();
         //barometerPressureValues = new HashMap<Long, HPASensorValue>();
@@ -32,7 +33,7 @@ public final class PositionGraph {
     /**
         data are returned in a byte representation format, first
      8 bytes represent the time in milliseconds where the barometer value was register,
-     next 4 bytes is the double representation of the hPa value of the barometer at that
+     next 4 bytes is the double representation of the altitude value of the barometer at that
      point of time
      */
     public synchronized byte[] getBarometerData() {
