@@ -316,11 +316,11 @@ public class SkyDivingEnvironment extends BaseAdapter implements
                 float meterValue = Float.intBitsToFloat(meterBits);
                 lines.add(String.valueOf(timestamp) + ":" + String.valueOf(meterValue));
 
-                return lines;
             }
+
+            return lines;
         } catch (IOException ioe) {
             return null;
         }
-        return null;
     }
 }

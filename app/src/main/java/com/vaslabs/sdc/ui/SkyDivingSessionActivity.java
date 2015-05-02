@@ -47,9 +47,7 @@ public class SkyDivingSessionActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SkyDivingEnvironment sde = SkyDivingEnvironment.getInstance();
-        if (sde != null)
-            sde.writeSensorLogs();
+
         try {
             unregisterReceiver(mReceiver);
         } catch (RuntimeException re) {
@@ -147,9 +145,13 @@ public class SkyDivingSessionActivity extends Activity {
             long now = System.currentTimeMillis();
             if (now - lastTimeKeyPressed < 500 && timesBackKeyPressed >= 3) {
                 unregisterReceiver(mReceiver);
+                SkyDivingEnvironment sde = SkyDivingEnvironment.getInstance();
+                if (sde != null)
+                    sde.writeSensorLogs();
                 SpeechCommunicationManager.getInstance().shutdown();
                 if (wakeLock != null)
                     wakeLock.release();
+
                 finish();
                 return true;
             } else {
