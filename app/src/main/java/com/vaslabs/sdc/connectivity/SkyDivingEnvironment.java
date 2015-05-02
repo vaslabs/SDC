@@ -254,7 +254,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
 
     @Override
     public void onHPASensorValueChange(HPASensorValue pressure, MetersSensorValue altitude) {
-        myself.getPosition().setAlt(altitude);
+        myself.updatePositionInformation(altitude);
         positionGraph.registerBarometerValue(pressure, altitude);
     }
 
@@ -300,19 +300,19 @@ public class SkyDivingEnvironment extends BaseAdapter implements
                 result = logStream.read(timestampBytes, 0, 8);
                 if (result <= 0)
                     break;
-                long timestamp = timestampBytes[0] << 56 |
-                        timestampBytes[1] << 48 |
-                        timestampBytes[2] << 40 |
-                        timestampBytes[3] << 32 |
-                        timestampBytes[4] << 24 |
-                        timestampBytes[5] << 16 |
-                        timestampBytes[6] << 8 |
-                        timestampBytes[7];
+                long timestamp = (timestampBytes[0] & 0x0ff) |
+                        (timestampBytes[1]& 0x0ff) << 8 |
+                        (timestampBytes[2] & 0x0ff) << 16 |
+                        (timestampBytes[3] & 0x0ff) << 24 |
+                        (timestampBytes[4] & 0x0ff) << 32 |
+                        (timestampBytes[5] & 0x0ff) << 40 |
+                        (timestampBytes[6] & 0x0ff) << 48 |
+                        timestampBytes[7] << 54;
                 result = logStream.read(meterBytes, 0, 4);
-                int meterBits = meterBytes[0] << 24 |
-                                 meterBytes[1] << 16 |
-                                 meterBytes[2] << 8 |
-                                 meterBytes[3];
+                int meterBits = (meterBytes[0] & 0x0ff) |
+                        (meterBytes[1] & 0x0ff) << 8 |
+                        (meterBytes[2] & 0x0ff) << 16 |
+                                 meterBytes[3] << 24;
                 float meterValue = Float.intBitsToFloat(meterBits);
                 lines.add(String.valueOf(timestamp) + ":" + String.valueOf(meterValue));
 

@@ -54,22 +54,28 @@ public class SDCLogManager {
         for (String line : logs) {
             jsonLines.put( line );
         }
-        json.accumulate( "log", jsonLines );
+        json.accumulate("log", jsonLines);
         
         return json;
     }
 
     public List<String> loadLogs() throws FileNotFoundException, IOException {
         FileInputStream inputStream = null;
-        inputStream = context.openFileInput( SkyDivingEnvironment.getLogFile() );
-        BufferedReader reader =
-                new BufferedReader( new InputStreamReader( inputStream ) );
-        String line = null;
         List<String> strings = new ArrayList<String>();
-        while ( ( line = reader.readLine() ) != null ) {
-            strings.add( line );
+        BufferedReader reader = null;
+        try {
+            inputStream = context.openFileInput(SkyDivingEnvironment.getLogFile());
+            reader =
+                    new BufferedReader(new InputStreamReader(inputStream));
+            String line = null;
+
+            while ((line = reader.readLine()) != null) {
+                strings.add(line);
+            }
+        } finally {
+            if (reader != null)
+                reader.close();
         }
-        
         return strings;
 
     }

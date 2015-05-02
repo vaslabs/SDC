@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import com.vaslabs.pwa.CommunicationManager;
 import com.vaslabs.pwa.Response;
@@ -45,16 +46,17 @@ public class ManageLogsActivity extends Activity {
         logsTextView = (TextView)findViewById( R.id.logsTextView );
         FileInputStream inputStream = null;
         loginDialog = new LoginDialogFragment();
+        StringBuilder content = new StringBuilder(1024);
         try {
             inputStream = this.openFileInput( SkyDivingEnvironment.getLogFile() );
             BufferedReader reader = new BufferedReader( new InputStreamReader(inputStream) );
-            StringBuilder content = new StringBuilder(1024);
+
             String line = null;
             while ((line = reader.readLine()) != null) {
                 content.append( line ).append( '\n' );
             }
-            
-            logsTextView.setText( content.toString() );
+
+
             
         } catch ( FileNotFoundException e ) {
             logsTextView.setText( e.toString() );
@@ -71,6 +73,16 @@ public class ManageLogsActivity extends Activity {
                     e.printStackTrace();
                 }
         }
+
+        SkyDivingEnvironment sde = SkyDivingEnvironment.getInstance(this);
+        List<String> positionLogLines = sde.getSensorLogsLinesUncompressed();
+        content.append('\n');
+        content.append('\n');
+        for (String logLine : positionLogLines) {
+            content.append(logLine);
+            content.append('\n');
+        }
+        logsTextView.setText(content.toString());
 
         submitLogsButton.setOnClickListener(new OnClickListener() {
 

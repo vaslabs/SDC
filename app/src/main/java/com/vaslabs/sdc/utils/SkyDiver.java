@@ -105,6 +105,12 @@ public class SkyDiver implements PositionalUpdate {
 
     }
 
+    public void updatePositionInformation(MetersSensorValue altitude) {
+        if (lastKnownPosition == null) {
+            lastKnownPosition = new Position(null, null, altitude);
+        }
+    }
+
     @Override
     public String toString() {
         String lat="null";
