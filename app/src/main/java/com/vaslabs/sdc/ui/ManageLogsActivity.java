@@ -76,11 +76,13 @@ public class ManageLogsActivity extends Activity {
 
         SkyDivingEnvironment sde = SkyDivingEnvironment.getInstance(this);
         List<String> positionLogLines = sde.getSensorLogsLinesUncompressed();
-        content.append('\n');
-        content.append('\n');
-        for (String logLine : positionLogLines) {
-            content.append(logLine);
+        if (positionLogLines != null) {
             content.append('\n');
+            content.append('\n');
+            for (String logLine : positionLogLines) {
+                content.append(logLine);
+                content.append('\n');
+            }
         }
         logsTextView.setText(content.toString());
 

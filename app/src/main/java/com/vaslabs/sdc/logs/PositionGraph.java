@@ -16,6 +16,7 @@ public final class PositionGraph {
     private Map<Long, MetersSensorValue> barometerAltitudeValues;
     private Map<Long, LocationSensorValue> gpsValues;
     public static final String LOG_FILE = "PositionGraph.log";
+    private float lastValue = -1000;
     public PositionGraph() {
         barometerAltitudeValues = new HashMap<Long, MetersSensorValue>();
         //barometerPressureValues = new HashMap<Long, HPASensorValue>();
@@ -23,7 +24,15 @@ public final class PositionGraph {
     }
 
     public synchronized void registerBarometerValue(HPASensorValue pressure, MetersSensorValue altitude) {
+
+        if (altitude == null)
+            return;
+        if (altitude.getRawValue() - lastValue < 5) {
+            return;
+        }
+        lastValue = altitude.getRawValue();
         long now = System.currentTimeMillis();
+
         barometerAltitudeValues.put(now, altitude);
         //barometerPressureValues.put(now, pressure);
     }
@@ -37,7 +46,7 @@ public final class PositionGraph {
      point of time
      */
     public synchronized byte[] getBarometerData() {
-        byte[] data = new byte[barometerAltitudeValues.size()*4*8];
+        byte[] data = new byte[barometerAltitudeValues.size()*12];
         int index = 0;
         byte nextByte;
         float sensorValue;

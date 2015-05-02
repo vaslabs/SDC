@@ -259,6 +259,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     public void writeSensorLogs() {
+        int trailingBytes = normaliseFile();
         FileOutputStream logStream = null;
         try {
             logStream = context.openFileOutput(PositionGraph.LOG_FILE, Context.MODE_APPEND);
@@ -281,6 +282,37 @@ public class SkyDivingEnvironment extends BaseAdapter implements
 
     }
 
+    private int normaliseFile() {
+        FileInputStream logStream = null;
+        try {
+            logStream = context.openFileInput(PositionGraph.LOG_FILE);
+        } catch (FileNotFoundException fnfe) {
+            return 0;
+        }
+
+        int bytes = 0;
+        int result = 0;
+        try {
+
+            while (result >= 0) {
+                result = logStream.read();
+                bytes++;
+            }
+            bytes = bytes % 12;
+        } catch (IOException e) {
+            return -1;
+        } finally {
+            if (logStream != null)
+                try {
+                    logStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+
+        return bytes;
+    }
+
     public List<String> getSensorLogsLinesUncompressed() {
         FileInputStream logStream = null;
         try {
@@ -298,7 +330,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
                 //first 8 bytes represent timestamp
 
                 result = logStream.read(timestampBytes, 0, 8);
-                if (result <= 0)
+                if (result < 0)
                     break;
                 long timestamp = (timestampBytes[0] & 0x0ff) |
                         (timestampBytes[1]& 0x0ff) << 8 |
