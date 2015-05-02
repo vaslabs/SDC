@@ -72,10 +72,21 @@ public class SDCLogManager {
             while ((line = reader.readLine()) != null) {
                 strings.add(line);
             }
-        } finally {
+        } catch (IOException ioe) {}
+        finally {
             if (reader != null)
-                reader.close();
+                try {
+                    reader.close();
+                } catch (IOException ioe) {
+
+                }
         }
+        strings.add("=END OF CONNECTIONS=");
+        strings.addAll(SkyDivingEnvironment.getInstance(context).getBarometerSensorLogsLinesUncompressed());
+        strings.add("=END OF BAROMETER=");
+        strings.addAll(SkyDivingEnvironment.getInstance(context).getGPSSensorLogsLinesUncompressed());
+        strings.add("=END OF GPS=");
+
         return strings;
 
     }

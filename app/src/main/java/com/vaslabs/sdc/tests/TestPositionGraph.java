@@ -70,7 +70,7 @@ public class TestPositionGraph extends AndroidTestCase {
 
         sde.writeSensorLogs();
 
-        List<String> lines = sde.getSensorLogsLinesUncompressed();
+        List<String> lines = sde.getBarometerSensorLogsLinesUncompressed();
         assertEquals(2, lines.size());
 
     }

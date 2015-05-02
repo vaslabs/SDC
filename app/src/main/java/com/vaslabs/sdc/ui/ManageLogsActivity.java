@@ -75,7 +75,20 @@ public class ManageLogsActivity extends Activity {
         }
 
         SkyDivingEnvironment sde = SkyDivingEnvironment.getInstance(this);
-        List<String> positionLogLines = sde.getSensorLogsLinesUncompressed();
+        List<String> positionLogLines = sde.getBarometerSensorLogsLinesUncompressed();
+        if (positionLogLines != null) {
+            content.append('\n');
+            content.append('\n');
+            for (String logLine : positionLogLines) {
+                content.append(logLine);
+                content.append('\n');
+            }
+        }
+
+        content.append('\n');
+        content.append('\n');
+
+        positionLogLines = sde.getGPSSensorLogsLinesUncompressed();
         if (positionLogLines != null) {
             content.append('\n');
             content.append('\n');

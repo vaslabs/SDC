@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import com.vaslabs.sdc.UserInformation;
 import com.vaslabs.sdc.sensors.BarometerListener;
 import com.vaslabs.sdc.sensors.BarometerSensor;
 import com.vaslabs.sdc.sensors.GPSSensor;
+import com.vaslabs.sdc.sensors.GPSSensorListener;
 import com.vaslabs.sdc.sensors.HPASensorValue;
 import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
@@ -41,7 +43,7 @@ import com.vaslabs.sdc.logs.PositionGraph;
 
 public class SkyDivingEnvironment extends BaseAdapter implements
         OnSpeechSuccessListener, SkyDiverEnvironmentUpdate,
-        SkyDiverPersonalUpdates, BarometerListener {
+        SkyDiverPersonalUpdates, BarometerListener, GPSSensorListener {
     private static final String LOG_TAG = "SKYDIVING_ENVIRONMENT";
     private Map<String, SkyDiver> skydivers;
     private List<SkyDiver> skydiversList;
@@ -65,9 +67,11 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         scm = SpeechCommunicationManager.getInstance();
         scm.initialiseTextToSpeech( context, this );
         skydiversList = new ArrayList<SkyDiver>();
+
         SkyDivingEnvironmentLogger.initLogger( context );
-        registerSensors();
         positionGraph = new PositionGraph();
+        registerSensors();
+
     }
 
     public synchronized static SkyDivingEnvironment getInstance( Context c ) {
@@ -101,6 +105,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         }
         try {
             gpsSensor = new GPSSensor(this.context);
+            gpsSensor.registerListener(this);
         } catch (Exception e) {
             //scm.getGPSErrorWarning();
         }
@@ -109,7 +114,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     @Override
     public synchronized void onNewSkydiverInfo( SkyDiver skydiver ) {
         if ( skydivers.containsKey( skydiver.getName() ) ) {
-            onSkydiverInfoUpdate( skydiver );
+            onSkydiverInfoUpdate(skydiver);
 
         } else {
             skydivers.put( skydiver.getName(), skydiver );
@@ -138,8 +143,8 @@ public class SkyDivingEnvironment extends BaseAdapter implements
             } else {
                 previouslyKnownSkyDiver.updatePositionInformation( skydiver
                         .getPosition() );
-                Collections.sort( this.skydiversList,
-                        new SkyDiverPositionalComparator( myself ) );
+                Collections.sort(this.skydiversList,
+                        new SkyDiverPositionalComparator(myself));
                 // also speed && direction which are not yet available TODO
             }
         }
@@ -259,10 +264,9 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     public void writeSensorLogs() {
-        int trailingBytes = normaliseFile();
         FileOutputStream logStream = null;
         try {
-            logStream = context.openFileOutput(PositionGraph.LOG_FILE, Context.MODE_APPEND);
+            logStream = context.openFileOutput(PositionGraph.BAROMETER_LOG_FILE, Context.MODE_APPEND);
         } catch (FileNotFoundException fnfe) {
             return;
         }
@@ -280,43 +284,31 @@ public class SkyDivingEnvironment extends BaseAdapter implements
                 }
         }
 
-    }
-
-    private int normaliseFile() {
-        FileInputStream logStream = null;
         try {
-            logStream = context.openFileInput(PositionGraph.LOG_FILE);
+            logStream = context.openFileOutput(PositionGraph.GPS_LOG_FILE, Context.MODE_APPEND);
         } catch (FileNotFoundException fnfe) {
-            return 0;
+            return;
         }
 
-        int bytes = 0;
-        int result = 0;
         try {
+            logStream.write(positionGraph.getGPSData());
+        } catch (IOException ioE) {
 
-            while (result >= 0) {
-                result = logStream.read();
-                bytes++;
-            }
-            bytes = bytes % 12;
-        } catch (IOException e) {
-            return -1;
         } finally {
             if (logStream != null)
                 try {
                     logStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+
                 }
         }
 
-        return bytes;
     }
 
-    public List<String> getSensorLogsLinesUncompressed() {
+    public List<String> getBarometerSensorLogsLinesUncompressed() {
         FileInputStream logStream = null;
         try {
-            logStream = context.openFileInput(PositionGraph.LOG_FILE);
+            logStream = context.openFileInput(PositionGraph.BAROMETER_LOG_FILE);
         } catch (FileNotFoundException e) {
             return null;
         }
@@ -324,28 +316,12 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         try {
             List<String> lines = new ArrayList<String>();
             int result = 0;
-            byte[] timestampBytes = new byte[8];
-            byte[] meterBytes = new byte[4];
+            byte[] data = new byte[12];
             while (result >= 0) {
-                //first 8 bytes represent timestamp
-
-                result = logStream.read(timestampBytes, 0, 8);
-                if (result < 0)
-                    break;
-                long timestamp = (timestampBytes[0] & 0x0ff) |
-                        (timestampBytes[1]& 0x0ff) << 8 |
-                        (timestampBytes[2] & 0x0ff) << 16 |
-                        (timestampBytes[3] & 0x0ff) << 24 |
-                        (timestampBytes[4] & 0x0ff) << 32 |
-                        (timestampBytes[5] & 0x0ff) << 40 |
-                        (timestampBytes[6] & 0x0ff) << 48 |
-                        timestampBytes[7] << 54;
-                result = logStream.read(meterBytes, 0, 4);
-                int meterBits = (meterBytes[0] & 0x0ff) |
-                        (meterBytes[1] & 0x0ff) << 8 |
-                        (meterBytes[2] & 0x0ff) << 16 |
-                                 meterBytes[3] << 24;
-                float meterValue = Float.intBitsToFloat(meterBits);
+                result = logStream.read(data, 0, 12);
+                ByteBuffer bf = ByteBuffer.wrap(data);
+                long timestamp = bf.getLong();
+                float meterValue = bf.getFloat();
                 lines.add(String.valueOf(timestamp) + ":" + String.valueOf(meterValue));
 
             }
@@ -354,5 +330,46 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         } catch (IOException ioe) {
             return null;
         }
+    }
+
+
+    public List<String> getGPSSensorLogsLinesUncompressed() {
+        FileInputStream logStream = null;
+        try {
+            logStream = context.openFileInput(PositionGraph.GPS_LOG_FILE);
+        } catch (FileNotFoundException e) {
+            return null;
+        }
+
+        try {
+            List<String> lines = new ArrayList<String>();
+            int result = 0;
+            byte[] data = new byte[24];
+
+            while (result >= 0) {
+                //first 8 bytes represent timestamp
+
+                result = logStream.read(data, 0, 24);
+                if (result < 0)
+                    break;
+                ByteBuffer bf = ByteBuffer.wrap(data);
+
+                long timestamp = bf.getLong();
+                double latValue = bf.getDouble();
+                double lngValue = bf.getDouble();
+                lines.add(String.valueOf(timestamp) + ":" + String.valueOf(latValue) + ',' +
+                    String.valueOf(lngValue));
+
+            }
+
+            return lines;
+        } catch (IOException ioe) {
+            return null;
+        }
+    }
+
+    @Override
+    public void onLatLngChange(LatitudeSensorValue lat, LongitudeSensorValue lng) {
+        positionGraph.registerGPSValue(lat, lng);
     }
 }

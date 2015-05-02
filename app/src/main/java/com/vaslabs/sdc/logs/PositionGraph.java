@@ -1,9 +1,14 @@
 package com.vaslabs.sdc.logs;
 
+import android.location.Location;
+
+import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.HashMap;
 import com.vaslabs.sdc.sensors.HPASensorValue;
+import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LocationSensorValue;
+import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
 
 import java.util.HashMap;
@@ -14,20 +19,21 @@ import java.util.HashMap;
 public final class PositionGraph {
     //private Map<Long, HPASensorValue> barometerPressureValues;
     private Map<Long, MetersSensorValue> barometerAltitudeValues;
-    private Map<Long, LocationSensorValue> gpsValues;
-    public static final String LOG_FILE = "PositionGraph.log";
+    private Map<Long, LatLng> gpsValues;
+    public static final String BAROMETER_LOG_FILE = "PositionGraphBarometer.log";
+    public static final String GPS_LOG_FILE = "PositionGraphGPS.log";
     private float lastValue = -1000;
     public PositionGraph() {
         barometerAltitudeValues = new HashMap<Long, MetersSensorValue>();
         //barometerPressureValues = new HashMap<Long, HPASensorValue>();
-        gpsValues = new HashMap<Long, LocationSensorValue>();
+        gpsValues = new HashMap<Long, LatLng>();
     }
 
     public synchronized void registerBarometerValue(HPASensorValue pressure, MetersSensorValue altitude) {
 
         if (altitude == null)
             return;
-        if (altitude.getRawValue() - lastValue < 5) {
+        if (Math.abs(altitude.getRawValue() - lastValue) < 3) {
             return;
         }
         lastValue = altitude.getRawValue();
@@ -35,6 +41,12 @@ public final class PositionGraph {
 
         barometerAltitudeValues.put(now, altitude);
         //barometerPressureValues.put(now, pressure);
+    }
+
+    public synchronized void registerGPSValue(LatitudeSensorValue lat, LongitudeSensorValue lng) {
+        long now = System.currentTimeMillis();
+        gpsValues.put(now, new LatLng(lat, lng));
+
     }
 
 
@@ -51,23 +63,42 @@ public final class PositionGraph {
         byte nextByte;
         float sensorValue;
         long ts;
+        ByteBuffer bf = ByteBuffer.wrap(data);
         for (Long timestamp : barometerAltitudeValues.keySet()) {
-            ts = timestamp;
-            for (int i = 0; i < 8; i++) {
-                nextByte = (byte) (ts & 0xff);
-                data[index++] = nextByte;
-                ts = ts >>> 8;
-            }
+            bf.putLong(timestamp);
             sensorValue = barometerAltitudeValues.get(timestamp).getRawValue();
-            int sensorValueBits = Float.floatToIntBits(sensorValue);
-            for (int i = 0; i < 4; i++) {
-                nextByte = (byte) (sensorValueBits & 0xff);
-                data[index++] = nextByte;
-                sensorValueBits = sensorValueBits >> 8;
-            }
+            bf.putFloat(sensorValue);
+        }
+        return data;
+    }
+
+    public synchronized byte[] getGPSData() {
+        byte[] data = new byte[gpsValues.size()*24];
+        ByteBuffer bf = ByteBuffer.wrap(data);
+
+        int index = 0;
+        byte nextByte;
+        double sensorValue;
+        long ts;
+        for (Long timestamp : gpsValues.keySet()) {
+            bf.putLong(timestamp);
+            sensorValue = gpsValues.get(timestamp).lat.getRawValue();
+            bf.putDouble(sensorValue);
+            sensorValue = gpsValues.get(timestamp).lng.getRawValue();
+            bf.putDouble(sensorValue);
         }
         return data;
     }
 
 
+}
+
+class LatLng {
+    public final LatitudeSensorValue lat;
+    public final LongitudeSensorValue lng;
+
+    public LatLng(LatitudeSensorValue lat, LongitudeSensorValue lng) {
+        this.lat = lat;
+        this.lng = lng;
+    }
 }
