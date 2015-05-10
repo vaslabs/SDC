@@ -77,14 +77,14 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
                 return true;
         }
 
-        double differantiation = point.differantiate(trendPoints.get(trendPoints.size()).point);
+        double differentiation = point.differantiate(trendPoints.get(trendPoints.size()).point);
 
         if (this.timeDensityD >= 0) {
-            if (differantiation >= this.timeDensityD) {
+            if (differentiation >= this.timeDensityD) {
                 return true;
             }
         } else {
-            if (differantiation >= this.timeDensityL) {
+            if (differentiation >= this.timeDensityL) {
                 return true;
             }
         }
