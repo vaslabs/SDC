@@ -17,17 +17,34 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
     private TrendDirection currentDirection = null;
     private VelocityState currentVelocityState = null;
     private final double accuracy;
-    private final long timeDensity;
+    private final long timeDensityL;
+    private final double timeDensityD;
     private final int historySize;
 
     public AbstractTrendStrategy(double accuracy, long timeDensity) {
         this(accuracy, timeDensity, 16);
     }
 
+    public AbstractTrendStrategy(double accuracy, double timeDensity) {
+        this(accuracy, timeDensity, 16);
+    }
+
     public AbstractTrendStrategy(double accuracy, long density, int historySize) {
         this.historySize = historySize;
         this.accuracy = accuracy;
-        this.timeDensity = density;
+        this.timeDensityL = density;
+        this.timeDensityD = -1;
+        trendPoints = new ArrayList<TrendPoint<Double, P>>();
+        trendMap = new HashMap<P, Double>();
+        trendDirectionMap = new HashMap<P, TrendDirection>();
+        trendVelocityStateMap = new HashMap<P, VelocityState>();
+    }
+
+    public AbstractTrendStrategy(double accuracy, double density, int historySize) {
+        this.historySize = historySize;
+        this.accuracy = accuracy;
+        this.timeDensityD = density;
+        this.timeDensityL = -1;
         trendPoints = new ArrayList<TrendPoint<Double, P>>();
         trendMap = new HashMap<P, Double>();
         trendDirectionMap = new HashMap<P, TrendDirection>();
@@ -35,7 +52,7 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
     }
 
     public final synchronized void acceptValue(Double value, P point) {
-        if (!trendMap.containsKey(point)) {
+        if (accept(point)) {
             trendMap.put(point, value);
             TrendPoint tp = new TrendPoint<Double, P>(value, point);
             trendPoints.add(tp);
@@ -47,6 +64,35 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
             applyTrendActions();
         }
     }
+
+    private boolean accept(P point) {
+        if (trendPoints.size() == 0)
+            return true;
+        if (trendMap.containsKey(point))
+            return true;
+        if (point.compareTo(trendPoints.get(trendPoints.size() - 1).point) < 0) {
+            if (rejectUnsortedValues())
+                return false;
+            else
+                return true;
+        }
+
+        double differantiation = point.differantiate(trendPoints.get(trendPoints.size()).point);
+
+        if (this.timeDensityD >= 0) {
+            if (differantiation >= this.timeDensityD) {
+                return true;
+            }
+        } else {
+            if (differantiation >= this.timeDensityL) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected abstract boolean rejectUnsortedValues();
 
     public final synchronized boolean isSorted() {
         return trendPointsAreSorted;
