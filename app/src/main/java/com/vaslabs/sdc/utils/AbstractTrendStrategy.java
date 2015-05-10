@@ -65,7 +65,7 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
         }
     }
 
-    private boolean accept(P point) {
+    private final boolean accept(P point) {
         if (trendPoints.size() == 0)
             return true;
         if (trendMap.containsKey(point))
@@ -216,7 +216,7 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
                         (pointA.value - pointB.value);
     }
 
-    private void normalise() {
+    private final void normalise() {
         arrangeSort();
         clearFromHistory();
         applyFilters();
@@ -244,7 +244,7 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
 
     protected abstract void applyFilters();
 
-    private void arrangeSort() {
+    private final void arrangeSort() {
         if (!isSorted()) {
             Collections.sort(trendPoints);
             trendPointsAreSorted = true;
