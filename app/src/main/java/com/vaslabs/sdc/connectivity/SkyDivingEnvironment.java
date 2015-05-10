@@ -1,20 +1,20 @@
 package com.vaslabs.sdc.connectivity;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.net.wifi.p2p.WifiP2pManager;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +58,8 @@ public class SkyDivingEnvironment extends BaseAdapter implements
 
     private final int defaultColor = SkyDiverListAdapterHelper
             .getDefaultColor();
+    private WifiP2pManager mManager;
+    private WifiP2pManager.Channel channel;
 
     private SkyDivingEnvironment( Context context ) {
         skydivers = new HashMap<String, SkyDiver>();
@@ -372,4 +374,37 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     public void onLatLngChange(LatitudeSensorValue lat, LongitudeSensorValue lng) {
         positionGraph.registerGPSValue(lat, lng);
     }
+
+    public void registerWirelessManager(WifiP2pManager mManager, WifiP2pManager.Channel channel) {
+        this.mManager = mManager;
+        this.channel = channel;
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    public void resetWifiManager() {
+        if (this.mManager != null) {
+            this.mManager.stopPeerDiscovery(channel, new WifiP2pManager.ActionListener() {
+                @Override
+                public void onSuccess() {
+                    mManager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onFailure(int i) {
+
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(int i) {
+
+                }
+            });
+        }
+    }
+
 }
