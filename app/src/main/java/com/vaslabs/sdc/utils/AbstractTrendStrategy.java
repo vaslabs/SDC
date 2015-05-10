@@ -19,6 +19,7 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
     private final double accuracy;
     private final long timeDensity;
     private final int historySize;
+
     public AbstractTrendStrategy(double accuracy, long timeDensity) {
         this(accuracy, timeDensity, 16);
     }
@@ -80,7 +81,7 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
 
     protected abstract void onTrendUpdate();
 
-    public final List<TrendPoint<Double, P>> getGraph(int startFrom, int endAt) {
+    public synchronized final List<TrendPoint<Double, P>> getTrendGraph(int startFrom, int endAt) {
         arrangeSort();
         List<TrendPoint<Double, P>> trend = new ArrayList<TrendPoint<Double, P>>();
         if (startFrom < 0)
@@ -94,9 +95,49 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
         return trend;
     }
 
-    public List<TrendPoint<Double, P>> getGraph(int latest) {
+    public synchronized List<TrendPoint<Double, P>> getTrendGraph(int latest) {
         int startFrom = historySize - latest;
-        return getGraph(startFrom, historySize);
+        return getTrendGraph(startFrom, historySize);
+    }
+
+    public synchronized Map<P, VelocityState> getVelocityGraph(int startFrom, int endAt) {
+        Map<P, VelocityState> velocityTrend = new HashMap<P, VelocityState>();
+        if (startFrom < 0)
+            return velocityTrend;
+        if (endAt > trendPoints.size())
+            return velocityTrend;
+        TrendPoint<Double, P> tp;
+        for (int i = startFrom; i < endAt; i++) {
+            tp = trendPoints.get(i);
+            velocityTrend.put(tp.point, trendVelocityStateMap.get(tp.point));
+        }
+        return velocityTrend;
+    }
+
+
+    public synchronized Map<P, TrendDirection> getDirectionGraph(int latest) {
+        int startFrom = historySize - latest;
+        return getDirectionGraph(startFrom, historySize);
+    }
+
+    public synchronized Map<P, TrendDirection> getDirectionGraph(int startFrom, int endAt) {
+        Map<P, TrendDirection> directionTrend = new HashMap<P, TrendDirection>();
+        if (startFrom < 0)
+            return directionTrend;
+        if (endAt > trendPoints.size())
+            return directionTrend;
+        TrendPoint<Double, P> tp;
+        for (int i = startFrom; i < endAt; i++) {
+            tp = trendPoints.get(i);
+            directionTrend.put(tp.point, directionTrend.get(tp.point));
+        }
+        return directionTrend;
+    }
+
+
+    public synchronized Map<P, VelocityState> getVelocityGraph(int latest) {
+        int startFrom = historySize - latest;
+        return getVelocityGraph(startFrom, historySize);
     }
 
     private final void computeAcceleration() {
