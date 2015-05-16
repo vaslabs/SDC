@@ -41,7 +41,6 @@ public class MainActivity extends Activity {
         if ( id == R.id.action_settings ) {
             Intent intent = new Intent(this, SettingsActivity.class);
             this.startActivity( intent );
-            finish();
             return true;
         }
         return super.onOptionsItemSelected( item );
