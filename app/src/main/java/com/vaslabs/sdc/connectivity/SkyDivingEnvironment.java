@@ -10,14 +10,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +36,6 @@ import com.vaslabs.sdc.ui.SpeechCommunicationManager;
 import com.vaslabs.sdc.ui.util.SkyDiverListAdapterHelper;
 import com.vaslabs.sdc.ui.util.TrendingPreferences;
 import com.vaslabs.sdc.utils.AbstractTrendStrategy;
-import com.vaslabs.sdc.utils.BarometerTrendOnDiveAltitudeListener;
 import com.vaslabs.sdc.utils.BarometerTrendStrategy;
 import com.vaslabs.sdc.utils.DefaultBarometerTrendListener;
 import com.vaslabs.sdc.utils.SDConnectivity;
@@ -116,16 +110,10 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         try
         {
             barometerSensor = new BarometerSensor(this.context);
-            barometerSensor.registerListener(this);
-            TrendingPreferences tp = TrendingPreferences.getInstance();
-            trendListener = new BarometerTrendOnDiveAltitudeListener();
-            trendListener.forDirectionAction(TrendDirection.DOWN);
-            trendListener.forCertainAltitude(new TrendPoint(new DifferentiableFloat(tp.altitudeLimit), 0.0));
-            trendStrategy = new BarometerTrendStrategy<DifferentiableFloat>(tp.altitudeSensitivity, tp.timeDensity, 1+(int) (5000/tp.altitudeSensitivity));
-            trendStrategy.registerEventListener(trendListener);
+
             hasBarometer = true;
         } catch (NoBarometerException nbe) {
-            //scm.getNoBarometerWarning();
+            hasBarometer = false;
         }
         try {
             gpsSensor = new GPSSensor(this.context);
@@ -285,6 +273,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     public void onHPASensorValueChange(HPASensorValue pressure, MetersSensorValue altitude) {
         myself.updatePositionInformation(altitude);
         positionGraph.registerBarometerValue(pressure, altitude);
+        this.trendStrategy.acceptValue(System.currentTimeMillis()/1000.0, new DifferentiableFloat(altitude.getRawValue()));
     }
 
     public void writeSensorLogs() {
@@ -392,6 +381,17 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         }
     }
 
+    private static class BarometerTrendOnDiveAltitudeListener extends DefaultBarometerTrendListener {
+
+
+
+        @Override
+        public void onTrendEvent() {
+            environmentInstance.beginScanning();
+        }
+
+    }
+
     @Override
     public void onLatLngChange(LatitudeSensorValue lat, LongitudeSensorValue lng) {
         positionGraph.registerGPSValue(lat, lng);
@@ -402,13 +402,28 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         this.mManager = mManager;
         this.mChannel = channel;
         this.actionListener = listener;
+
+        if (!hasBarometer) {
+            beginScanning();
+            return;
+        }
+
+        TrendingPreferences tp = TrendingPreferences.getInstance();
+        trendListener = new BarometerTrendOnDiveAltitudeListener();
+        trendListener.forDirectionAction(TrendDirection.DOWN);
+        trendListener.forCertainAltitude(new TrendPoint(new DifferentiableFloat(tp.altitudeLimit), 0.0));
+        trendStrategy = new BarometerTrendStrategy<DifferentiableFloat>(tp.altitudeSensitivity, tp.timeDensity, 1+(int) (5000/tp.altitudeSensitivity));
+        trendStrategy.registerEventListener(trendListener);
+        barometerSensor.registerListener(this);
+
+
     }
 
-    public synchronized void beginScanning() {
+    private synchronized void beginScanning() {
         if (!hasStartedScanning) {
             hasStartedScanning = true;
-            if (this.mManager != null)
-                this.mManager.discoverPeers(this.mChannel, this.actionListener);
+            this.mManager.discoverPeers(this.mChannel, this.actionListener);
+            SkyDivingEnvironmentLogger.Log(System.currentTimeMillis() + ": Started scanning");
         }
     }
 
@@ -416,3 +431,5 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         return this.hasBarometer;
     }
 }
+
+

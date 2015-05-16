@@ -1,14 +1,15 @@
 package com.vaslabs.sdc.tests;
 
+import android.net.wifi.p2p.WifiP2pManager;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
+import com.vaslabs.sdc.connectivity.WirelessBroadcastReceiver;
 import com.vaslabs.sdc.sensors.BarometerSensor;
 import com.vaslabs.sdc.types.DifferentiableFloat;
 import com.vaslabs.sdc.types.TrendPoint;
-import com.vaslabs.sdc.ui.util.TrendingPreferences;
 import com.vaslabs.sdc.utils.AbstractTrendStrategy;
-import com.vaslabs.sdc.utils.BarometerTrendOnDiveAltitudeListener;
 import com.vaslabs.sdc.utils.BarometerTrendStrategy;
 import com.vaslabs.sdc.utils.DefaultBarometerTrendListener;
 import com.vaslabs.sdc.utils.TrendDirection;
@@ -114,11 +115,25 @@ public class TestDiscoverPeersOnBarometerEvent extends AndroidTestCase {
         trendStrategy.setAccessible(true);
         Field hasStartedScanning = SkyDivingEnvironment.class.getDeclaredField("hasStartedScanning");
         hasStartedScanning.setAccessible(true);
-        AbstractTrendStrategy ats = (AbstractTrendStrategy)(trendStrategy.get(sde));
 
         Field barometerSensor = SkyDivingEnvironment.class.getDeclaredField("barometerSensor");
         barometerSensor.setAccessible(true);
         barometerSensor.set(sde, new BarometerSensor(mContext));
+
+        WifiP2pManager mManager = (WifiP2pManager) this.mContext.getSystemService(this.mContext.WIFI_P2P_SERVICE);
+        WifiP2pManager.Channel mChannel = mManager.initialize(this.mContext, mContext.getMainLooper(), new WifiP2pManager.ChannelListener() {
+            @Override
+            public void onChannelDisconnected() {
+                Log.i("ChannelListener", "Channel disconnected");
+            }
+        });
+
+        WirelessBroadcastReceiver mReceiver = new WirelessBroadcastReceiver(mManager, mChannel, this.mContext);
+
+        SkyDivingEnvironment.getInstance().registerWirelessManager(mManager, mChannel, null);
+
+        AbstractTrendStrategy ats = (AbstractTrendStrategy)(trendStrategy.get(sde));
+
 
         for (float i = 0; i < 3000; i++) {
             ats.acceptValue(i*0.6, new DifferentiableFloat(i));
