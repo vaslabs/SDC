@@ -3,12 +3,12 @@ package com.vaslabs.sdc.tests;
 import android.test.AndroidTestCase;
 
 import com.vaslabs.sdc.types.DifferentiableFloat;
+import com.vaslabs.sdc.types.TrendPoint;
 import com.vaslabs.sdc.utils.AbstractTrendStrategy;
+import com.vaslabs.sdc.utils.BarometerTrendOnDiveAltitudeListener;
 import com.vaslabs.sdc.utils.BarometerTrendStrategy;
-import com.vaslabs.sdc.utils.Trend;
+import com.vaslabs.sdc.utils.DefaultBarometerTrendListener;
 import com.vaslabs.sdc.utils.TrendDirection;
-
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,4 +67,40 @@ public class TestDiscoverPeersOnBarometerEvent extends AndroidTestCase {
         assertNull(directionGraph.get(Double.valueOf(0)));
         assertEquals(TrendDirection.DOWN, directionGraph.get(Double.valueOf(0.11)));
     }
+
+    int numbersCalled = 0;
+    public void test_dive_scenario_without_perturbations() {
+        AbstractTrendStrategy<DifferentiableFloat> trendStrategy = new BarometerTrendStrategy<DifferentiableFloat>(0.5, 0.1, 3000);
+        DefaultBarometerTrendListener trendListener = new DefaultBarometerTrendListener() {
+            @Override
+            public void onTrendEvent() {
+                numbersCalled++;
+            }
+        };
+
+        trendListener.forDirectionAction(TrendDirection.DOWN);
+        trendListener.forCertainAltitude(new TrendPoint(new DifferentiableFloat(1000f), Double.valueOf(0)));
+        trendStrategy.registerEventListener(trendListener);
+        uponClimbing(trendStrategy);
+        assertEquals(0, numbersCalled);
+        assertEquals(3000, trendStrategy.getSize());
+        uponDiving(trendStrategy);
+        assertEquals(3000, trendStrategy.getSize());
+        assertEquals(1000, numbersCalled);
+
+
+    }
+
+    private void uponClimbing(AbstractTrendStrategy<DifferentiableFloat> trendStrategy) {
+        for (int i = 0; i < 3000; i++) {
+            trendStrategy.acceptValue(Double.valueOf(i), new DifferentiableFloat(Float.valueOf(i)));
+        }
+    }
+
+    private void uponDiving(AbstractTrendStrategy<DifferentiableFloat> trendStrategy) {
+        for (float i = 3000; i >= 0; i--) {
+            trendStrategy.acceptValue(Double.valueOf(6000 - i), new DifferentiableFloat(i));
+        }
+    }
+
 }

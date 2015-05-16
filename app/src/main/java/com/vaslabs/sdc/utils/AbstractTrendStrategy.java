@@ -11,8 +11,9 @@ import java.util.Map;
 public abstract class AbstractTrendStrategy<V extends Differentiable> implements Trend<Double, V> {
 
 
-    private List<TrendPoint<Double, V>> trendPoints;
-    private boolean trendPointsAreSorted = true;
+    private ArrayList<TrendPoint<Double, V>> trendPoints;
+    private int cycleIndex = 0;
+    private boolean isCyclic = false;
     private final Map<Double, V> trendMap;
     private final Map<Double, TrendDirection> trendDirectionMap;
     private final Map<Double, VelocityState> trendVelocityStateMap;
@@ -22,6 +23,7 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
     private final long timeDensityL;
     private final double timeDensityD;
     private final int historySize;
+    private List<TrendListener> listeners = new ArrayList<TrendListener>();
 
     public AbstractTrendStrategy(double accuracy, long timeDensity) {
         this(accuracy, timeDensity, 16);
@@ -36,7 +38,7 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         this.accuracy = accuracy;
         this.timeDensityL = density;
         this.timeDensityD = -1;
-        trendPoints = new ArrayList<TrendPoint<Double, V>>();
+        trendPoints = new ArrayList<TrendPoint<Double, V>>(historySize);
         trendMap = new HashMap<Double, V>();
         trendDirectionMap = new HashMap<Double, TrendDirection>();
         trendVelocityStateMap = new HashMap<Double, VelocityState>();
@@ -47,39 +49,54 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         this.accuracy = accuracy;
         this.timeDensityD = density;
         this.timeDensityL = -1;
-        trendPoints = new ArrayList<TrendPoint<Double, V>>();
+        trendPoints = new ArrayList<TrendPoint<Double, V>>(historySize);
         trendMap = new HashMap<Double, V>();
         trendDirectionMap = new HashMap<Double, TrendDirection>();
         trendVelocityStateMap = new HashMap<Double, VelocityState>();
     }
 
     public final synchronized void acceptValue(Double point, V value) {
-        if (accept(point, value)) {
+        if (accept(point)) {
+            if (cycleIndex >= historySize) {
+                cycleIndex = 0;
+                isCyclic = true;
+                TrendPoint<Double, V> trentPointToRemove = trendPoints.get(cycleIndex);
+                dropTrendPoint(trentPointToRemove);
+            }
             trendMap.put(point, value);
             TrendPoint tp = new TrendPoint<Double, V>(value, point);
-            trendPoints.add(tp);
+            if (isCyclic)
+                trendPoints.set(cycleIndex++, tp);
+            else {
+                trendPoints.add(tp);
+                cycleIndex++;
+            }
             int noOfTrendItems = trendPoints.size();
             if (noOfTrendItems > 1)
-            if (tp.compareTo(trendPoints.get(noOfTrendItems - 2)) < 0) {
-                trendPointsAreSorted = false;
-            }
             applyTrendActions();
         }
     }
 
-    private final boolean accept(Double point, V value) {
+    private void dropTrendPoint(TrendPoint<Double, V> trendPointToRemove) {
+        this.trendMap.remove(trendPointToRemove.point);
+        this.trendDirectionMap.remove(trendPointToRemove.point);
+        this.trendVelocityStateMap.remove(trendPointToRemove.point);
+    }
+
+    private final boolean accept(Double point) {
         if (trendPoints.size() == 0)
             return true;
         if (trendMap.containsKey(point))
             return false;
-        if (point.compareTo(trendPoints.get(trendPoints.size() - 1).point) < 0) {
-            if (rejectUnsortedValues())
-                return false;
-            else
-                return true;
-        }
 
-        double differentiation = Math.abs(point - trendPoints.get(trendPoints.size() - 1).point);
+        int thisTrendPoint = cycleIndex - 1;
+        thisTrendPoint = thisTrendPoint < 0 ? trendPoints.size() + thisTrendPoint : thisTrendPoint;
+
+        if (point.compareTo(trendPoints.get(thisTrendPoint).point) < 0)
+            return false;
+
+
+        double differentiation = Math.abs(point - trendPoints.get(thisTrendPoint).point);
 
         if (this.timeDensityD >= 0) {
             if (differentiation >= this.timeDensityD) {
@@ -94,11 +111,6 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         return false;
     }
 
-    protected abstract boolean rejectUnsortedValues();
-
-    public final synchronized boolean isSorted() {
-        return trendPointsAreSorted;
-    }
 
     private final void applyTrendActions() {
         normalise();
@@ -108,7 +120,16 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         if (size == 1)
             return;
 
-        double difference = trendPoints.get(size - 1).value.differantiate(trendPoints.get(size - 2).value);
+        int lastTrendPoint = cycleIndex - 2;
+        int thisTrendPoint = cycleIndex - 1;
+        if (lastTrendPoint < 0) {
+            lastTrendPoint = trendPoints.size() + lastTrendPoint;
+        }
+        if (thisTrendPoint < 0) {
+            thisTrendPoint = trendPoints.size() + thisTrendPoint;
+        }
+
+        double difference = trendPoints.get(thisTrendPoint).value.differantiate(trendPoints.get(lastTrendPoint).value);
 
         if (difference > accuracy) {
             currentDirection = TrendDirection.UP;
@@ -119,26 +140,67 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         } else {
             currentDirection = TrendDirection.NEUTRAL;
         }
-        trendDirectionMap.put(trendPoints.get(size - 1).point, currentDirection);
+        trendDirectionMap.put(trendPoints.get(thisTrendPoint).point, currentDirection);
 
         computeAcceleration();
         onTrendUpdate();
 
     }
 
-    protected abstract void onTrendUpdate();
+    protected void onTrendUpdate() {
+        for (TrendListener listener : listeners) {
+            if (shouldCallListener(listener)) {
+                listener.onTrendEvent();
+            }
+        }
+    }
+
+    private boolean shouldCallListener(TrendListener listener) {
+        if (listener.getDirectionAction() != null && !listener.getDirectionAction().equals(currentDirection))
+            return false;
+        if (listener.getVelocityState() != null && !listener.getVelocityState().equals(currentVelocityState))
+            return false;
+        int previousPoint = cycleIndex - 1;
+        if (previousPoint < 0)
+            previousPoint = this.trendPoints.size() + previousPoint;
+        V value = this.trendPoints.get(previousPoint).value;
+        switch (listener.getDirectionAction()) {
+
+            case UP:
+                if (listener.getValueLimit().value.compareTo(value) < 0 )
+                    return true;
+            case DOWN:
+                if (listener.getValueLimit().value.compareTo(value) > 0 )
+                    return true;
+            case NEUTRAL:
+            default:
+                return false;
+        }
+    }
 
     public synchronized final List<TrendPoint<Double, V>> getTrendGraph(int startFrom, int endAt) {
-        arrangeSort();
         List<TrendPoint<Double, V>> trend = new ArrayList<TrendPoint<Double, V>>();
         if (startFrom < 0)
-            return trend;
+            startFrom = 0;
         if (endAt > trendPoints.size())
-            return trend;
+            endAt = trendPoints.size();
+        if (isCyclic)
+            return normaliseCyclicList(trend, startFrom, endAt);
         for (int i = startFrom; i < endAt; i++) {
             trend.add(trendPoints.get(i));
         }
 
+        return trend;
+    }
+
+    private List<TrendPoint<Double,V>> normaliseCyclicList(List<TrendPoint<Double, V>> trend, int startFrom, int endAt) {
+        startFrom = cycleIndex + startFrom;
+        endAt = endAt - cycleIndex;
+        while (startFrom != endAt) {
+            if (startFrom >= trendPoints.size())
+                startFrom = 0;
+            trend.add(trendPoints.get(startFrom++));
+        }
         return trend;
     }
 
@@ -154,8 +216,9 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         if (endAt > trendPoints.size())
             return velocityTrend;
         TrendPoint<Double, V> tp;
+        List<TrendPoint<Double, V>> localTrendPoints = this.getTrendGraph(startFrom, endAt);
         for (int i = startFrom; i < endAt; i++) {
-            tp = trendPoints.get(i);
+            tp = localTrendPoints.get(i);
             velocityTrend.put(tp.point, trendVelocityStateMap.get(tp.point));
         }
         return velocityTrend;
@@ -176,8 +239,9 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         if (endAt > trendPoints.size())
             endAt = trendPoints.size();
         TrendPoint<Double, V> tp;
+        List<TrendPoint<Double, V>> localTrendPoints = this.getTrendGraph(startFrom, endAt);
         for (int i = startFrom; i < endAt; i++) {
-            tp = trendPoints.get(i);
+            tp = localTrendPoints.get(i);
             directionTrend.put(tp.point, this.trendDirectionMap.get(tp.point));
         }
         return directionTrend;
@@ -194,9 +258,16 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         if (size < 3)
             return;
 
-        double velocityFromAtoB = computeVelocity(trendPoints.get(size - 3), trendPoints.get(size - 2));
-        double velocityFromBtoA = computeVelocity(trendPoints.get(size -2), trendPoints.get(size - 1));
-        double dt = trendPoints.get(size - 3).value.differantiate(trendPoints.get(size - 1).value);
+        int pointBefore3Steps = cycleIndex - 3;
+        int pointBefore2Steps = cycleIndex - 2;
+        int pointBefore1Steps = cycleIndex - 1;
+        pointBefore3Steps = (pointBefore3Steps < 0) ? size + pointBefore3Steps : pointBefore3Steps;
+        pointBefore2Steps = (pointBefore2Steps < 0) ? size + pointBefore2Steps : pointBefore2Steps;
+        pointBefore1Steps = (pointBefore1Steps < 0) ? size + pointBefore1Steps : pointBefore1Steps;
+
+        double velocityFromAtoB = computeVelocity(trendPoints.get(pointBefore3Steps), trendPoints.get(pointBefore2Steps));
+        double velocityFromBtoA = computeVelocity(trendPoints.get(pointBefore2Steps), trendPoints.get(pointBefore1Steps));
+        double dt = trendPoints.get(pointBefore3Steps).value.differantiate(trendPoints.get(pointBefore1Steps).value);
         double acceleration = (velocityFromBtoA - velocityFromAtoB) / dt;
 
         if (acceleration > accuracy) {
@@ -209,7 +280,7 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
             currentVelocityState = VelocityState.CONSTANT;
         }
 
-        trendVelocityStateMap.put(trendPoints.get(size - 1).point, currentVelocityState);
+        trendVelocityStateMap.put(trendPoints.get(pointBefore1Steps).point, currentVelocityState);
 
     }
 
@@ -220,42 +291,17 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
     }
 
     private final void normalise() {
-        arrangeSort();
-        clearFromHistory();
         applyFilters();
-    }
-
-    private final synchronized void clearFromHistory() {
-        if (trendPoints.size() <= historySize) {
-            return;
-        }
-        List<TrendPoint<Double, V>> trendPointsLimit = new ArrayList<TrendPoint<Double, V>>(historySize + 2);
-        TrendPoint tp;
-        for (int i = 0; i < trendPoints.size() - historySize; i++) {
-            tp = trendPoints.get(i);
-            trendDirectionMap.remove(tp.point);
-            trendVelocityStateMap.remove(tp.point);
-            trendMap.remove(tp.point);
-        }
-        for (int i = trendPoints.size() - historySize; i < trendPoints.size(); i++) {
-            tp = trendPoints.get(i);
-            trendPointsLimit.add(tp);
-        }
-        trendPoints = trendPointsLimit;
-
     }
 
     protected abstract void applyFilters();
 
-    private final void arrangeSort() {
-        if (!isSorted()) {
-            Collections.sort(trendPoints);
-            trendPointsAreSorted = true;
-        }
-    }
-
 
     public int getSize() {
         return trendPoints.size();
+    }
+
+    public void registerEventListener(TrendListener trendListener) {
+        listeners.add(trendListener);
     }
 }

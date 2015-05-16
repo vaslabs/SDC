@@ -19,15 +19,10 @@ public class BarometerTrendStrategy<T> extends AbstractTrendStrategy<Differentia
         super(accuracy, timeDensity);
     }
 
-    @Override
-    protected boolean rejectUnsortedValues() {
-        return false;
+    public BarometerTrendStrategy(double accuracy, double timeDensity, int historySize) {
+        super(accuracy, timeDensity, historySize);
     }
 
-    @Override
-    protected void onTrendUpdate() {
-
-    }
 
     @Override
     protected void applyFilters() {
