@@ -7,13 +7,20 @@ import com.vaslabs.sdc.sensors.BarometerSensor;
 import com.vaslabs.sdc.sensors.HPASensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
 import com.vaslabs.sdc.sensors.NoBarometerException;
+import com.vaslabs.sdc.ui.util.TrendingPreferences;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SettingsActivity extends Activity implements BarometerListener {
 
@@ -23,17 +30,39 @@ public class SettingsActivity extends Activity implements BarometerListener {
     private Button currentPressureButton;
     private Button saveButton;
     private Button cancelButton;
-    UserInformation userInfo;
+    private Spinner spinnerMeterSensitivity;
+    private Spinner spinnerTimeDensity;
+
     private BarometerSensor barometer;
+    private Context meterSensitivityOptions;
+    private List<Integer> meterOptions;
+    private List<Double> densityOptions;
+
+    UserInformation userInfo;
+
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
-        setContentView( R.layout.activity_settings );
+        setContentView(R.layout.activity_settings);
         
         massEditText = (EditText) this.findViewById( R.id.massEditText );
         nameEditText = (EditText)this.findViewById( R.id.nameEditText );
         seaLevelEditText = (EditText)this.findViewById( R.id.seaLevelEditText );
-        
+        spinnerMeterSensitivity = (Spinner)this.findViewById(R.id.spinnerMeterSensitivity);
+        spinnerTimeDensity = (Spinner)this.findViewById(R.id.spinnerTimeDensity);
+
+        meterOptions = new ArrayList<Integer>();
+        meterOptions.add(10);
+        meterOptions.add(20);
+        meterOptions.add(50);
+        meterOptions.add(100);
+        densityOptions = new ArrayList<Double>();
+        densityOptions.add(0.5);
+        densityOptions.add(1.0);
+        densityOptions.add(2.0);
+        densityOptions.add(5.0);
+        attachOptionsMeters(spinnerMeterSensitivity);
+        attachOptionsTimeDensity(spinnerTimeDensity);
         userInfo = UserInformation.getUserInfo( this );
         
         updateTextFields();
@@ -54,7 +83,8 @@ public class SettingsActivity extends Activity implements BarometerListener {
             
             @Override
             public void onClick( View v ) {
-                
+                TrendingPreferences.getNewTrendingPreferences(meterOptions.get(spinnerMeterSensitivity.getSelectedItemPosition()),
+                        densityOptions.get(spinnerTimeDensity.getSelectedItemPosition()));
                 UserPreferences up = new UserPreferences();
                 try {
                     up.mass = Float.parseFloat( massEditText.getText().toString() );
@@ -92,11 +122,23 @@ public class SettingsActivity extends Activity implements BarometerListener {
         } );
         
     }
-    
+
+    private void attachOptionsMeters(Spinner spinnerMeterSensitivity) {
+        ArrayAdapter meterOptionsAdapter = new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_item);
+        meterOptionsAdapter.addAll(meterOptions);
+        spinnerMeterSensitivity.setAdapter(meterOptionsAdapter);
+    }
+
+    private void attachOptionsTimeDensity(Spinner spinnerTimeDensity) {
+        ArrayAdapter densityOptionsAdapter = new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_item);
+        densityOptionsAdapter.addAll(densityOptions);
+        spinnerTimeDensity.setAdapter(densityOptionsAdapter);
+    }
+
     private void updateTextFields() {
         massEditText.setText( String.valueOf(userInfo.getMass()) );
         nameEditText.setText( userInfo.getName() );
-        seaLevelEditText.setText( String.valueOf( userInfo.getSeaLevelCalibration()) );
+        seaLevelEditText.setText( String.valueOf(userInfo.getSeaLevelCalibration()) );
         
     }
 

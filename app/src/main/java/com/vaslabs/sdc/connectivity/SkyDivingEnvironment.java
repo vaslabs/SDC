@@ -34,15 +34,24 @@ import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
 import com.vaslabs.sdc.sensors.NoBarometerException;
+import com.vaslabs.sdc.types.DifferentiableFloat;
+import com.vaslabs.sdc.types.TrendPoint;
 import com.vaslabs.sdc.ui.OnSpeechSuccessListener;
 import com.vaslabs.sdc.ui.SpeechCommunicationManager;
 import com.vaslabs.sdc.ui.util.SkyDiverListAdapterHelper;
+import com.vaslabs.sdc.ui.util.TrendingPreferences;
+import com.vaslabs.sdc.utils.AbstractTrendStrategy;
+import com.vaslabs.sdc.utils.BarometerTrendOnDiveAltitudeListener;
+import com.vaslabs.sdc.utils.BarometerTrendStrategy;
+import com.vaslabs.sdc.utils.DefaultBarometerTrendListener;
 import com.vaslabs.sdc.utils.SDConnectivity;
 import com.vaslabs.sdc.utils.SkyDiver;
 import com.vaslabs.sdc.utils.SkyDiverEnvironmentUpdate;
 import com.vaslabs.sdc.utils.SkyDiverPersonalUpdates;
 import com.vaslabs.sdc.utils.SkyDiverPositionalComparator;
 import com.vaslabs.sdc.logs.PositionGraph;
+import com.vaslabs.sdc.utils.TrendDirection;
+import com.vaslabs.sdc.utils.TrendListener;
 
 public class SkyDivingEnvironment extends BaseAdapter implements
         OnSpeechSuccessListener, SkyDiverEnvironmentUpdate,
@@ -58,13 +67,17 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     private BarometerSensor barometerSensor;
     private GPSSensor gpsSensor;
     private PositionGraph positionGraph;
-    protected Lock wifiResetLock;
+    private DefaultBarometerTrendListener trendListener;
+    private AbstractTrendStrategy<DifferentiableFloat> trendStrategy;
     private final int defaultColor = SkyDiverListAdapterHelper
             .getDefaultColor();
     private WirelessBroadcastReceiver mReceiver;
-
+    private WifiP2pManager mManager;
+    private WifiP2pManager.Channel mChannel;
+    private WifiP2pManager.ActionListener actionListener;
+    private boolean hasBarometer = false;
+    private boolean hasStartedScanning = false;
     private SkyDivingEnvironment( Context context ) {
-        wifiResetLock = new ReentrantLock();
         skydivers = new HashMap<String, SkyDiver>();
         this.context = context;
         UserInformation ui = UserInformation.getUserInfo( context );
@@ -104,6 +117,13 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         {
             barometerSensor = new BarometerSensor(this.context);
             barometerSensor.registerListener(this);
+            TrendingPreferences tp = TrendingPreferences.getInstance();
+            trendListener = new BarometerTrendOnDiveAltitudeListener();
+            trendListener.forDirectionAction(TrendDirection.DOWN);
+            trendListener.forCertainAltitude(new TrendPoint(new DifferentiableFloat(tp.altitudeLimit), 0.0));
+            trendStrategy = new BarometerTrendStrategy<DifferentiableFloat>(tp.altitudeSensitivity, tp.timeDensity, 1+(int) (5000/tp.altitudeSensitivity));
+            trendStrategy.registerEventListener(trendListener);
+            hasBarometer = true;
         } catch (NoBarometerException nbe) {
             //scm.getNoBarometerWarning();
         } catch (Exception e) {
@@ -379,8 +399,19 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         positionGraph.registerGPSValue(lat, lng);
     }
 
-    public void registerWirelessManager(WirelessBroadcastReceiver receiver) {
-        this.mReceiver = receiver;
+    public void registerWirelessManager(WifiP2pManager mManager, WifiP2pManager.Channel channel, WifiP2pManager.ActionListener listener) {
+
+        this.mManager = mManager;
+        this.mChannel = channel;
+        this.actionListener = listener;
     }
 
+    public synchronized void beginScanning() {
+        if (!hasStartedScanning)
+            this.mManager.discoverPeers(this.mChannel, this.actionListener);
+    }
+
+    public boolean hasBarometer() {
+        return this.hasBarometer;
+    }
 }

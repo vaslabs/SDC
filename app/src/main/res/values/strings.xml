@@ -28,4 +28,7 @@
     <string name="username_text">username</string>
     <string name="password_text">password</string>
     <string name="submit">Submit</string>
+    <string name="trendDensity">Time density</string>
+    <string name="meterSensitivity">Altitude change sensitivity</string>
+    <string name="altLimitText">Scanning altitude</string>
 </resources>

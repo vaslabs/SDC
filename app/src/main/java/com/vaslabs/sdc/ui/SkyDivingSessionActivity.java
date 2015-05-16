@@ -129,9 +129,10 @@ public class SkyDivingSessionActivity extends Activity {
 
         mReceiver = new WirelessBroadcastReceiver(mManager, mChannel, this);
 
-        SkyDivingEnvironment.getInstance().registerWirelessManager(mReceiver);
+        SkyDivingEnvironment.getInstance().registerWirelessManager(mManager, mChannel,  new WifiActionListener( mManager, mChannel ) );
 
-        mManager.discoverPeers( mChannel, new WifiActionListener( mManager, mChannel ) );
+        if (!SkyDivingEnvironment.getInstance().hasBarometer())
+            SkyDivingEnvironment.getInstance().beginScanning();
 
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
