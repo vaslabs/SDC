@@ -423,7 +423,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         if (!hasStartedScanning) {
             hasStartedScanning = true;
             this.mManager.discoverPeers(this.mChannel, this.actionListener);
-            SkyDivingEnvironmentLogger.Log(System.currentTimeMillis() + ": Started scanning");
+            SkyDivingEnvironmentLogger.Log("Started scanning");
         }
     }
 
