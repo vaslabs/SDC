@@ -1,6 +1,8 @@
 package com.vaslabs.sdc.connectivity;
 
 import android.content.Context;
+import android.net.NetworkInfo;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 
 public class ActionResponderFactory {

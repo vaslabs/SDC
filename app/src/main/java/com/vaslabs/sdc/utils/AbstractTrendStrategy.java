@@ -1,19 +1,21 @@
 package com.vaslabs.sdc.utils;
 
+import com.vaslabs.sdc.types.TrendPoint;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractTrendStrategy<P extends Differentiable> implements Trend<Double, P> {
+public abstract class AbstractTrendStrategy<V extends Differentiable> implements Trend<Double, V> {
 
 
-    private List<TrendPoint<Double, P>> trendPoints;
+    private List<TrendPoint<Double, V>> trendPoints;
     private boolean trendPointsAreSorted = true;
-    private final Map<P, Double> trendMap;
-    private final Map<P, TrendDirection> trendDirectionMap;
-    private final Map<P, VelocityState> trendVelocityStateMap;
+    private final Map<Double, V> trendMap;
+    private final Map<Double, TrendDirection> trendDirectionMap;
+    private final Map<Double, VelocityState> trendVelocityStateMap;
     private TrendDirection currentDirection = null;
     private VelocityState currentVelocityState = null;
     private final double accuracy;
@@ -34,10 +36,10 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
         this.accuracy = accuracy;
         this.timeDensityL = density;
         this.timeDensityD = -1;
-        trendPoints = new ArrayList<TrendPoint<Double, P>>();
-        trendMap = new HashMap<P, Double>();
-        trendDirectionMap = new HashMap<P, TrendDirection>();
-        trendVelocityStateMap = new HashMap<P, VelocityState>();
+        trendPoints = new ArrayList<TrendPoint<Double, V>>();
+        trendMap = new HashMap<Double, V>();
+        trendDirectionMap = new HashMap<Double, TrendDirection>();
+        trendVelocityStateMap = new HashMap<Double, VelocityState>();
     }
 
     public AbstractTrendStrategy(double accuracy, double density, int historySize) {
@@ -45,16 +47,16 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
         this.accuracy = accuracy;
         this.timeDensityD = density;
         this.timeDensityL = -1;
-        trendPoints = new ArrayList<TrendPoint<Double, P>>();
-        trendMap = new HashMap<P, Double>();
-        trendDirectionMap = new HashMap<P, TrendDirection>();
-        trendVelocityStateMap = new HashMap<P, VelocityState>();
+        trendPoints = new ArrayList<TrendPoint<Double, V>>();
+        trendMap = new HashMap<Double, V>();
+        trendDirectionMap = new HashMap<Double, TrendDirection>();
+        trendVelocityStateMap = new HashMap<Double, VelocityState>();
     }
 
-    public final synchronized void acceptValue(Double value, P point) {
-        if (accept(point)) {
+    public final synchronized void acceptValue(Double point, V value) {
+        if (accept(point, value)) {
             trendMap.put(point, value);
-            TrendPoint tp = new TrendPoint<Double, P>(value, point);
+            TrendPoint tp = new TrendPoint<Double, V>(value, point);
             trendPoints.add(tp);
             int noOfTrendItems = trendPoints.size();
             if (noOfTrendItems > 1)
@@ -65,11 +67,11 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
         }
     }
 
-    private final boolean accept(P point) {
+    private final boolean accept(Double point, V value) {
         if (trendPoints.size() == 0)
             return true;
         if (trendMap.containsKey(point))
-            return true;
+            return false;
         if (point.compareTo(trendPoints.get(trendPoints.size() - 1).point) < 0) {
             if (rejectUnsortedValues())
                 return false;
@@ -77,7 +79,7 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
                 return true;
         }
 
-        double differentiation = point.differantiate(trendPoints.get(trendPoints.size()).point);
+        double differentiation = Math.abs(point - trendPoints.get(trendPoints.size() - 1).point);
 
         if (this.timeDensityD >= 0) {
             if (differentiation >= this.timeDensityD) {
@@ -106,9 +108,8 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
         if (size == 1)
             return;
 
-        double previousValue = trendPoints.get(size - 2).value;
-        double currentValue = trendPoints.get(size - 1).value;
-        double difference = currentValue - previousValue;
+        double difference = trendPoints.get(size - 1).value.differantiate(trendPoints.get(size - 2).value);
+
         if (difference > accuracy) {
             currentDirection = TrendDirection.UP;
         } else if (difference >= 0) {
@@ -127,9 +128,9 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
 
     protected abstract void onTrendUpdate();
 
-    public synchronized final List<TrendPoint<Double, P>> getTrendGraph(int startFrom, int endAt) {
+    public synchronized final List<TrendPoint<Double, V>> getTrendGraph(int startFrom, int endAt) {
         arrangeSort();
-        List<TrendPoint<Double, P>> trend = new ArrayList<TrendPoint<Double, P>>();
+        List<TrendPoint<Double, V>> trend = new ArrayList<TrendPoint<Double, V>>();
         if (startFrom < 0)
             return trend;
         if (endAt > trendPoints.size())
@@ -141,18 +142,18 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
         return trend;
     }
 
-    public synchronized List<TrendPoint<Double, P>> getTrendGraph(int latest) {
+    public synchronized List<TrendPoint<Double, V>> getTrendGraph(int latest) {
         int startFrom = historySize - latest;
         return getTrendGraph(startFrom, historySize);
     }
 
-    public synchronized Map<P, VelocityState> getVelocityGraph(int startFrom, int endAt) {
-        Map<P, VelocityState> velocityTrend = new HashMap<P, VelocityState>();
+    public synchronized Map<Double, VelocityState> getVelocityGraph(int startFrom, int endAt) {
+        Map<Double, VelocityState> velocityTrend = new HashMap<Double, VelocityState>();
         if (startFrom < 0)
             return velocityTrend;
         if (endAt > trendPoints.size())
             return velocityTrend;
-        TrendPoint<Double, P> tp;
+        TrendPoint<Double, V> tp;
         for (int i = startFrom; i < endAt; i++) {
             tp = trendPoints.get(i);
             velocityTrend.put(tp.point, trendVelocityStateMap.get(tp.point));
@@ -161,27 +162,29 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
     }
 
 
-    public synchronized Map<P, TrendDirection> getDirectionGraph(int latest) {
-        int startFrom = historySize - latest;
+    public synchronized Map<Double, TrendDirection> getDirectionGraph(int latest) {
+        int startFrom = this.trendPoints.size() - latest;
+        if (startFrom < 0)
+            startFrom = 0;
         return getDirectionGraph(startFrom, historySize);
     }
 
-    public synchronized Map<P, TrendDirection> getDirectionGraph(int startFrom, int endAt) {
-        Map<P, TrendDirection> directionTrend = new HashMap<P, TrendDirection>();
+    public synchronized Map<Double, TrendDirection> getDirectionGraph(int startFrom, int endAt) {
+        Map<Double, TrendDirection> directionTrend = new HashMap<Double, TrendDirection>();
         if (startFrom < 0)
             return directionTrend;
         if (endAt > trendPoints.size())
-            return directionTrend;
-        TrendPoint<Double, P> tp;
+            endAt = trendPoints.size();
+        TrendPoint<Double, V> tp;
         for (int i = startFrom; i < endAt; i++) {
             tp = trendPoints.get(i);
-            directionTrend.put(tp.point, directionTrend.get(tp.point));
+            directionTrend.put(tp.point, this.trendDirectionMap.get(tp.point));
         }
         return directionTrend;
     }
 
 
-    public synchronized Map<P, VelocityState> getVelocityGraph(int latest) {
+    public synchronized Map<Double, VelocityState> getVelocityGraph(int latest) {
         int startFrom = historySize - latest;
         return getVelocityGraph(startFrom, historySize);
     }
@@ -193,7 +196,7 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
 
         double velocityFromAtoB = computeVelocity(trendPoints.get(size - 3), trendPoints.get(size - 2));
         double velocityFromBtoA = computeVelocity(trendPoints.get(size -2), trendPoints.get(size - 1));
-        double dt = trendPoints.get(size - 3).point.differantiate(trendPoints.get(size - 1).point);
+        double dt = trendPoints.get(size - 3).value.differantiate(trendPoints.get(size - 1).value);
         double acceleration = (velocityFromBtoA - velocityFromAtoB) / dt;
 
         if (acceleration > accuracy) {
@@ -210,10 +213,10 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
 
     }
 
-    private final double computeVelocity(TrendPoint<Double, P> pointA, TrendPoint<Double, P> pointB) {
+    private final double computeVelocity(TrendPoint<Double, V> pointA, TrendPoint<Double, V> pointB) {
         return
-                (pointA.point.differantiate(pointB.point)) /
-                        (pointA.value - pointB.value);
+                (pointA.value.differantiate(pointB.value)) /
+                        (pointA.point - pointB.point);
     }
 
     private final void normalise() {
@@ -226,7 +229,7 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
         if (trendPoints.size() <= historySize) {
             return;
         }
-        List<TrendPoint<Double, P>> trendPointsLimit = new ArrayList<TrendPoint<Double, P>>(historySize + 2);
+        List<TrendPoint<Double, V>> trendPointsLimit = new ArrayList<TrendPoint<Double, V>>(historySize + 2);
         TrendPoint tp;
         for (int i = 0; i < trendPoints.size() - historySize; i++) {
             tp = trendPoints.get(i);
@@ -252,4 +255,7 @@ public abstract class AbstractTrendStrategy<P extends Differentiable> implements
     }
 
 
+    public int getSize() {
+        return trendPoints.size();
+    }
 }

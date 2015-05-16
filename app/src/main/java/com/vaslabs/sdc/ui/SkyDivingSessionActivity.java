@@ -22,6 +22,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class SkyDivingSessionActivity extends Activity {
     /**
@@ -119,10 +120,16 @@ public class SkyDivingSessionActivity extends Activity {
         
         
         mManager = (WifiP2pManager) getSystemService(this.WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(this, getMainLooper(), null);
+        mChannel = mManager.initialize(this, getMainLooper(), new WifiP2pManager.ChannelListener() {
+            @Override
+            public void onChannelDisconnected() {
+                Log.i("ChannelListener", "Channel disconnected");
+            }
+        });
+
         mReceiver = new WirelessBroadcastReceiver(mManager, mChannel, this);
 
-        SkyDivingEnvironment.getInstance().registerWirelessManager(mManager, mChannel);
+        SkyDivingEnvironment.getInstance().registerWirelessManager(mReceiver);
 
         mManager.discoverPeers( mChannel, new WifiActionListener( mManager, mChannel ) );
 
@@ -150,7 +157,9 @@ public class SkyDivingSessionActivity extends Activity {
                 SkyDivingEnvironment sde = SkyDivingEnvironment.getInstance();
                 if (sde != null)
                     sde.writeSensorLogs();
-                SpeechCommunicationManager.getInstance().shutdown();
+                try {
+                    SpeechCommunicationManager.getInstance().shutdown();
+                } catch (Exception e) {Log.e("SPEECH", e.toString());}
                 if (wakeLock != null)
                     wakeLock.release();
 
@@ -158,6 +167,7 @@ public class SkyDivingSessionActivity extends Activity {
                 return true;
             } else {
                 lastTimeKeyPressed = now;
+                Toast.makeText(this, "Double click back to exit", Toast.LENGTH_LONG).show();
             }
         }
 

@@ -13,5 +13,9 @@ import java.util.List;
  */
 public class ConnectionChangedConnectivityActionResponder extends
         ConnectivityActionResponder {
-    
+
+        @Override
+        public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
+
+        }
 }

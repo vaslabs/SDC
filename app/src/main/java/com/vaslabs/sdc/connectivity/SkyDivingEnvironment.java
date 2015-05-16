@@ -10,6 +10,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -55,13 +58,13 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     private BarometerSensor barometerSensor;
     private GPSSensor gpsSensor;
     private PositionGraph positionGraph;
-
+    protected Lock wifiResetLock;
     private final int defaultColor = SkyDiverListAdapterHelper
             .getDefaultColor();
-    private WifiP2pManager mManager;
-    private WifiP2pManager.Channel channel;
+    private WirelessBroadcastReceiver mReceiver;
 
     private SkyDivingEnvironment( Context context ) {
+        wifiResetLock = new ReentrantLock();
         skydivers = new HashMap<String, SkyDiver>();
         this.context = context;
         UserInformation ui = UserInformation.getUserInfo( context );
@@ -73,6 +76,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         SkyDivingEnvironmentLogger.initLogger( context );
         positionGraph = new PositionGraph();
         registerSensors();
+
 
     }
 
@@ -127,7 +131,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
                     SpeechCommunicationManager.getInstance();
             scm.getProximityWarning( context );
             Log.v( LOG_TAG, "New connection: " + skydiver.toString() );
-            SkyDivingEnvironmentLogger.Log( "New connection: " + skydiver.toString() );
+            SkyDivingEnvironmentLogger.Log("New connection: " + skydiver.toString());
         }
         this.notifyDataSetChanged();
     }
@@ -240,7 +244,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
                 connectivity < colors.length ? colors[connectivity]
                         : defaultColor;
         tv.setBackgroundColor( color );
-        tv.setText( getItem( position ).getName() );
+        tv.setText(getItem(position).getName());
 
         return tv;
     }
@@ -252,7 +256,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     @Override
     public void onLooseConnection( String skydiverKey ) {
         SkyDiver sd = skydivers.get( skydiverKey );
-        onLooseConnection( sd );
+        onLooseConnection(sd);
     }
 
     public static String getLogFile() {
@@ -375,36 +379,8 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         positionGraph.registerGPSValue(lat, lng);
     }
 
-    public void registerWirelessManager(WifiP2pManager mManager, WifiP2pManager.Channel channel) {
-        this.mManager = mManager;
-        this.channel = channel;
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    public void resetWifiManager() {
-        if (this.mManager != null) {
-            this.mManager.stopPeerDiscovery(channel, new WifiP2pManager.ActionListener() {
-                @Override
-                public void onSuccess() {
-                    mManager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
-                        @Override
-                        public void onSuccess() {
-
-                        }
-
-                        @Override
-                        public void onFailure(int i) {
-
-                        }
-                    });
-                }
-
-                @Override
-                public void onFailure(int i) {
-
-                }
-            });
-        }
+    public void registerWirelessManager(WirelessBroadcastReceiver receiver) {
+        this.mReceiver = receiver;
     }
 
 }

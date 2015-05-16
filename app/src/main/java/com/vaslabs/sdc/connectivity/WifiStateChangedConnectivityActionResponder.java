@@ -10,4 +10,8 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 public class WifiStateChangedConnectivityActionResponder extends
         ConnectivityActionResponder {
 
+        @Override
+        public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
+
+        }
 }

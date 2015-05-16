@@ -23,9 +23,8 @@ public class WirelessBroadcastReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         ConnectivityActionResponder actionResponder = 
                 ActionResponderFactory.getResponder(action, this.context);
-        
         actionResponder.manageAction(wifiP2PManager, mChannel);
-        
+
     }
 
 }
