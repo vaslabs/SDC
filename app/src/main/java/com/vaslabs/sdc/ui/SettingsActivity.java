@@ -27,6 +27,8 @@ public class SettingsActivity extends Activity implements BarometerListener {
     private EditText massEditText;
     private EditText nameEditText;
     private EditText seaLevelEditText;
+    private EditText altitudeLimitEditText;
+
     private Button currentPressureButton;
     private Button saveButton;
     private Button cancelButton;
@@ -50,7 +52,7 @@ public class SettingsActivity extends Activity implements BarometerListener {
         seaLevelEditText = (EditText)this.findViewById( R.id.seaLevelEditText );
         spinnerMeterSensitivity = (Spinner)this.findViewById(R.id.spinnerMeterSensitivity);
         spinnerTimeDensity = (Spinner)this.findViewById(R.id.spinnerTimeDensity);
-
+        altitudeLimitEditText = (EditText)this.findViewById(R.id.altitudeLimitEditText);
         meterOptions = new ArrayList<Integer>();
         meterOptions.add(10);
         meterOptions.add(20);
@@ -83,8 +85,14 @@ public class SettingsActivity extends Activity implements BarometerListener {
             
             @Override
             public void onClick( View v ) {
+                float altitudeLimit = 1000;
+                try {
+                    altitudeLimit = Float.parseFloat(altitudeLimitEditText.getText().toString());
+                } catch (NumberFormatException nfe) {
+                    Toast.makeText(v.getContext(), nfe.getMessage() + ": Defaults to 1000", Toast.LENGTH_SHORT).show();
+                }
                 TrendingPreferences.getNewTrendingPreferences(meterOptions.get(spinnerMeterSensitivity.getSelectedItemPosition()),
-                        densityOptions.get(spinnerTimeDensity.getSelectedItemPosition()));
+                        densityOptions.get(spinnerTimeDensity.getSelectedItemPosition()), altitudeLimit); //TODO
                 UserPreferences up = new UserPreferences();
                 try {
                     up.mass = Float.parseFloat( massEditText.getText().toString() );

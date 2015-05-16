@@ -2,13 +2,18 @@ package com.vaslabs.sdc.tests;
 
 import android.test.AndroidTestCase;
 
+import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
+import com.vaslabs.sdc.sensors.BarometerSensor;
 import com.vaslabs.sdc.types.DifferentiableFloat;
 import com.vaslabs.sdc.types.TrendPoint;
+import com.vaslabs.sdc.ui.util.TrendingPreferences;
 import com.vaslabs.sdc.utils.AbstractTrendStrategy;
 import com.vaslabs.sdc.utils.BarometerTrendOnDiveAltitudeListener;
 import com.vaslabs.sdc.utils.BarometerTrendStrategy;
 import com.vaslabs.sdc.utils.DefaultBarometerTrendListener;
 import com.vaslabs.sdc.utils.TrendDirection;
+
+import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
@@ -100,6 +105,33 @@ public class TestDiscoverPeersOnBarometerEvent extends AndroidTestCase {
     private void uponDiving(AbstractTrendStrategy<DifferentiableFloat> trendStrategy) {
         for (float i = 3000; i >= 0; i--) {
             trendStrategy.acceptValue(Double.valueOf(6000 - i), new DifferentiableFloat(i));
+        }
+    }
+
+    public void test_integration() throws IllegalAccessException, NoSuchFieldException, InterruptedException {
+        SkyDivingEnvironment sde = SkyDivingEnvironment.getInstance(this.mContext);
+        Field trendStrategy = SkyDivingEnvironment.class.getDeclaredField("trendStrategy");
+        trendStrategy.setAccessible(true);
+        Field hasStartedScanning = SkyDivingEnvironment.class.getDeclaredField("hasStartedScanning");
+        hasStartedScanning.setAccessible(true);
+        AbstractTrendStrategy ats = (AbstractTrendStrategy)(trendStrategy.get(sde));
+
+        Field barometerSensor = SkyDivingEnvironment.class.getDeclaredField("barometerSensor");
+        barometerSensor.setAccessible(true);
+        barometerSensor.set(sde, new BarometerSensor(mContext));
+
+        for (float i = 0; i < 3000; i++) {
+            ats.acceptValue(i*0.6, new DifferentiableFloat(i));
+            assertFalse(hasStartedScanning.getBoolean(sde));
+        }
+
+        for (float i = 0; i < 3000; i++) {
+            ats.acceptValue(3000*0.6 + i*0.6, new DifferentiableFloat(3000-i));
+            if (3000 - i <= 950) {
+                assertTrue(hasStartedScanning.getBoolean(sde));
+            } else {
+                assertFalse(hasStartedScanning.getBoolean(sde));
+            }
         }
     }
 

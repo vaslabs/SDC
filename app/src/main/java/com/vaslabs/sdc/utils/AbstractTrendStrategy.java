@@ -56,7 +56,7 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
     }
 
     public final synchronized void acceptValue(Double point, V value) {
-        if (accept(point)) {
+        if (accept(point, value)) {
             if (cycleIndex >= historySize) {
                 cycleIndex = 0;
                 isCyclic = true;
@@ -83,7 +83,7 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         this.trendVelocityStateMap.remove(trendPointToRemove.point);
     }
 
-    private final boolean accept(Double point) {
+    private final boolean accept(Double point, V value) {
         if (trendPoints.size() == 0)
             return true;
         if (trendMap.containsKey(point))
@@ -95,8 +95,11 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         if (point.compareTo(trendPoints.get(thisTrendPoint).point) < 0)
             return false;
 
-
         double differentiation = Math.abs(point - trendPoints.get(thisTrendPoint).point);
+
+        if (Math.abs(value.differantiate(trendPoints.get(thisTrendPoint).value)) < accuracy) {
+            return false;
+        }
 
         if (this.timeDensityD >= 0) {
             if (differentiation >= this.timeDensityD) {
@@ -107,6 +110,8 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
                 return true;
             }
         }
+
+
 
         return false;
     }
@@ -131,11 +136,11 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
 
         double difference = trendPoints.get(thisTrendPoint).value.differantiate(trendPoints.get(lastTrendPoint).value);
 
-        if (difference > accuracy) {
+        if (difference >= accuracy) {
             currentDirection = TrendDirection.UP;
-        } else if (difference >= 0) {
+        } else if (difference == 0) {
             currentDirection = TrendDirection.NEUTRAL;
-        } else if (difference < -accuracy) {
+        } else if (difference <= -accuracy) {
             currentDirection = TrendDirection.DOWN;
         } else {
             currentDirection = TrendDirection.NEUTRAL;

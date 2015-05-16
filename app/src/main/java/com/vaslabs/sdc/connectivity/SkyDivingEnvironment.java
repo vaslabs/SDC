@@ -126,8 +126,6 @@ public class SkyDivingEnvironment extends BaseAdapter implements
             hasBarometer = true;
         } catch (NoBarometerException nbe) {
             //scm.getNoBarometerWarning();
-        } catch (Exception e) {
-            //scm.getBarometerErrorWarning();
         }
         try {
             gpsSensor = new GPSSensor(this.context);
@@ -407,8 +405,11 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     public synchronized void beginScanning() {
-        if (!hasStartedScanning)
-            this.mManager.discoverPeers(this.mChannel, this.actionListener);
+        if (!hasStartedScanning) {
+            hasStartedScanning = true;
+            if (this.mManager != null)
+                this.mManager.discoverPeers(this.mChannel, this.actionListener);
+        }
     }
 
     public boolean hasBarometer() {
