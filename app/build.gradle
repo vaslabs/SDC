@@ -22,6 +22,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:20.+'
+    compile 'com.android.support:support-v4:20.+',
+            'com.github.lecho:hellocharts-library:1.5.5@aar'
 }
 
