@@ -24,7 +24,7 @@
     <string name="mock_skydiver_disconnect">Simulation: Disconnect skydiver</string>
     <string name="disconnected_warning">"Connection lost with skydiver that had a %s connection before"</string>
     <string name="manage_logs">Manage logs</string>
-    <string name="title_activity_manage_logs">ManageLogsActivity</string>
+    <string name="title_activity_manage_logs">Manage Logs</string>
     <string name="username_text">username</string>
     <string name="password_text">password</string>
     <string name="submit">Submit</string>
