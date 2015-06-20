@@ -6,5 +6,6 @@ package com.vaslabs.sdc.utils;
 public interface IValidator {
     boolean validate();
     ValidationMessageType getMessageType();
-
+    CharSequence getMessage();
+    CharSequence getTitle();
 }
