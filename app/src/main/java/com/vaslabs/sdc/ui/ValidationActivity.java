@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.vaslabs.sdc.ui.util.ValidationAdapter;
 import com.vaslabs.sdc.ui.util.ValidationChangeListener;
@@ -37,6 +38,7 @@ public class ValidationActivity extends Activity implements ValidationChangeList
         validationListView.setAdapter(validationAdapter);
 
         onValidationChanged();
+        Toast.makeText(this, "Click on the icons next to the sensor titles to refresh the validation", Toast.LENGTH_LONG).show();
         validationProceedButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
