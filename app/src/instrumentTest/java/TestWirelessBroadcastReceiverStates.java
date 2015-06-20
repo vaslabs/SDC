@@ -1,5 +1,3 @@
-package com.vaslabs.sdc.tests;
-
 import com.vaslabs.sdc.connectivity.ActionResponderFactory;
 import com.vaslabs.sdc.connectivity.ConnectionChangedConnectivityActionResponder;
 import com.vaslabs.sdc.connectivity.ConnectivityActionResponder;

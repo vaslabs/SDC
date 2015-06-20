@@ -19,10 +19,13 @@ android {
     lintOptions {
         abortOnError false
     }
+    sourceSets { main { java.srcDirs = ['src/main/java', 'src/instrumentTest/java'] } }
 }
 
 dependencies {
     compile 'com.android.support:support-v4:20.+',
             'com.github.lecho:hellocharts-library:1.5.5@aar'
+    testCompile 'junit:junit:4.12'
+    testCompile "org.mockito:mockito-core:1.9.5"
 }
 

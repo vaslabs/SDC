@@ -1,5 +1,3 @@
-package com.vaslabs.sdc.tests;
-
 import com.vaslabs.sdc.sensors.BarometerSensor;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
 
@@ -12,7 +10,7 @@ public class TestBarometerSensor extends AndroidTestCase {
     }
 
     public void test_barometer_is_initialised() {
-        BarometerSensor bs = new BarometerSensor( this.mContext );
+        BarometerSensor bs = BarometerSensor.getInstance( this.mContext );
         try {
             Thread.sleep( 1000 );
         } catch ( InterruptedException e ) {
@@ -26,15 +24,16 @@ public class TestBarometerSensor extends AndroidTestCase {
     }
 
     public void test_barometer_converts_hPa_to_meters() {
-        BarometerSensor bs = new BarometerSensor( this.mContext );
+        BarometerSensor bs = BarometerSensor.getInstance( this.mContext );
         try {
-            Thread.sleep( 1000 );
+            Thread.sleep( 2000 );
         } catch ( InterruptedException e ) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         MetersSensorValue msv = bs.getAltitude();
-        assertTrue( msv.getRawValue() > 0 );
+        if ( !(msv.getRawValue() != 0 )) {
+            fail(String.valueOf(msv.getRawValue()));
+        }
     }
 
 }

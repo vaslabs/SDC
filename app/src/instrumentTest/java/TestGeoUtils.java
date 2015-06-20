@@ -1,5 +1,3 @@
-package com.vaslabs.sdc.tests;
-
 import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;

@@ -109,7 +109,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     private void registerSensors() {
         try
         {
-            barometerSensor = new BarometerSensor(this.context);
+            barometerSensor = BarometerSensor.getInstance(this.context);
 
             hasBarometer = true;
         } catch (NoBarometerException nbe) {

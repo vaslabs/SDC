@@ -1,5 +1,3 @@
-package com.vaslabs.sdc.tests;
-
 import android.test.AndroidTestCase;
 
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;

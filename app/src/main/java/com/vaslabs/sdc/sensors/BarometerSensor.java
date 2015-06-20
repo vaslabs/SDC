@@ -15,7 +15,10 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
     private HPASensorValue value;
     private HPASensorValue seaLevelPressureValue;
     private BarometerListener listener = null;
-    public BarometerSensor( Context c ) {
+    private static BarometerSensor barometerSensor = null;
+    private final static Object barometerInitLock = new Object();
+    public final boolean isDummy;
+    private BarometerSensor( Context c ) {
 
         super(Sensor.TYPE_PRESSURE, c);
 
@@ -23,12 +26,23 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
         
         Sensor hwSensor = getSensor();
         if ( hwSensor == null ) {
-            throw new NoBarometerException();
-        }
-        sm.registerListener( this, hwSensor, SensorManager.SENSOR_DELAY_NORMAL );
+            isDummy = true;
+        } else
+            isDummy = false;
         seaLevelPressureValue = new HPASensorValue();
         seaLevelPressureValue
                 .setRawValue( SensorManager.PRESSURE_STANDARD_ATMOSPHERE );
+        if (!isDummy) {
+            sm.registerListener( this, hwSensor, SensorManager.SENSOR_DELAY_NORMAL );
+        }
+    }
+
+    public static BarometerSensor getInstance(Context c) {
+        synchronized (barometerInitLock) {
+            if (barometerSensor == null)
+                barometerSensor = new BarometerSensor(c);
+        }
+        return barometerSensor;
     }
 
     public void calibrate( float seaLevel ) {

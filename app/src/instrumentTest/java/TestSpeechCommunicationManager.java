@@ -1,5 +1,3 @@
-package com.vaslabs.sdc.tests;
-
 import com.vaslabs.sdc.ui.OnSpeechSuccessListener;
 import com.vaslabs.sdc.ui.SpeechCommunicationManager;
 

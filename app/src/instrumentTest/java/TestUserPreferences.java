@@ -1,5 +1,3 @@
-package com.vaslabs.sdc.tests;
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;

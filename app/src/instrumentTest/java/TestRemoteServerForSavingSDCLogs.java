@@ -1,6 +1,3 @@
-package com.vaslabs.sdc.tests;
-
-
 import org.json.JSONException;
 import org.json.JSONObject;
 

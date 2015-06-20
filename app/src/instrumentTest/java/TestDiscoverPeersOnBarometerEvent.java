@@ -1,5 +1,3 @@
-package com.vaslabs.sdc.tests;
-
 import android.net.wifi.p2p.WifiP2pManager;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -118,7 +116,7 @@ public class TestDiscoverPeersOnBarometerEvent extends AndroidTestCase {
 
         Field barometerSensor = SkyDivingEnvironment.class.getDeclaredField("barometerSensor");
         barometerSensor.setAccessible(true);
-        barometerSensor.set(sde, new BarometerSensor(mContext));
+        barometerSensor.set(sde, BarometerSensor.getInstance(mContext));
 
         WifiP2pManager mManager = (WifiP2pManager) this.mContext.getSystemService(this.mContext.WIFI_P2P_SERVICE);
         WifiP2pManager.Channel mChannel = mManager.initialize(this.mContext, mContext.getMainLooper(), new WifiP2pManager.ChannelListener() {

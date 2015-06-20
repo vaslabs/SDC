@@ -74,7 +74,7 @@ public class SettingsActivity extends Activity implements BarometerListener {
         cancelButton = (Button)this.findViewById( R.id.cancelButton );
         
         try {
-            barometer = new BarometerSensor(this);
+            barometer = BarometerSensor.getInstance(this);
 
             barometer.registerListener(this);
         }

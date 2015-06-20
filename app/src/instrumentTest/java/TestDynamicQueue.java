@@ -1,5 +1,3 @@
-package com.vaslabs.sdc.tests;
-
 import com.vaslabs.sdc.utils.DynamicQueue;
 
 import android.test.AndroidTestCase;
