@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">SkyDivingCompanion</string>
+    <string name="app_name">Skydiving Companion</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_sensors">SensorsActivity</string>
@@ -12,7 +12,7 @@
     <string name="connection_engaged" formatted="false">Connection engaged with remote skydiver %s</string>
     <string name="distance_warning" formatted="false">You are %d away from %s</string>
     <string name="pref_title_sea_level_pressure">Sea level pressure</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_settings">Settings</string>
     <string name="prompt_set_current_barometer_value">Set current barometer value as sea level</string>
     <string name="unknown_value">Unavailable</string>
     <string name="save">Save</string>
@@ -31,7 +31,7 @@
     <string name="trendDensity">Time density</string>
     <string name="meterSensitivity">Altitude change sensitivity</string>
     <string name="altLimitText">Scanning altitude</string>
-    <string name="title_activity_validation">ValidationActivity</string>
+    <string name="title_activity_validation">Health Check</string>
     <string name="caution_proceed">Proceed with caution</string>
     <string name="proceed">Proceed</string>
 </resources>
