@@ -69,7 +69,7 @@ public class MainActivity extends Activity {
                 
                 @Override
                 public void onClick( View v ) {
-                    Intent intent = new Intent(v.getContext(), SkyDivingSessionActivity.class);
+                    Intent intent = new Intent(v.getContext(), ValidationActivity.class);
                     startActivity( intent );
                 }
             } );

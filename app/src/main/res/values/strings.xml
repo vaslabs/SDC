@@ -31,4 +31,7 @@
     <string name="trendDensity">Time density</string>
     <string name="meterSensitivity">Altitude change sensitivity</string>
     <string name="altLimitText">Scanning altitude</string>
+    <string name="title_activity_validation">ValidationActivity</string>
+    <string name="caution_proceed">Proceed with caution</string>
+    <string name="proceed">Proceed</string>
 </resources>
