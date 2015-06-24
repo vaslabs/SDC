@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.vaslabs.sdc.ui.charts.BarometerChartActivity;
+
 public class MainActivity extends Activity {
 
     @Override
@@ -38,10 +40,16 @@ public class MainActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if ( id == R.id.action_settings ) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            this.startActivity( intent );
-            return true;
+        Intent intent;
+        switch (id) {
+            case R.id.action_settings:
+                intent = new Intent(this, SettingsActivity.class);
+                this.startActivity( intent );
+                return true;
+            case R.id.action_charts:
+                intent = new Intent(this, BarometerChartActivity.class);
+                this.startActivity( intent );
+                return true;
         }
         return super.onOptionsItemSelected( item );
     }

@@ -71,6 +71,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vaslabs.sdc.ui.MainActivity" />
         </activity>
+        <activity
+            android:name=".charts.BarometerChartActivity"
+            android:label="@string/title_activity_barometer_chart"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat.Light">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vaslabs.sdc.ui.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
