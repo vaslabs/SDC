@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.vaslabs.sdc.ui.charts.BarometerChartActivity;
+import com.vaslabs.sdc.ui.charts.LogbookActivity;
 
 public class MainActivity extends Activity {
 
@@ -48,6 +49,10 @@ public class MainActivity extends Activity {
                 return true;
             case R.id.action_charts:
                 intent = new Intent(this, BarometerChartActivity.class);
+                this.startActivity( intent );
+                return true;
+            case R.id.logbook:
+                intent = new Intent(this, LogbookActivity.class);
                 this.startActivity( intent );
                 return true;
         }

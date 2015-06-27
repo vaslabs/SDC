@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
+import com.vaslabs.sdc.logs.LogbookStats;
 import com.vaslabs.sdc.ui.R;
 
 import java.io.IOException;
@@ -65,6 +66,7 @@ public class BarometerChartActivity extends ActionBarActivity {
         private boolean hasLabels = false;
         private boolean isCubic = false;
         private boolean hasLabelForSelected = false;
+        private BarometerEntry[] avgBarometerEntries;
 
         public PlaceholderFragment() {
         }
@@ -191,6 +193,7 @@ public class BarometerChartActivity extends ActionBarActivity {
             } catch (IOException e) {
 
             }
+            avgBarometerEntries = LogbookStats.average(barometerEntries, 3);
         }
 
         private void reset() {
@@ -228,12 +231,12 @@ public class BarometerChartActivity extends ActionBarActivity {
 
             List<Line> lines = new ArrayList<Line>();
             BarometerEntry be;
-            long firstTimestamp = barometerEntries.get(0).getTimestamp();
+            long firstTimestamp = avgBarometerEntries[0].getTimestamp();
             for (int i = 0; i < numberOfLines; ++i) {
 
                 List<PointValue> values = new ArrayList<PointValue>();
-                for (int j = 0; j < barometerEntries.size(); ++j) {
-                    be = barometerEntries.get(j);
+                for (int j = 0; j < avgBarometerEntries.length; ++j) {
+                    be = avgBarometerEntries[j];
                     values.add(new PointValue(be.getTimestamp() - firstTimestamp, be.getAltitude()));
                 }
 

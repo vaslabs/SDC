@@ -37,4 +37,7 @@
     <string name="title_activity_charts">Altitude chart</string>
     <string name="title_activity_barometer_chart">Altitude chart</string>
     <string name="action_charts">Geeky charts</string>
+    <string name="title_activity_logbook">LogbookActivity</string>
+    <string name="freeFallTime">Free fall time</string>
+    <string name="logbook">My logbook</string>
 </resources>
