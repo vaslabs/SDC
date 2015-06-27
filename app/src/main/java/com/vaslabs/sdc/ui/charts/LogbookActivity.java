@@ -5,6 +5,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,6 +13,7 @@ import com.google.gson.Gson;
 import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.logs.LogbookStats;
 import com.vaslabs.sdc.ui.R;
+import com.vaslabs.sdc.ui.util.LogBookAdapter;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,7 +21,7 @@ import java.io.InputStreamReader;
 public class LogbookActivity extends Activity {
 
     private LogbookStats stats;
-    private TextView textView;
+    private ListView logBookListView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,8 +38,11 @@ public class LogbookActivity extends Activity {
         }
 
         stats = LogbookStats.generateLogbookStats(barometerEntries);
-        textView = (TextView)findViewById(R.id.logTextView);
-        textView.setText(stats.toString());
+        logBookListView = (ListView)findViewById(R.id.logBookListView);
+
+        LogBookAdapter logBookAdapter = new LogBookAdapter(stats, this);
+
+        logBookListView.setAdapter(logBookAdapter);
 
 
     }

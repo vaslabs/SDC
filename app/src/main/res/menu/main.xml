@@ -8,13 +8,24 @@
         android:showAsAction="never"
         android:title="@string/action_settings"/>
     <item
-        android:id="@+id/action_charts"
+        android:id="@+id/barometer_chart"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="@string/action_charts"/>
+        android:title="@string/barometer_chart"/>
+    <item
+        android:id="@+id/velocity_chart"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/title_activity_velocity_chart"/>
     <item
         android:id="@+id/logbook"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/logbook"/>
+    <item
+        android:id="@+id/submitlogs"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/manage_logs"/>
+
 </menu>

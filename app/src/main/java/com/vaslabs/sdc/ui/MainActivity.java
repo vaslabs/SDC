@@ -10,9 +10,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.vaslabs.sdc.ui.charts.BarometerChartActivity;
 import com.vaslabs.sdc.ui.charts.LogbookActivity;
+import com.vaslabs.sdc.ui.charts.VelocityChartActivity;
 
 public class MainActivity extends Activity {
 
@@ -47,13 +49,21 @@ public class MainActivity extends Activity {
                 intent = new Intent(this, SettingsActivity.class);
                 this.startActivity( intent );
                 return true;
-            case R.id.action_charts:
+            case R.id.barometer_chart:
                 intent = new Intent(this, BarometerChartActivity.class);
+                this.startActivity( intent );
+                return true;
+            case R.id.velocity_chart:
+                intent = new Intent(this, VelocityChartActivity.class);
                 this.startActivity( intent );
                 return true;
             case R.id.logbook:
                 intent = new Intent(this, LogbookActivity.class);
                 this.startActivity( intent );
+                return true;
+            case R.id.submitlogs:
+                intent = new Intent(this, ManageLogsActivity.class);
+                startActivity(intent);
                 return true;
         }
         return super.onOptionsItemSelected( item );
@@ -64,8 +74,7 @@ public class MainActivity extends Activity {
      */
     public static class PlaceholderFragment extends Fragment {
 
-        private Button skyDivingSessionButton;
-        private Button manageLogsButton;
+        private ImageButton skyDivingSessionButton;
         public PlaceholderFragment() {
         }
 
@@ -75,9 +84,8 @@ public class MainActivity extends Activity {
             View rootView =
                     inflater.inflate( R.layout.fragment_main, container, false );
             
-            skyDivingSessionButton = (Button) rootView.findViewById( R.id.skyDivingSessionButton );
-            manageLogsButton = (Button)rootView.findViewById( R.id.manageLogsButton );
-            
+            skyDivingSessionButton = (ImageButton) rootView.findViewById( R.id.skyDivingSessionButton );
+
             skyDivingSessionButton.setOnClickListener( new View.OnClickListener() {
                 
                 @Override
@@ -86,15 +94,7 @@ public class MainActivity extends Activity {
                     startActivity( intent );
                 }
             } );
-            
-            manageLogsButton.setOnClickListener( new View.OnClickListener() {
-                
-                @Override
-                public void onClick( View v ) {
-                    Intent intent = new Intent(v.getContext(), ManageLogsActivity.class);
-                    startActivity(intent);
-                }
-            });
+
             
             return rootView;
         }

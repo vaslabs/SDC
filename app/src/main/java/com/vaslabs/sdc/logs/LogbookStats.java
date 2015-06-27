@@ -68,6 +68,19 @@ public final class LogbookStats {
 
     }
 
+    public static VelocityEntry[] calculateVelocityValues(BarometerEntry[] barometerEntries) {
+        VelocityEntry[] velocityEntries = new VelocityEntry[barometerEntries.length];
+        velocityEntries[0] = new VelocityEntry(barometerEntries[0].getTimestamp(), 0f);
+        float dt, dx;
+        for (int i = 1; i < barometerEntries.length; i++)  {
+            dx = barometerEntries[i].getAltitude() - barometerEntries[i-1].getAltitude();
+            dt = (barometerEntries[i].getTimestamp() - barometerEntries[i-1].getTimestamp())/1000f;
+            velocityEntries[i] = new VelocityEntry(barometerEntries[i].getTimestamp(), dx/dt);
+
+        }
+        return velocityEntries;
+    }
+
     public static BarometerEntry[] average(BarometerEntries barometerEntries, int density) {
         BarometerEntry[] avgEntries = new BarometerEntry[barometerEntries.size()/density];
         long timestampAvg = 0;
@@ -115,4 +128,21 @@ public final class LogbookStats {
                 ", maxAltitude=" + maxAltitude +
                 '}';
     }
+
+    public float getFreeFallTime() {
+        return freeFallTime;
+    }
+
+    public float getMaximumSpeed() {
+        return maximumSpeed;
+    }
+
+    public float getDeploymentAltitude() {
+        return deploymentAltitude;
+    }
+
+    public float getExitAltitude() {
+        return exitAltitude;
+    }
+
 }

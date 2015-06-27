@@ -8,21 +8,15 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.vaslabs.sdc.MainActivity$PlaceholderFragment" >
 
-    <Button
+    <ImageButton
         android:id="@+id/skyDivingSessionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="143dp"
-        android:text="@string/skydivingsession" />
+        android:src="@drawable/session_activity_button"
+        android:background="@drawable/abc_ab_transparent_dark_holo"/>
 
-    <Button
-        android:id="@+id/manageLogsButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/manage_logs" />
 
 </RelativeLayout>

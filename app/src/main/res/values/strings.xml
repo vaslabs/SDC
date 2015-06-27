@@ -38,6 +38,12 @@
     <string name="title_activity_barometer_chart">Altitude chart</string>
     <string name="action_charts">Geeky charts</string>
     <string name="title_activity_logbook">LogbookActivity</string>
-    <string name="freeFallTime">Free fall time</string>
+    <string name="freeFallTime">Free fall time(s)</string>
     <string name="logbook">My logbook</string>
+    <string name="maximumSpeed">Max velocity(m/s)</string>
+    <string name="deploymentAltitude">Deployment alt(m)</string>
+    <string name="exitAltitude">Exit altitude(m)</string>
+    <string name="maxAltitude">Max alt</string>
+    <string name="title_activity_velocity_chart">Velocity chart</string>
+    <string name="barometer_chart">Barometer chart</string>
 </resources>

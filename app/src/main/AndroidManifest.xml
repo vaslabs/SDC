@@ -81,6 +81,15 @@
                 android:value="com.vaslabs.sdc.ui.MainActivity" />
         </activity>
         <activity
+            android:name=".charts.VelocityChartActivity"
+            android:label="@string/title_activity_velocity_chart"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat.Light" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vaslabs.sdc.ui.MainActivity" />
+        </activity>
+        <activity
             android:name=".charts.LogbookActivity"
             android:label="@string/title_activity_logbook"
             android:parentActivityName=".MainActivity" >
