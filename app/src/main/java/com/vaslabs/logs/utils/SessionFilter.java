@@ -9,6 +9,7 @@ import com.vaslabs.structs.DateStruct;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by vnicolao on 04/07/15.
@@ -51,5 +52,18 @@ public class SessionFilter {
             sessionMap.get(ds).insert(ce);
         }
         return sessionMap;
+    }
+
+    public static SkydivingSessionData mostRecent(Map<DateStruct, SkydivingSessionData> sessionDates) {
+        DateStruct mostRecentDate = null;
+        SkydivingSessionData mostRecentSession;
+        Set<DateStruct> dates = sessionDates.keySet();
+        for (DateStruct ds : dates) {
+            if (ds.compareTo(mostRecentDate) > 0) {
+                mostRecentDate = ds;
+            }
+        }
+
+        return sessionDates.get(mostRecentDate);
     }
 }

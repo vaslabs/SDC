@@ -13,6 +13,7 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Calendar;
 import java.util.Map;
 
 /**
@@ -61,8 +62,24 @@ public class TestConvertLogsToJson extends AndroidTestCase {
         if (sessionDates.keySet().size() <= 1) {
             fail("Expected more than 1 sessions but found: " + sessionDates.keySet().size());
         }
+
+        thenFindTheMostRecentOne();
+        andCheckDateToBeRight();
+
     }
 
+    private void andCheckDateToBeRight() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(sessionData.getBarometerEntry(0).getTimestamp());
+        DateStruct ds = new DateStruct(cal);
+        assertEquals(2015, ds.year);
+        assertEquals(Calendar.JUNE, ds.month);
+        assertEquals(28, ds.day);
+    }
+
+    private void thenFindTheMostRecentOne() {
+        sessionData = SessionFilter.mostRecent(sessionDates);
+    }
 
 
 }

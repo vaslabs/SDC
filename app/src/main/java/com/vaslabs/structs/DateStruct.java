@@ -1,11 +1,12 @@
 package com.vaslabs.structs;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by vnicolao on 04/07/15.
  */
-public final class DateStruct {
+public final class DateStruct implements Comparable<DateStruct> {
     public final int year;
     public final int month;
     public final int day;
@@ -40,5 +41,27 @@ public final class DateStruct {
         result = 31 * result + month;
         result = 31 * result + day;
         return result;
+    }
+
+    @Override
+    public int compareTo(DateStruct dateStruct) {
+        if (dateStruct == null)
+            return 1;
+        if (this.year > dateStruct.year)
+            return 1;
+        else if (this.year < dateStruct.year)
+            return -1;
+
+        if (this.month > dateStruct.month)
+            return 1;
+        else if (this.month < dateStruct.month)
+            return -1;
+
+        if (this.day > dateStruct.day)
+            return 1;
+        else if (this.day < dateStruct.day)
+            return -1;
+
+        return 0;
     }
 }
