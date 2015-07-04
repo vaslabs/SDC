@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by vnicolao on 20/06/15.
  */
-public class BarometerEntries {
+public final class BarometerEntries {
     private List<BarometerEntry> barometerEntries;
 
     public BarometerEntry get(int i) {

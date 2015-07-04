@@ -1,0 +1,208 @@
+package com.vaslabs.logs.utils;
+
+import java.util.*;
+import java.io.*;
+enum SDEntry {CONNECTION, BAROMETER, GPS};
+public class LogUtils {
+
+    public static final String END_OF_CONNECTIONS = "=END OF CONNECTIONS=";
+    public static final String END_OF_BAROMETER = "=END OF BAROMETER=";
+    public static final String END_OF_GPS = "=END OF GPS=";
+
+
+    public static String parse(InputStreamReader reader) throws IOException {
+        SkydivingData sd = readFromFile(new BufferedReader(reader));
+
+        return sd.toString();
+    }
+
+
+    public static SkydivingData readFromFile(BufferedReader reader) throws IOException {
+        IOException error = null;
+        SkydivingData sd = new SkydivingData();
+        try {
+            String line;
+            SDEntry readingEntry = SDEntry.CONNECTION;
+            while ( (line = reader.readLine()) != null) {
+                if (END_OF_CONNECTIONS.equals(line)) {
+                    readingEntry = SDEntry.BAROMETER;
+                    continue;
+                } else if (END_OF_BAROMETER.equals(line)) {
+                    readingEntry = SDEntry.GPS;
+                    continue;
+                } else if (END_OF_GPS.equals(line)) {
+                    break;
+                }
+
+                sd.addEntry(line, readingEntry);
+            }
+        } catch (IOException ioE) {
+            error = ioE;
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                }
+                catch (IOException e) {
+                    error = e;
+                }
+            }
+        }
+
+        if (error == null)
+            return sd;
+        throw error;
+    }
+}
+
+abstract class Entry implements Comparable<Entry> {
+    public final long timestamp;
+    public Entry(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    @Override
+    public int compareTo(Entry other) {
+        long result = this.timestamp - other.timestamp;
+        if (result == 0)
+            return 0;
+        if (result < 0)
+            return -1;
+        return 1;
+    }
+}
+
+class ConnectionEntry extends Entry {
+
+    public final String deviceName;
+    public final int connectionEvent;
+    public static final int NEW_CONNECTION = 1;
+    public static final int LOST_CONNECTION = -1;
+    public static final String NEW_CONNECTION_INDICATOR = "New connection";
+    public static final String LOST_CONNECTION_INDICATOR = "Lost connection";
+    private ConnectionEntry(long timestamp, String deviceName, int connectionEvent) {
+        super(timestamp);
+        this.deviceName = deviceName;
+        this.connectionEvent = connectionEvent;
+    }
+
+    public static ConnectionEntry valueOf(String entry) {
+        String[] parts = entry.split(":");
+        long timestamp = Long.parseLong(parts[0]);
+
+        String deviceName = parts[2].trim();
+        int connectionEvent = NEW_CONNECTION_INDICATOR.equals(parts[1].trim()) ? NEW_CONNECTION : LOST_CONNECTION;
+
+        return new ConnectionEntry(timestamp, deviceName, connectionEvent);
+    }
+
+    public String toString() {
+        return "{\"timestamp\":" + String.valueOf(timestamp) + ", \"deviceName\":" + "\"" + deviceName + "\"" + ", \"connectionEvent\":" + String.valueOf(connectionEvent)
+                + "}";
+    }
+}
+
+
+
+class GPSEntry extends Entry {
+
+    public final double latitude;
+    public final double longitude;
+
+    private GPSEntry(long timestamp, double latitude, double longitude) {
+        super(timestamp);
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+    public static GPSEntry valueOf(String entry) {
+        String[] parts = entry.split(":");
+        long timestamp = Long.parseLong(parts[0]);
+        String[] position = parts[1].trim().split(",");
+        double latitude = Double.parseDouble(position[0]);
+        double longitude = Double.parseDouble(position[1]);
+        return new GPSEntry(timestamp, latitude, longitude);
+    }
+
+    public String toString() {
+        return "{\"timestamp\":" + String.valueOf(timestamp) + ", \"latitude\":" + latitude + ", \"longitude\":" + longitude
+                + "}";
+    }
+
+}
+
+class BarometerEntry extends Entry {
+
+    public final float altitude;
+
+    private BarometerEntry(long timestamp, float altitude) {
+        super(timestamp);
+        this.altitude = altitude;
+    }
+
+    public static BarometerEntry valueOf(String entry) {
+        String[] parts = entry.split(":");
+        long timestamp = Long.parseLong(parts[0]);
+
+        float altitude = Float.parseFloat(parts[1]);
+        return new BarometerEntry(timestamp, altitude);
+    }
+
+    public String toString() {
+        return "{\"timestamp\":" + String.valueOf(timestamp) + ", \"altitude\":" + altitude
+                + "}";
+    }
+}
+
+class SkydivingData {
+    List<BarometerEntry> barometerEntries;
+    List<GPSEntry> gpsEntries;
+    List<ConnectionEntry> connectionEntries;
+
+    public SkydivingData() {
+        barometerEntries = new ArrayList<BarometerEntry>();
+        gpsEntries = new ArrayList<GPSEntry>(128);
+        connectionEntries = new ArrayList<ConnectionEntry>();
+    }
+
+    public void addEntry(String entryLine, SDEntry entryType) {
+        switch (entryType) {
+            case CONNECTION:
+                addConnectionEntry(entryLine);
+                break;
+            case BAROMETER:
+                addBarometerEntry(entryLine);
+                break;
+            case GPS:
+                addGPSEntry(entryLine);
+                break;
+        }
+
+    }
+
+
+    private void addConnectionEntry(String entry) {
+        ConnectionEntry be = ConnectionEntry.valueOf(entry);
+        connectionEntries.add(be);
+    }
+
+    private void addBarometerEntry(String entry) {
+        BarometerEntry be = BarometerEntry.valueOf(entry);
+        barometerEntries.add(be);
+    }
+
+    private void addGPSEntry(String entry) {
+        GPSEntry be = GPSEntry.valueOf(entry);
+        gpsEntries.add(be);
+    }
+
+    public String toString() {
+        return "{" +
+                "\"barometerEntries\":" + barometerEntries.toString() + ", " +
+                "\"connectionEntries\":" + connectionEntries.toString() + ", " +
+                "\"gpsEntries\":" + gpsEntries.toString() +
+                "}";
+    }
+
+
+}

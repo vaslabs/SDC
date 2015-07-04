@@ -19,7 +19,12 @@ android {
     lintOptions {
         abortOnError false
     }
-    sourceSets { main { java.srcDirs = ['src/main/java', 'src/instrumentTest/java'] } }
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java', 'src/instrumentTest/java']
+            res.srcDirs = ['src/main/res', 'src/androidTest/res/']
+        }
+    }
 }
 
 dependencies {
