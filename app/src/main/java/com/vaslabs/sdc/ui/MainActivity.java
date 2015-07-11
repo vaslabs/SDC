@@ -43,28 +43,29 @@ public class MainActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        Intent intent;
+        Intent intent = null;
         switch (id) {
             case R.id.action_settings:
                 intent = new Intent(this, SettingsActivity.class);
-                this.startActivity( intent );
-                return true;
+                break;
             case R.id.barometer_chart:
                 intent = new Intent(this, BarometerChartActivity.class);
-                this.startActivity( intent );
-                return true;
             case R.id.velocity_chart:
                 intent = new Intent(this, VelocityChartActivity.class);
-                this.startActivity( intent );
-                return true;
+                break;
             case R.id.logbook:
                 intent = new Intent(this, LogbookActivity.class);
-                this.startActivity( intent );
-                return true;
+                break;
             case R.id.submitlogs:
                 intent = new Intent(this, ManageLogsActivity.class);
-                startActivity(intent);
-                return true;
+                break;
+            case R.id.apisetup:
+                intent = new Intent(this, QRApiScannerActivity.class);
+                break;
+        }
+        if (intent != null) {
+            startActivity(intent);
+            return true;
         }
         return super.onOptionsItemSelected( item );
     }

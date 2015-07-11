@@ -46,4 +46,6 @@
     <string name="maxAltitude">Max alt</string>
     <string name="title_activity_velocity_chart">Velocity chart</string>
     <string name="barometer_chart">Barometer chart</string>
+    <string name="title_activity_qrapi_scanner">QRApiScannerActivity</string>
+    <string name="apisetup">Setup API</string>
 </resources>

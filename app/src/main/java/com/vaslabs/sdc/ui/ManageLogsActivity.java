@@ -6,11 +6,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Map;
 
+import com.google.gson.Gson;
+import com.vaslabs.logbook.SkydivingSessionData;
+import com.vaslabs.logs.utils.LogUtils;
+import com.vaslabs.logs.utils.SessionFilter;
 import com.vaslabs.pwa.CommunicationManager;
 import com.vaslabs.pwa.Response;
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
 import com.vaslabs.sdc.logs.SDCLogManager;
+import com.vaslabs.structs.DateStruct;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -148,28 +154,35 @@ public class ManageLogsActivity extends Activity {
 
 }
 
-class SubmitLogs extends AsyncTask<String, Void, Integer> {
+class SubmitLogs extends AsyncTask<String, Void, String> {
 
     private Context context;
     protected SubmitLogs(Context context) {
         this.context = context;
     }
     @Override
-    protected Integer doInBackground(String... params) {
-        if (params.length != 2) {
-            return HttpStatus.SC_UNAUTHORIZED;
-        }
+    protected String doInBackground(String... params) {
         CommunicationManager cm = CommunicationManager.getInstance();
         cm.setRemoteHost( context.getString(R.string.remote_host));
         SDCLogManager lm = SDCLogManager.getInstance(context);
         try {
-            String username = params[0];
-            String password = params[1];
-            lm.submitLogs(username, password);
+            InputStreamReader jsonReader = new InputStreamReader(lm.openLogs());
+            String jsonString = LogUtils.parse(jsonReader);
+            Gson gson = new Gson();
+            SkydivingSessionData sessionData = gson.fromJson(jsonString, SkydivingSessionData.class);
+            Map<DateStruct, SkydivingSessionData> sessionDates = SessionFilter.filter(sessionData);
+            sessionData = SessionFilter.mostRecent(sessionDates);
+            SDCLogManager logManager = SDCLogManager.getInstance(context);
+            logManager.submitLogs(sessionDates);
+            try {
+                lm.saveLatestSession(sessionData);
+            } catch (IOException ioe) {
+                Log.e("SDLCLogManager", ioe.toString());
+            }
         }
         catch (Exception e) {
             Log.e("Submitting logs", e.toString());
-            return HttpStatus.SC_UNAUTHORIZED;
+            return e.toString();
         }
         String message = null;
         try {
@@ -177,19 +190,16 @@ class SubmitLogs extends AsyncTask<String, Void, Integer> {
             Object responseBody = response.getBody();
             JSONObject json = (JSONObject) responseBody;
             message = json.getString("message");
-            if ("OK".equals(message))
-                return HttpStatus.SC_OK;
+            return message;
         } catch (Exception e) {
             Log.e("Submitting logs", e.toString());
-            return 500;
+            return e.toString();
         }
-        Log.e("SDC remote server", message);
-        return HttpStatus.SC_OK;
     }
 
     @Override
-    protected void onPostExecute(Integer status) {
-        if (status == HttpStatus.SC_OK) {
+    protected void onPostExecute(String status) {
+        if ("OK".equals(status)) {
             Toast.makeText(context, "Success: Logs have been submitted", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(context, "Error: " + status, Toast.LENGTH_LONG).show();

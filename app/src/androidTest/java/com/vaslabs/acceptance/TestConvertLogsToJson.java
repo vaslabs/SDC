@@ -6,7 +6,9 @@ import com.google.gson.Gson;
 import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.logs.utils.LogUtils;
 import com.vaslabs.logs.utils.SessionFilter;
+import com.vaslabs.sdc.logs.SDCLogManager;
 import com.vaslabs.sdc.ui.R;
+import com.vaslabs.sdc_dashboard.API.API;
 import com.vaslabs.structs.DateStruct;
 
 import org.json.JSONException;
@@ -53,7 +55,7 @@ public class TestConvertLogsToJson extends AndroidTestCase {
         sessionDates = SessionFilter.filter(sessionData);
     }
 
-    public void test_deserialised_data() throws JSONException {
+    public void test_deserialised_data() throws Exception {
         onSessionEnded();
         thenParseLogs();
         validateDataFromJson();
@@ -62,11 +64,18 @@ public class TestConvertLogsToJson extends AndroidTestCase {
         if (sessionDates.keySet().size() <= 1) {
             fail("Expected more than 1 sessions but found: " + sessionDates.keySet().size());
         }
-
         thenFindTheMostRecentOne();
         andCheckDateToBeRight();
 
+        submitEverything();
+
     }
+
+    private void submitEverything() throws Exception {
+        SDCLogManager logManager = SDCLogManager.getInstance(mContext);
+        logManager.submitLogs(sessionDates);
+    }
+
 
     private void andCheckDateToBeRight() {
         Calendar cal = Calendar.getInstance();

@@ -11,26 +11,10 @@ import android.test.AndroidTestCase;
 
 public class TestRemoteServerForSavingSDCLogs extends AndroidTestCase {
 
-    private String username;
-    private String password;
-    
+    private String apitoken;
+
     public void setUp() {
-        username = mContext.getString( R.string.username );
-        password = mContext.getString( R.string.password );
-    }
-    
-    public void test_reachability() {
-        CommunicationManager cm = CommunicationManager.getInstance();
-        cm.setRemoteHost( mContext.getString( R.string.remote_host ));
-        try {
-            Response response = cm.signIn( username, password );
-            Object body = response.getBody();
-            assertTrue(body instanceof JSONObject);
-            JSONObject jsBody = (JSONObject)body;
-            assertEquals("INVALID DATA", jsBody.getString( "message" ));
-        } catch ( Exception e ) {
-           fail(e.toString());
-        }
+        apitoken = mContext.getString( R.string.apitoken );
     }
     
     public void test_that_logs_can_be_submitted() throws JSONException {
@@ -38,7 +22,7 @@ public class TestRemoteServerForSavingSDCLogs extends AndroidTestCase {
         cm.setRemoteHost( mContext.getString(R.string.remote_host));
         SDCLogManager lm = SDCLogManager.getInstance(mContext);
         try {
-            lm.submitLogs(username, password);
+            lm.submitLogs(apitoken);
         }
         catch (Exception e) {
             fail(e.toString());
@@ -51,7 +35,7 @@ public class TestRemoteServerForSavingSDCLogs extends AndroidTestCase {
         
         
         try {
-            lm.submitLogs("username", "password");
+            lm.submitLogs("invalidtoken");
             
         }
         catch (Exception ice) {

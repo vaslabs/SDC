@@ -15,7 +15,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
         android:targetPackage="com.vaslabs.sdc.ui" >
@@ -92,6 +94,14 @@
         <activity
             android:name=".charts.LogbookActivity"
             android:label="@string/title_activity_logbook"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vaslabs.sdc.ui.MainActivity" />
+        </activity>
+        <activity
+            android:name=".QRApiScannerActivity"
+            android:label="@string/title_activity_qrapi_scanner"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
