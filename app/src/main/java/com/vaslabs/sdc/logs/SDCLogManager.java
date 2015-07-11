@@ -70,8 +70,8 @@ public class SDCLogManager {
             sessionData = sessionDates.get(key);
             json = buildRequest(sessionData);
             CommunicationManager.submitLogs(json, this.context);
-            sessionDates.remove(key);
         }
+        sessionDates.clear();
     }
 
     public void saveLatestSession(SkydivingSessionData sessionData) throws IOException {

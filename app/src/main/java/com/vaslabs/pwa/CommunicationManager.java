@@ -1,9 +1,7 @@
 package com.vaslabs.pwa;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,14 +13,12 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.vaslabs.sdc.pwa.PWAInvalidCredentialsException;
 import com.vaslabs.sdc.ui.R;
 import com.vaslabs.sdc_dashboard.API.API;
 
 import android.content.Context;
-import android.util.Base64;
 
 public class CommunicationManager {
 
