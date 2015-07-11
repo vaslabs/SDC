@@ -16,7 +16,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="143dp"
         android:src="@drawable/session_activity_button"
-        android:background="@drawable/abc_ab_transparent_dark_holo"/>
+        />
 
 
 </RelativeLayout>
