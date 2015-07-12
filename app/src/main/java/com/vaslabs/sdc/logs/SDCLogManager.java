@@ -81,5 +81,6 @@ public class SDCLogManager {
 
         PrintWriter writer = new PrintWriter(fos);
         writer.write(jsonString);
+        writer.close();
     }
 }
