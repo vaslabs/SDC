@@ -16,6 +16,7 @@ import com.vaslabs.pwa.CommunicationManager;
 import com.vaslabs.pwa.Response;
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
 import com.vaslabs.sdc.logs.SDCLogManager;
+import com.vaslabs.sdc_dashboard.API.API;
 import com.vaslabs.structs.DateStruct;
 
 import android.app.Activity;
@@ -43,142 +44,52 @@ public class ManageLogsActivity extends Activity {
 
     private TextView logsTextView;
     private Button submitLogsButton;
-    private LoginDialogFragment loginDialog;
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
-        super.onCreate( savedInstanceState );
+        super.onCreate(savedInstanceState);
         setContentView( R.layout.activity_manage_logs );
         submitLogsButton = (Button)findViewById(R.id.submitLogsbutton);
         logsTextView = (TextView)findViewById( R.id.logsTextView );
-        FileInputStream inputStream = null;
-        loginDialog = new LoginDialogFragment();
-        StringBuilder content = new StringBuilder(1024);
+        StringBuilder content = null;
         try {
-            inputStream = this.openFileInput( SkyDivingEnvironment.getLogFile() );
-            BufferedReader reader = new BufferedReader( new InputStreamReader(inputStream) );
-
-            String line = null;
-            while ((line = reader.readLine()) != null) {
+            SDCLogManager logManager = SDCLogManager.getInstance(this);
+            List<String> logLines = logManager.loadLogs();
+            content = new StringBuilder(255*logLines.size());
+            for (String line : logLines)
                 content.append( line ).append( '\n' );
-            }
 
-
-            
-        } catch ( FileNotFoundException e ) {
-            logsTextView.setText( e.toString() );
+        } catch ( IOException e ) {
+            logsTextView.setText(e.toString());
         }
-        catch (IOException e) {
-            logsTextView.setText( e.toString() );            
+        if (content != null)
+            logsTextView.setText(content.toString());
+        else {
+            logsTextView.setText(getString(R.string.nologsmessage));
         }
-        finally  {
-            if (inputStream != null)
-                try {
-                    inputStream.close();
-                } catch ( IOException e ) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-        }
-
-        SkyDivingEnvironment sde = SkyDivingEnvironment.getInstance(this);
-        List<String> positionLogLines = sde.getBarometerSensorLogsLinesUncompressed();
-        if (positionLogLines != null) {
-            content.append('\n');
-            content.append('\n');
-            for (String logLine : positionLogLines) {
-                content.append(logLine);
-                content.append('\n');
-            }
-        }
-
-        content.append('\n');
-        content.append('\n');
-
-        positionLogLines = sde.getGPSSensorLogsLinesUncompressed();
-        if (positionLogLines != null) {
-            content.append('\n');
-            content.append('\n');
-            for (String logLine : positionLogLines) {
-                content.append(logLine);
-                content.append('\n');
-            }
-        }
-        logsTextView.setText(content.toString());
-
-        submitLogsButton.setOnClickListener(new OnClickListener() {
-
+        submitLogsButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                loginDialog.show(getFragmentManager(), "Logs");
+            public void onClick(View view) {
+                    (new SubmitLogs(view.getContext()))
+                            .execute();
             }
         });
     }
 
-    static public class LoginDialogFragment extends DialogFragment {
-        private EditText usernameEditText;
-        private EditText passwordEditText;
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            // Get the layout inflater
-            LayoutInflater inflater = getActivity().getLayoutInflater();
-            // Inflate and set the layout for the dialog
-            // Pass null as the parent view because its going in the dialog layout
-            View inflate = inflater.inflate(R.layout.dialog_layout, null);
-            usernameEditText = (EditText) inflate.findViewById(R.id.usernameEditText);
-            passwordEditText = (EditText) inflate.findViewById(R.id.passwordEditText);
-            builder.setView(inflate)
-                    // Add action buttons
-                    .setPositiveButton(R.string.submit, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-
-                            (new SubmitLogs(getActivity()))
-                                       .execute(usernameEditText.getText().toString(),
-                                               passwordEditText.getText().toString()
-                                       );
-                            Toast.makeText(getActivity(), "Submitting logs...", Toast.LENGTH_SHORT).show();
-                            LoginDialogFragment.this.getDialog().dismiss();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            LoginDialogFragment.this.getDialog().cancel();
-                        }
-                    });
-
-            return builder.create();
-        }
-    }
-
 }
 
-class SubmitLogs extends AsyncTask<String, Void, String> {
+class SubmitLogs extends AsyncTask<Void, Void, String> {
 
     private Context context;
     protected SubmitLogs(Context context) {
         this.context = context;
     }
     @Override
-    protected String doInBackground(String... params) {
+    protected String doInBackground(Void... params) {
         CommunicationManager cm = CommunicationManager.getInstance();
         cm.setRemoteHost( context.getString(R.string.remote_host));
         SDCLogManager lm = SDCLogManager.getInstance(context);
         try {
-            InputStreamReader jsonReader = new InputStreamReader(lm.openLogs());
-            String jsonString = LogUtils.parse(jsonReader);
-            Gson gson = new Gson();
-            SkydivingSessionData sessionData = gson.fromJson(jsonString, SkydivingSessionData.class);
-            Map<DateStruct, SkydivingSessionData> sessionDates = SessionFilter.filter(sessionData);
-            sessionData = SessionFilter.mostRecent(sessionDates);
-            SDCLogManager logManager = SDCLogManager.getInstance(context);
-            logManager.submitLogs(sessionDates);
-            try {
-                lm.saveLatestSession(sessionData);
-            } catch (IOException ioe) {
-                Log.e("SDLCLogManager", ioe.toString());
-            }
+            lm.manageLogSubmission();
         }
         catch (Exception e) {
             Log.e("Submitting logs", e.toString());
@@ -186,15 +97,30 @@ class SubmitLogs extends AsyncTask<String, Void, String> {
         }
         String message = null;
         try {
-            Response response = lm.getLastResponse();
-            Object responseBody = response.getBody();
-            JSONObject json = (JSONObject) responseBody;
-            message = json.getString("message");
+            Response[] responses = lm.getResponses();
+            message = buildMessage(responses);
             return message;
         } catch (Exception e) {
             Log.e("Submitting logs", e.toString());
             return e.toString();
         }
+    }
+
+    private String buildMessage(Response[] responses) {
+        int skipped = 0;
+        int notOk = 0;
+        for (Response response : responses) {
+
+            if (response.getCode() == Response.SKIPPED)
+            {
+                skipped++;
+            } else if (response.getCode() != HttpStatus.SC_OK ) {
+                notOk++;
+            }
+        }
+        if (notOk == 0)
+            return "OK";
+        return "" + notOk + " out of " + (responses.length - skipped) + " failed submission";
     }
 
     @Override

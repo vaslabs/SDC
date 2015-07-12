@@ -318,7 +318,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
 
     }
 
-    public List<String> getBarometerSensorLogsLinesUncompressed() {
+    public static List<String> getBarometerSensorLogsLinesUncompressed(Context context) {
         FileInputStream logStream = null;
         try {
             logStream = context.openFileInput(PositionGraph.BAROMETER_LOG_FILE);
@@ -346,7 +346,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
 
-    public List<String> getGPSSensorLogsLinesUncompressed() {
+    public static List<String> getGPSSensorLogsLinesUncompressed(Context context) {
         FileInputStream logStream = null;
         try {
             logStream = context.openFileInput(PositionGraph.GPS_LOG_FILE);

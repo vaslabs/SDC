@@ -4,7 +4,6 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
 import com.vaslabs.sdc.types.DifferentiableFloat;
@@ -14,11 +13,9 @@ import com.vaslabs.sdc.utils.AbstractTrendStrategy;
 import com.vaslabs.sdc.utils.BarometerTrendStrategy;
 import com.vaslabs.sdc.utils.DefaultBarometerTrendListener;
 import com.vaslabs.sdc.utils.TrendDirection;
-import com.vaslabs.sdc.utils.TrendListener;
-import com.vaslabs.sdc.utils.VelocityState;
+
 
 import java.io.InputStreamReader;
-import java.util.List;
 
 /**
  * Created by vnicolao on 20/06/15.

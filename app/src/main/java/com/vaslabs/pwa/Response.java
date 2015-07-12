@@ -4,6 +4,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 public class Response {
+    public static final int SKIPPED = -1;
+    public static final Response SKIPPED_RESPONSE = new Response(null, SKIPPED);
     private int code;
     private JSONArray body;
 

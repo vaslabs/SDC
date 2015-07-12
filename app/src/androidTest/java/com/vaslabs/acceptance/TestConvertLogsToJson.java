@@ -8,7 +8,6 @@ import com.vaslabs.logs.utils.LogUtils;
 import com.vaslabs.logs.utils.SessionFilter;
 import com.vaslabs.sdc.logs.SDCLogManager;
 import com.vaslabs.sdc.ui.R;
-import com.vaslabs.sdc_dashboard.API.API;
 import com.vaslabs.structs.DateStruct;
 
 import org.json.JSONException;
@@ -46,9 +45,9 @@ public class TestConvertLogsToJson extends AndroidTestCase {
 
     private void validateDataFromJson() {
 
-        assertEquals(2033, sessionData.barometerEntriesSize());
-        assertEquals(1032, sessionData.gpsEntriesSize());
-        assertEquals(0, sessionData.connectionEventsSize());
+        assertEquals(1790, sessionData.barometerEntriesSize());
+        assertEquals(1088, sessionData.gpsEntriesSize());
+        assertEquals(7, sessionData.connectionEventsSize());
     }
 
     private void whenApplyFilters() {
@@ -67,13 +66,6 @@ public class TestConvertLogsToJson extends AndroidTestCase {
         thenFindTheMostRecentOne();
         andCheckDateToBeRight();
 
-        submitEverything();
-
-    }
-
-    private void submitEverything() throws Exception {
-        SDCLogManager logManager = SDCLogManager.getInstance(mContext);
-        logManager.submitLogs(sessionDates);
     }
 
 
@@ -82,8 +74,8 @@ public class TestConvertLogsToJson extends AndroidTestCase {
         cal.setTimeInMillis(sessionData.getBarometerEntry(0).getTimestamp());
         DateStruct ds = new DateStruct(cal);
         assertEquals(2015, ds.year);
-        assertEquals(Calendar.JUNE, ds.month);
-        assertEquals(28, ds.day);
+        assertEquals(Calendar.MAY, ds.month);
+        assertEquals(03, ds.day);
     }
 
     private void thenFindTheMostRecentOne() {

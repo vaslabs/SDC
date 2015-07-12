@@ -68,7 +68,7 @@ public class TestPositionGraph extends AndroidTestCase {
 
         sde.writeSensorLogs();
 
-        List<String> lines = sde.getBarometerSensorLogsLinesUncompressed();
+        List<String> lines = SkyDivingEnvironment.getBarometerSensorLogsLinesUncompressed(mContext);
         assertEquals(2, lines.size());
 
     }

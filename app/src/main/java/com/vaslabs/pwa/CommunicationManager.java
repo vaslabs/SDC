@@ -118,12 +118,12 @@ public class CommunicationManager {
         
     }
 
-    public static void submitLogs(String json, Context context) throws Exception {
+    public static Response submitLogs(String json, Context context) throws Exception {
         String token = API.getApiToken(context);
 
         CommunicationManager cm = CommunicationManager.getInstance();
         cm.setRemoteHost(context.getString(R.string.remote_host));
-        cm.sendRequest(json, token);
+        return cm.sendRequest(json, token);
 
     }
 

@@ -1,5 +1,9 @@
 package com.vaslabs.logs.utils;
 
+import android.content.Context;
+
+import com.vaslabs.sdc.logs.SDCLogManager;
+
 import java.util.*;
 import java.io.*;
 enum SDEntry {CONNECTION, BAROMETER, GPS};
@@ -13,6 +17,27 @@ public class LogUtils {
     public static String parse(InputStreamReader reader) throws IOException {
         SkydivingData sd = readFromFile(new BufferedReader(reader));
 
+        return sd.toString();
+    }
+
+    public static String parse(List<String> lines) throws IOException {
+        SkydivingData sd = new SkydivingData();
+        SDEntry readingEntry = SDEntry.CONNECTION;
+
+        for (String line : lines) {
+            if (END_OF_CONNECTIONS.equals(line)) {
+                readingEntry = SDEntry.BAROMETER;
+                continue;
+            } else if (END_OF_BAROMETER.equals(line)) {
+                readingEntry = SDEntry.GPS;
+                continue;
+            } else if (END_OF_GPS.equals(line)) {
+                break;
+            }
+
+            sd.addEntry(line, readingEntry);
+
+        }
         return sd.toString();
     }
 
@@ -53,6 +78,12 @@ public class LogUtils {
             return sd;
         throw error;
     }
+
+    public static String buildSessionData(Context c) throws IOException {
+        SDCLogManager logManager = SDCLogManager.getInstance(c);
+        List<String> logLines = logManager.loadLogs();
+        return LogUtils.parse(logLines);
+    }
 }
 
 abstract class Entry implements Comparable<Entry> {
@@ -78,6 +109,7 @@ class ConnectionEntry extends Entry {
     public final int connectionEvent;
     public static final int NEW_CONNECTION = 1;
     public static final int LOST_CONNECTION = -1;
+    public static final int SCANNING_STARTED = 0;
     public static final String NEW_CONNECTION_INDICATOR = "New connection";
     public static final String LOST_CONNECTION_INDICATOR = "Lost connection";
     private ConnectionEntry(long timestamp, String deviceName, int connectionEvent) {
@@ -90,6 +122,10 @@ class ConnectionEntry extends Entry {
         String[] parts = entry.split(":");
         long timestamp = Long.parseLong(parts[0]);
 
+        if (parts.length < 3) {
+            return new ConnectionEntry(timestamp, "", SCANNING_STARTED);
+        }
+
         String deviceName = parts[2].trim();
         int connectionEvent = NEW_CONNECTION_INDICATOR.equals(parts[1].trim()) ? NEW_CONNECTION : LOST_CONNECTION;
 
@@ -101,7 +137,6 @@ class ConnectionEntry extends Entry {
                 + "}";
     }
 }
-
 
 
 class GPSEntry extends Entry {

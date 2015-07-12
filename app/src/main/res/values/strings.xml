@@ -48,4 +48,5 @@
     <string name="barometer_chart">Barometer chart</string>
     <string name="title_activity_qrapi_scanner">QRApiScannerActivity</string>
     <string name="apisetup">Setup API</string>
+    <string name="nologsmessage">No logs have been found. Either you have sumbitted all logs or something went wrong.</string>
 </resources>
