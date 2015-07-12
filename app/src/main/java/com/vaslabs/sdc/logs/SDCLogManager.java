@@ -61,7 +61,7 @@ public class SDCLogManager {
                 strings.add(line);
             }
         } catch (FileNotFoundException fnfe) {
-            
+
         }
         finally {
             if (reader != null)
@@ -72,11 +72,16 @@ public class SDCLogManager {
                 }
         }
         strings.add("=END OF CONNECTIONS=");
-        strings.addAll(SkyDivingEnvironment.getBarometerSensorLogsLinesUncompressed(context));
+        List<String> barometerLines = SkyDivingEnvironment.getBarometerSensorLogsLinesUncompressed(context);
+        if (barometerLines != null)
+            strings.addAll(barometerLines);
         strings.add("=END OF BAROMETER=");
-        strings.addAll(SkyDivingEnvironment.getGPSSensorLogsLinesUncompressed(context));
+        List<String> gpsLines = SkyDivingEnvironment.getGPSSensorLogsLinesUncompressed(context);
+        if (gpsLines != null)
+            strings.addAll(gpsLines);
         strings.add("=END OF GPS=");
-
+        if (gpsLines == null && barometerLines == null)
+            throw new IOException("No data");
         return strings;
 
     }
