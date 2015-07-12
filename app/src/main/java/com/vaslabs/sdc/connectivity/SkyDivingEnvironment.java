@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vaslabs.sdc.UserInformation;
 import com.vaslabs.sdc.sensors.BarometerListener;
@@ -199,8 +200,8 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         if ( sd != null ) {
             SpeechCommunicationManager.getInstance().informAboutdisconnection(
                     SDConnectivity.values()[sd.getConnectivityStrengthAsInt()],
-                    context );
-            sd.setConnectivityStrength( SDConnectivity.CONNECTION_LOST );
+                    context);
+            sd.setConnectivityStrength(SDConnectivity.CONNECTION_LOST);
         }
 
         this.notifyDataSetChanged();
@@ -214,8 +215,8 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     @Override
     public synchronized void onMyGPSUpdate( LatitudeSensorValue lat,
             LongitudeSensorValue lng ) {
-        myself.getPosition().setLat( lat );
-        myself.getPosition().setLng( lng );
+        myself.getPosition().setLat(lat);
+        myself.getPosition().setLng(lng);
 
     }
 
@@ -281,13 +282,17 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         try {
             logStream = context.openFileOutput(PositionGraph.BAROMETER_LOG_FILE, Context.MODE_APPEND);
         } catch (FileNotFoundException fnfe) {
-            return;
+            try {
+                logStream = context.openFileOutput(PositionGraph.BAROMETER_LOG_FILE, Context.MODE_PRIVATE);
+            } catch (FileNotFoundException e) {
+                Toast.makeText(this.context, e.toString(), Toast.LENGTH_LONG).show();
+            }
         }
 
         try {
             logStream.write(positionGraph.getBarometerData());
         } catch (IOException ioE) {
-
+            Toast.makeText(this.context, ioE.toString(), Toast.LENGTH_LONG).show();
         } finally {
             if (logStream != null)
                 try {
@@ -300,12 +305,19 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         try {
             logStream = context.openFileOutput(PositionGraph.GPS_LOG_FILE, Context.MODE_APPEND);
         } catch (FileNotFoundException fnfe) {
+            try {
+                logStream = context.openFileOutput(PositionGraph.GPS_LOG_FILE, Context.MODE_PRIVATE);
+            } catch (FileNotFoundException e) {
+                Toast.makeText(this.context, e.toString(), Toast.LENGTH_LONG).show();
+            }
+
             return;
         }
 
         try {
             logStream.write(positionGraph.getGPSData());
         } catch (IOException ioE) {
+            Toast.makeText(this.context, ioE.toString(), Toast.LENGTH_LONG).show();
 
         } finally {
             if (logStream != null)

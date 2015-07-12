@@ -34,7 +34,11 @@ public class SkyDivingEnvironmentLogger {
         String logMsg = String.format( "%s: %s", System.currentTimeMillis(), logLine );
         
         try {
-            logStream = context.openFileOutput( LOG_FILE, Context.MODE_APPEND );
+            try {
+                logStream = context.openFileOutput( LOG_FILE, Context.MODE_APPEND );
+            } catch (FileNotFoundException fnfe) {
+                logStream = context.openFileOutput( LOG_FILE, Context.MODE_PRIVATE );
+            }
             logStream.write( logMsg.getBytes());
             logStream.write( '\n' );
         } catch ( IOException e ) {

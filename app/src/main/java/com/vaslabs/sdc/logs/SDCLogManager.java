@@ -2,6 +2,7 @@ package com.vaslabs.sdc.logs;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,6 +60,8 @@ public class SDCLogManager {
             while ((line = reader.readLine()) != null) {
                 strings.add(line);
             }
+        } catch (FileNotFoundException fnfe) {
+            
         }
         finally {
             if (reader != null)
