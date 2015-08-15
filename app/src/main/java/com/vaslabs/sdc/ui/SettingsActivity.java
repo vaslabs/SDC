@@ -1,5 +1,6 @@
 package com.vaslabs.sdc.ui;
 
+import com.gc.materialdesign.views.ButtonRectangle;
 import com.vaslabs.sdc.UserInformation;
 import com.vaslabs.sdc.UserPreferences;
 import com.vaslabs.sdc.sensors.BarometerListener;
@@ -29,11 +30,9 @@ public class SettingsActivity extends Activity implements BarometerListener {
     private EditText seaLevelEditText;
     private EditText altitudeLimitEditText;
 
-    private Button currentPressureButton;
-    private Button saveButton;
-    private Button cancelButton;
-    private Spinner spinnerMeterSensitivity;
-    private Spinner spinnerTimeDensity;
+    private ButtonRectangle currentPressureButton;
+    private ButtonRectangle saveButton;
+    private ButtonRectangle cancelButton;
 
     private BarometerSensor barometer;
     private Context meterSensitivityOptions;
@@ -50,8 +49,7 @@ public class SettingsActivity extends Activity implements BarometerListener {
         massEditText = (EditText) this.findViewById( R.id.massEditText );
         nameEditText = (EditText)this.findViewById( R.id.nameEditText );
         seaLevelEditText = (EditText)this.findViewById( R.id.seaLevelEditText );
-        spinnerMeterSensitivity = (Spinner)this.findViewById(R.id.spinnerMeterSensitivity);
-        spinnerTimeDensity = (Spinner)this.findViewById(R.id.spinnerTimeDensity);
+
         altitudeLimitEditText = (EditText)this.findViewById(R.id.altitudeLimitEditText);
         meterOptions = new ArrayList<Integer>();
         meterOptions.add(10);
@@ -63,15 +61,13 @@ public class SettingsActivity extends Activity implements BarometerListener {
         densityOptions.add(1.0);
         densityOptions.add(2.0);
         densityOptions.add(5.0);
-        attachOptionsMeters(spinnerMeterSensitivity);
-        attachOptionsTimeDensity(spinnerTimeDensity);
         userInfo = UserInformation.getUserInfo( this );
         
         updateTextFields();
         
-        currentPressureButton = (Button)this.findViewById( R.id.currentPressureButton );
-        saveButton = (Button)this.findViewById( R.id.saveButton );
-        cancelButton = (Button)this.findViewById( R.id.cancelButton );
+        currentPressureButton = (com.gc.materialdesign.views.ButtonRectangle)this.findViewById( R.id.currentPressureButton );
+        saveButton = (com.gc.materialdesign.views.ButtonRectangle)this.findViewById( R.id.saveButton );
+        cancelButton = (com.gc.materialdesign.views.ButtonRectangle)this.findViewById( R.id.cancelButton );
         
         try {
             barometer = BarometerSensor.getInstance(this);
@@ -91,8 +87,6 @@ public class SettingsActivity extends Activity implements BarometerListener {
                 } catch (NumberFormatException nfe) {
                     Toast.makeText(v.getContext(), nfe.getMessage() + ": Defaults to 1000", Toast.LENGTH_SHORT).show();
                 }
-                TrendingPreferences.getNewTrendingPreferences(meterOptions.get(spinnerMeterSensitivity.getSelectedItemPosition()),
-                        densityOptions.get(spinnerTimeDensity.getSelectedItemPosition()), altitudeLimit); //TODO
                 UserPreferences up = new UserPreferences();
                 try {
                     up.mass = Float.parseFloat( massEditText.getText().toString() );
