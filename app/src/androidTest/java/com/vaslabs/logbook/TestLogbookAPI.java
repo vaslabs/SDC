@@ -32,7 +32,6 @@ public class TestLogbookAPI extends AndroidTestCase{
         Constructor<Response> summaryLogbookResponseConstructor = Response.class.getDeclaredConstructor(JSONArray.class, Integer.TYPE);
         summaryLogbookResponseConstructor.setAccessible(true);
         JSONArray jsonArray = new JSONArray();
-        JSONObject jsonObject = new JSONObject();
         JSONObject summaryJS = new JSONObject();
         summaryJS.accumulate("numberOfJumbs", 3);
         long dMillis = Calendar.getInstance().getTimeInMillis();
@@ -41,7 +40,6 @@ public class TestLogbookAPI extends AndroidTestCase{
         summaryJS.accumulate("averageDeployAltitude", 1000);
         summaryJS.accumulate("averageSpeed", 100.1);
         summaryJS.accumulate("averageTopSpeed", 200.0);
-        jsonObject.accumulate("logbookSummary", summaryJS);
         jsonArray.put(summaryJS);
         Response summaryLogbookResponse = summaryLogbookResponseConstructor.newInstance(jsonArray, 0);
         Mockito.when(cm.sendRequest("{\"action\":0}", API.getApiToken(this.mContext))).thenReturn(summaryLogbookResponse);
