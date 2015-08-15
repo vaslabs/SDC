@@ -10,6 +10,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dexafree.materialList.cards.SmallImageCard;
+import com.dexafree.materialList.controller.MaterialListAdapter;
+import com.dexafree.materialList.model.Card;
 import com.vaslabs.sdc.ui.R;
 import com.vaslabs.sdc.utils.IValidator;
 
@@ -18,7 +21,7 @@ import java.util.Arrays;
 /**
  * Created by vnicolao on 20/06/15.
  */
-public class ValidationAdapter extends BaseAdapter {
+public class ValidationAdapter extends MaterialListAdapter {
 
     private final IValidator[] validators;
     private final Context context;
@@ -29,14 +32,31 @@ public class ValidationAdapter extends BaseAdapter {
         this.validators = Arrays.copyOf(validators, validators.length);
         this.context = context;
         this.vcl = validationChangeListener;
+        for (IValidator validator : validators) {
+            SmallImageCard card = toCard(validator, context);
+            this.add(card);
+            validator.attachCard(card);
+        }
     }
 
-    @Override
+    public static SmallImageCard toCard(IValidator validator, Context context) {
+        SmallImageCard card = new SmallImageCard(context);
+        card.setDescription(validator.getMessage().toString());
+        card.setTitle(validator.getTitle().toString());
+        int drawable_id;
+        if (validator.validate())
+            drawable_id = R.drawable.ic_success;
+        else
+            drawable_id = resources[validator.getMessageType().ordinal()];
+        card.setDrawable(drawable_id);
+        
+        return card;
+    }
+
     public int getCount() {
         return validators.length;
     }
 
-    @Override
     public Object getItem(int i) {
         return validators[i];
     }
@@ -46,27 +66,5 @@ public class ValidationAdapter extends BaseAdapter {
         return validators[i].getTitle().hashCode();
     }
 
-    @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        final IValidator validator = validators[i];
-        View viewFromTemplate = LayoutInflater.from(context).inflate(R.layout.validation_view, null);
-        final ImageButton imageButton = (ImageButton) viewFromTemplate.findViewById(R.id.validationImageButton);
-        imageButton.setBackgroundColor(Color.TRANSPARENT);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(view.getContext(), validator.getMessage() + "?: Resolve the problems and click the button again", Toast.LENGTH_LONG).show();
-                vcl.onValidationChanged();
-            }
-        });
-        TextView titleTextView = (TextView) viewFromTemplate.findViewById(R.id.validationTitleTextView);
-        if (validator.validate())
-            imageButton.setImageResource(R.drawable.ic_success);
-        else
-            imageButton.setImageResource(resources[validator.getMessageType().ordinal()]);
-        titleTextView.setText(validator.getTitle());
-        return viewFromTemplate;
-    }
 
 }

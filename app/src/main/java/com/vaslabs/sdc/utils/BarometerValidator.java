@@ -2,6 +2,9 @@ package com.vaslabs.sdc.utils;
 
 import android.content.Context;
 
+import com.dexafree.materialList.cards.SimpleCard;
+import com.dexafree.materialList.cards.SmallImageCard;
+import com.dexafree.materialList.model.Card;
 import com.vaslabs.sdc.sensors.BarometerSensor;
 import com.vaslabs.sdc.sensors.SDSensorManager;
 
@@ -14,6 +17,8 @@ public final class BarometerValidator extends AbstractValidator {
     private static final Object initLock = new Object();
     private String message = "Barometer is present";
     private String title = "Barometer";
+    private SimpleCard card;
+
     protected BarometerValidator(Context c) {
         super(c);
     }
@@ -42,6 +47,7 @@ public final class BarometerValidator extends AbstractValidator {
     public CharSequence getTitle() {
         return this.title;
     }
+
 
     public static IValidator getInstance(Context mContext) {
         synchronized (initLock) {

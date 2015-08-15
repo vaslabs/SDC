@@ -10,6 +10,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.dexafree.materialList.controller.RecyclerItemClickListener;
+import com.dexafree.materialList.model.CardItemView;
+import com.dexafree.materialList.view.MaterialListView;
 import com.gc.materialdesign.views.ButtonRectangle;
 import com.vaslabs.sdc.ui.util.ValidationAdapter;
 import com.vaslabs.sdc.ui.util.ValidationChangeListener;
@@ -23,7 +26,7 @@ import com.vaslabs.sdc.utils.WifiValidator;
 public class ValidationActivity extends Activity implements ValidationChangeListener {
 
     private ValidationAdapter validationAdapter;
-    private ListView validationListView;
+    private MaterialListView validationListView;
     private IValidator[] validators;
     private ButtonRectangle validationProceedButton;
     @Override
@@ -35,18 +38,33 @@ public class ValidationActivity extends Activity implements ValidationChangeList
 
         validators = new IValidator[] {BarometerValidator.getInstance(this), LocationValidator.getInstance(this), WifiValidator.getInstance(this)};
         validationAdapter = new ValidationAdapter(this, validators, this);
-        validationListView = (ListView) findViewById(R.id.validationStepsListView);
+        validationListView = (MaterialListView) findViewById(R.id.validationStepsListView);
         validationListView.setAdapter(validationAdapter);
 
         onValidationChanged();
-        Toast.makeText(this, "Click on the icons next to the sensor titles to refresh the validation", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Click on the cards to refresh the validation", Toast.LENGTH_LONG).show();
         validationProceedButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), SkyDivingSessionActivity.class);
-                startActivity( intent );
+                startActivity(intent);
                 finish();
+            }
+        });
+
+        validationListView.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(CardItemView view, int position) {
+                onValidationChanged();
+            }
+
+            @Override
+            public void onItemLongClick(CardItemView view, int position) {
+                Toast.makeText(view.getContext(),
+                        "Is " + validators[position].getTitle() + " available?",
+                        Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -81,6 +99,7 @@ public class ValidationActivity extends Activity implements ValidationChangeList
         boolean valid;
         for (IValidator v : validators) {
             valid = v.validate();
+            v.refreshImage(valid);
             if (!valid) {
                 if (v.getMessageType() == ValidationMessageType.ERROR)
                     hasErrors = true;
@@ -90,9 +109,9 @@ public class ValidationActivity extends Activity implements ValidationChangeList
         }
         validationProceedButton.setEnabled(!hasErrors);
         if (isReadyToProceed) {
-                validationProceedButton.setText(this.getString(R.string.proceed));
-            } else {
-                validationProceedButton.setText(this.getString(R.string.caution_proceed));
-            }
+            validationProceedButton.setText(this.getString(R.string.proceed));
+        } else {
+            validationProceedButton.setText(this.getString(R.string.caution_proceed));
         }
+    }
 }
