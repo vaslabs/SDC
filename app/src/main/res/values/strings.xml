@@ -18,7 +18,7 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="scm_success">Speech interface has been successfully initialised.</string>
-    <string name="title_activity_sky_diving_session">SkyDivingSessionActivity</string>
+    <string name="title_activity_sky_diving_session">SkyDiving session started</string>
     <string name="skydivingsession">Start skydiving session</string>
     <string name="mock_skydiver_addition">Simulation: add skydiver</string>
     <string name="mock_skydiver_disconnect">Simulation: Disconnect skydiver</string>
@@ -37,7 +37,7 @@
     <string name="title_activity_charts">Altitude chart</string>
     <string name="title_activity_barometer_chart">Altitude chart</string>
     <string name="action_charts">Geeky charts</string>
-    <string name="title_activity_logbook">LogbookActivity</string>
+    <string name="title_activity_logbook">Logbook</string>
     <string name="freeFallTime">Free fall time(s)</string>
     <string name="logbook">My logbook</string>
     <string name="maximumSpeed">Max velocity(m/s)</string>
