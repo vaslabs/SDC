@@ -24,6 +24,7 @@ public enum LogbookAPI implements ILogbookAPI {
                 LogbookSummary ls = gson.fromJson(body, LogbookSummary.class);
                 return ls;
             } catch (Exception e) {
+                e.printStackTrace();
                 return null;
             }
         }

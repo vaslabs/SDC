@@ -9,7 +9,7 @@ public final class LogbookSummary {
 
     private double averageTopSpeed;
     private int numberOfJumbs;
-    private Date latestJumbDate;
+    private long latestJumbDate;
     private int averageExitAltitude;
     private int averageDeployAltitude;
     private double averageSpeed;
@@ -18,7 +18,7 @@ public final class LogbookSummary {
         return numberOfJumbs;
     }
 
-    public Date getLatestJumbDate() {
+    public long getLatestJumbDate() {
         return latestJumbDate;
     }
 
