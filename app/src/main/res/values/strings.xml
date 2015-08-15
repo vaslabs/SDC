@@ -39,7 +39,7 @@
     <string name="action_charts">Geeky charts</string>
     <string name="title_activity_logbook">Logbook</string>
     <string name="freeFallTime">Free fall time(s)</string>
-    <string name="logbook">My logbook</string>
+    <string name="logbook">Latest logbook summary</string>
     <string name="maximumSpeed">Max velocity(m/s)</string>
     <string name="deploymentAltitude">Deployment alt(m)</string>
     <string name="exitAltitude">Exit altitude(m)</string>
@@ -49,4 +49,7 @@
     <string name="title_activity_qrapi_scanner">QRApiScannerActivity</string>
     <string name="apisetup">Setup API</string>
     <string name="nologsmessage">No logs have been found. Either you have sumbitted all logs or something went wrong.</string>
+    <string name="last_session_logbook">Logbook summary of last session</string>
+    <string name="title_activity_logbook_summary">LogbookSummaryActivity</string>
+    <string name="start_skydiving_msg">Start</string>
 </resources>

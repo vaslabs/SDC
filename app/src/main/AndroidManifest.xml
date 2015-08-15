@@ -18,6 +18,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
+
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
         android:targetPackage="com.vaslabs.sdc.ui" >
@@ -106,6 +107,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vaslabs.sdc.ui.MainActivity" />
+        </activity>
+        <activity
+            android:name=".charts.LogbookSummaryActivity"
+            android:label="@string/title_activity_logbook_summary" >
         </activity>
     </application>
 

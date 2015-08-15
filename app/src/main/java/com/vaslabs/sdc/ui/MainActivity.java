@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import com.romainpiel.shimmer.Shimmer;
+import com.romainpiel.shimmer.ShimmerTextView;
 import com.vaslabs.sdc.ui.charts.BarometerChartActivity;
 import com.vaslabs.sdc.ui.charts.LogbookActivity;
 import com.vaslabs.sdc.ui.charts.VelocityChartActivity;
@@ -77,6 +79,8 @@ public class MainActivity extends Activity {
     public static class PlaceholderFragment extends Fragment {
 
         private ImageButton skyDivingSessionButton;
+        private ShimmerTextView shimmerTextView;
+        Shimmer shimmer;
         public PlaceholderFragment() {
         }
 
@@ -88,14 +92,20 @@ public class MainActivity extends Activity {
             
             skyDivingSessionButton = (ImageButton) rootView.findViewById( R.id.skyDivingSessionButton );
             skyDivingSessionButton.setBackgroundColor(Color.TRANSPARENT);
-            skyDivingSessionButton.setOnClickListener( new View.OnClickListener() {
-                
+            skyDivingSessionButton.setOnClickListener(new View.OnClickListener() {
+
                 @Override
-                public void onClick( View v ) {
+                public void onClick(View v) {
+                    shimmer.cancel();
                     Intent intent = new Intent(v.getContext(), ValidationActivity.class);
-                    startActivity( intent );
+                    startActivity(intent);
                 }
-            } );
+            });
+
+            shimmerTextView = (ShimmerTextView) rootView.findViewById(R.id.shimmer_tv);
+            shimmerTextView.bringToFront();
+            shimmer = new Shimmer();
+            shimmer.start(shimmerTextView);
 
             
             return rootView;
