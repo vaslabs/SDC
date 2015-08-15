@@ -15,12 +15,14 @@
         android:layout_alignParentEnd="true"
         android:layout_above="@+id/submitLogsbutton" />
 
-    <Button
+    <com.gc.materialdesign.views.ButtonRectangle
+
         android:id="@+id/submitLogsbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="Send logs for review" />
+        android:text="Send logs for review"
+    />
 
 </RelativeLayout>

@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.gc.materialdesign.views.ButtonRectangle;
 import com.vaslabs.sdc.ui.util.ValidationAdapter;
 import com.vaslabs.sdc.ui.util.ValidationChangeListener;
 import com.vaslabs.sdc.utils.BarometerValidator;
@@ -24,13 +25,13 @@ public class ValidationActivity extends Activity implements ValidationChangeList
     private ValidationAdapter validationAdapter;
     private ListView validationListView;
     private IValidator[] validators;
-    private Button validationProceedButton;
+    private ButtonRectangle validationProceedButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_validation);
 
-        validationProceedButton = (Button) findViewById(R.id.validationProceedButton);
+        validationProceedButton = (ButtonRectangle) findViewById(R.id.validationProceedButton);
 
         validators = new IValidator[] {BarometerValidator.getInstance(this), LocationValidator.getInstance(this), WifiValidator.getInstance(this)};
         validationAdapter = new ValidationAdapter(this, validators, this);
@@ -89,9 +90,9 @@ public class ValidationActivity extends Activity implements ValidationChangeList
         }
         validationProceedButton.setEnabled(!hasErrors);
         if (isReadyToProceed) {
-                validationProceedButton.setText(R.string.proceed);
+                validationProceedButton.setText(this.getString(R.string.proceed));
             } else {
-                validationProceedButton.setText(R.string.caution_proceed);
+                validationProceedButton.setText(this.getString(R.string.caution_proceed));
             }
         }
 }

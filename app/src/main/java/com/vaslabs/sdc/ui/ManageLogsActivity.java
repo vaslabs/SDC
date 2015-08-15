@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 
+import com.gc.materialdesign.views.ButtonRectangle;
 import com.google.gson.Gson;
 import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.logs.utils.LogUtils;
@@ -43,12 +44,12 @@ import static android.view.View.OnClickListener;
 public class ManageLogsActivity extends Activity {
 
     private TextView logsTextView;
-    private Button submitLogsButton;
+    private ButtonRectangle submitLogsButton;
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
         setContentView( R.layout.activity_manage_logs );
-        submitLogsButton = (Button)findViewById(R.id.submitLogsbutton);
+        submitLogsButton = (ButtonRectangle)findViewById(R.id.submitLogsbutton);
         logsTextView = (TextView)findViewById( R.id.logsTextView );
         StringBuilder content = null;
         try {
