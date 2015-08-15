@@ -3,6 +3,7 @@ package com.vaslabs.sdc.ui;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -86,7 +87,7 @@ public class MainActivity extends Activity {
                     inflater.inflate( R.layout.fragment_main, container, false );
             
             skyDivingSessionButton = (ImageButton) rootView.findViewById( R.id.skyDivingSessionButton );
-
+            skyDivingSessionButton.setBackgroundColor(Color.TRANSPARENT);
             skyDivingSessionButton.setOnClickListener( new View.OnClickListener() {
                 
                 @Override
