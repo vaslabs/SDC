@@ -12,6 +12,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        maven { url 'http://maven.livotovlabs.pro/content/groups/public/' }
+        maven { url 'http://maven.livotovlabs.pro/content/groups/public/'}
+        maven { url "https://jitpack.io" }
     }
 }

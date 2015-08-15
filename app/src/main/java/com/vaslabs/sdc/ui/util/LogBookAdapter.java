@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.rengwuxian.materialedittext.MaterialEditText;
 import com.vaslabs.sdc.logs.LogbookStats;
 import com.vaslabs.sdc.ui.R;
 
@@ -52,11 +53,11 @@ public class LogBookAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         View viewFromTemplate = LayoutInflater.from(context).inflate(R.layout.logbook_item_view, null);
-        TextView attributeNameTextView = (TextView) viewFromTemplate.findViewById(R.id.itemNameTextView);
-        EditText attributeValueEditText = (EditText) viewFromTemplate.findViewById(R.id.valueEditView);
-        attributeNameTextView.setText(names[i].toString());
-        attributeValueEditText.setText(String.valueOf(values.get(names[i].toString())));
-
+        MaterialEditText attributeValueEditText = (MaterialEditText) viewFromTemplate.findViewById(R.id.valueMaterialEditView);
+        String value = String.valueOf(values.get(names[i].toString()));
+        String name = names[i].toString();
+        attributeValueEditText.setFloatingLabelText(name);
+        attributeValueEditText.setText(value);
         return viewFromTemplate;
 
     }
