@@ -1,13 +1,18 @@
 package com.vaslabs.sdc.ui.charts;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.dexafree.materialList.cards.SimpleCard;
 import com.dexafree.materialList.cards.SmallImageCard;
 import com.dexafree.materialList.controller.RecyclerItemClickListener;
@@ -27,6 +32,8 @@ public class LogbookSummaryActivity extends Activity {
 
     MaterialListView logbookSummaryListView = null;
     Card[] viewCards;
+    private DistanceUnit lastSelectedDistanceUnit = DistanceUnit.KM;
+    private TimeUnit lastSelectedTimeUnit = TimeUnit.HOURS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +43,7 @@ public class LogbookSummaryActivity extends Activity {
         logbookSummaryListView = (MaterialListView) findViewById(R.id.logbookSummaryListView);
         LogbookSummary logbookSummary = LogbookAPI.MOCK.getLogbookSummary(null, this);
 
-        viewCards = toCards(logbookSummary, DistanceUnit.FEET, DistanceUnit.KM, TimeUnit.HOURS);
+        viewCards = toCards(logbookSummary, DistanceUnit.FEET, lastSelectedDistanceUnit, lastSelectedTimeUnit);
 
         for (Card card : viewCards) {
             logbookSummaryListView.add(card);
@@ -45,12 +52,37 @@ public class LogbookSummaryActivity extends Activity {
         logbookSummaryListView.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener() {
 
             @Override
-            public void onItemClick(CardItemView view, int position) {
+            public void onItemClick(CardItemView view, final int position) {
                 Card clickedCard = viewCards[position];
                 if (!(clickedCard instanceof SmallImageUnitsCard))
                     return;
+
                 SmallImageUnitsCard unitsCard = (SmallImageUnitsCard)clickedCard;
-                unitsCard.switchToNext();
+                if (!unitsCard.areCompositeUnitOptionsAvailable()) {
+                    unitsCard.switchToNext();
+                    return;
+                }
+
+                final DistanceUnit[] distanceUnits = DistanceUnit.values();
+                String[] items = new String[distanceUnits.length];
+
+                for (int i = 0; i < items.length; i++) {
+                    items[i] = distanceUnits[i].name();
+                }
+
+                new MaterialDialog.Builder(view.getContext())
+                        .title(R.string.pick_distance_metric)
+                        .items(items)
+                        .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                lastSelectedDistanceUnit = distanceUnits[which];
+                                showTimeUnitsDialog(position);
+                                return true;
+                            }
+                        })
+                        .show().setSelectedIndex(lastSelectedDistanceUnit.ordinal());
+
             }
 
             @Override
@@ -58,6 +90,30 @@ public class LogbookSummaryActivity extends Activity {
             }
         });
 
+    }
+
+    private void showTimeUnitsDialog(final int position) {
+        final TimeUnit[] timeUnits = TimeUnit.values();
+        String[] items = new String[timeUnits.length];
+        for (int i = 0; i < items.length; i++) {
+            items[i] = timeUnits[i].name();
+        }
+        new MaterialDialog.Builder(this)
+                .title(R.string.pick_distance_metric)
+                .items(items)
+                .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        lastSelectedTimeUnit = timeUnits[which];
+                        dialog.dismiss();
+                        for (int i = 0; i < viewCards.length; i++) {
+                            if (viewCards[i] instanceof SmallImageUnitsCard)
+                                ((SmallImageUnitsCard) viewCards[i]).switchTo(lastSelectedDistanceUnit, lastSelectedTimeUnit);
+                        }
+                        return true;
+                    }
+                })
+                .show().setSelectedIndex(lastSelectedTimeUnit.ordinal());
     }
 
     private Card[] toCards(LogbookSummary logbookSummary, DistanceUnit distancePref, TimeUnit timePref) {
@@ -167,6 +223,8 @@ public class LogbookSummaryActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }
 
 class SmallImageUnitsCard extends SmallImageCard {
@@ -193,11 +251,11 @@ class SmallImageUnitsCard extends SmallImageCard {
         compositeUnit = cu;
     }
 
-    public void switchTo(CompositeUnit cu) {
+    public void switchTo(DistanceUnit du, TimeUnit tu) {
         if (compositeUnit == null)
             return;
 
-        compositeUnit = compositeUnit.convert(cu.DISTANCE_UNIT, cu.TIME_UNIT);
+        compositeUnit = compositeUnit.convert(du, tu);
         this.setDescription(compositeUnit.toString());
     }
 
@@ -225,4 +283,5 @@ class SmallImageUnitsCard extends SmallImageCard {
         DistanceUnit newDistanceUnit = units[next_ordinal];
         switchTo(newDistanceUnit);
     }
+
 }

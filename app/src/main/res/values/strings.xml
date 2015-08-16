@@ -58,4 +58,6 @@
     <string name="average_deploy_altitude">Average deployment altitude</string>
     <string name="average_exit_altitude">Average exit altitude</string>
     <string name="latest_jump_date">Latest activity</string>
+    <string name="pick_distance_metric">Pick a metric unit for measuring distance</string>
+    <string name="choose">OK</string>
 </resources>

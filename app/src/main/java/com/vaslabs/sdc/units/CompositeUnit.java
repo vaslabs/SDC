@@ -38,7 +38,7 @@ public class CompositeUnit {
     }
 
     public String toString() {
-        return DISTANCE_VALUE + getMetricSignature();
+        return String.format("%.2f%s",DISTANCE_VALUE, getMetricSignature());
     }
 
 }
