@@ -8,18 +8,18 @@ import java.util.Date;
 public final class LogbookSummary {
 
     private double averageTopSpeed;
-    private int numberOfJumbs;
-    private long latestJumbDate;
+    private int numberOfJumps;
+    private long latestJumpDate;
     private int averageExitAltitude;
     private int averageDeployAltitude;
     private double averageSpeed;
 
-    public int getNumberOfJumbs() {
-        return numberOfJumbs;
+    public int getNumberOfJumps() {
+        return numberOfJumps;
     }
 
-    public long getLatestJumbDate() {
-        return latestJumbDate;
+    public long getLatestJumpDate() {
+        return latestJumpDate;
     }
 
     public int getAverageExitAltitude() {

@@ -15,8 +15,10 @@ import android.widget.ImageButton;
 
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
+import com.vaslabs.logbook.LogbookSummary;
 import com.vaslabs.sdc.ui.charts.BarometerChartActivity;
 import com.vaslabs.sdc.ui.charts.LogbookActivity;
+import com.vaslabs.sdc.ui.charts.LogbookSummaryActivity;
 import com.vaslabs.sdc.ui.charts.VelocityChartActivity;
 
 public class MainActivity extends Activity {
@@ -57,7 +59,7 @@ public class MainActivity extends Activity {
                 intent = new Intent(this, VelocityChartActivity.class);
                 break;
             case R.id.logbook:
-                intent = new Intent(this, LogbookActivity.class);
+                intent = new Intent(this, LogbookSummaryActivity.class);
                 break;
             case R.id.submitlogs:
                 intent = new Intent(this, ManageLogsActivity.class);

@@ -52,4 +52,10 @@
     <string name="last_session_logbook">Logbook summary of last session</string>
     <string name="title_activity_logbook_summary">LogbookSummaryActivity</string>
     <string name="start_skydiving_msg">Start</string>
+    <string name="number_of_dives_title">Number of dives</string>
+    <string name="average_speed">Average speed</string>
+    <string name="average_top_speed">Average terminal velocity</string>
+    <string name="average_deploy_altitude">Average deployment altitude</string>
+    <string name="average_exit_altitude">Average exit altitude</string>
+    <string name="latest_jump_date">Latest activity</string>
 </resources>

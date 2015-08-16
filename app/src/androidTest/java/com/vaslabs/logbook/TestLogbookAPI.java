@@ -33,9 +33,9 @@ public class TestLogbookAPI extends AndroidTestCase{
         summaryLogbookResponseConstructor.setAccessible(true);
         JSONArray jsonArray = new JSONArray();
         JSONObject summaryJS = new JSONObject();
-        summaryJS.accumulate("numberOfJumbs", 3);
+        summaryJS.accumulate("numberOfJumps", 3);
         long dMillis = Calendar.getInstance().getTimeInMillis();
-        summaryJS.accumulate("latestJumbDate", dMillis);
+        summaryJS.accumulate("latestJumpDate", dMillis);
         summaryJS.accumulate("averageExitAltitude", 3400);
         summaryJS.accumulate("averageDeployAltitude", 1000);
         summaryJS.accumulate("averageSpeed", 100.1);
@@ -44,8 +44,17 @@ public class TestLogbookAPI extends AndroidTestCase{
         Response summaryLogbookResponse = summaryLogbookResponseConstructor.newInstance(jsonArray, 0);
         Mockito.when(cm.sendRequest("{\"action\":0}", API.getApiToken(this.mContext))).thenReturn(summaryLogbookResponse);
         LogbookSummary logbookSummary = logbookAPI.getLogbookSummary(cm, this.mContext);
-        assertEquals(3, logbookSummary.getNumberOfJumbs());
-        assertEquals(dMillis, logbookSummary.getLatestJumbDate());
+        assertEquals(3, logbookSummary.getNumberOfJumps());
+        assertEquals(dMillis, logbookSummary.getLatestJumpDate());
+        assertEquals(3400, logbookSummary.getAverageExitAltitude());
+        assertEquals(1000, logbookSummary.getAverageDeployAltitude());
+        assertEquals(100.1, logbookSummary.getAverageSpeed());
+        assertEquals(200.0, logbookSummary.getAverageTopSpeed());
+    }
+
+    public void test_logbook_summary_object_mock_api() throws Exception {
+        LogbookSummary logbookSummary = LogbookAPI.MOCK.getLogbookSummary(null, this.mContext);
+        assertEquals(3, logbookSummary.getNumberOfJumps());
         assertEquals(3400, logbookSummary.getAverageExitAltitude());
         assertEquals(1000, logbookSummary.getAverageDeployAltitude());
         assertEquals(100.1, logbookSummary.getAverageSpeed());
