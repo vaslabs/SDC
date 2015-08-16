@@ -13,6 +13,9 @@ import com.dexafree.materialList.view.MaterialListView;
 import com.vaslabs.logbook.LogbookAPI;
 import com.vaslabs.logbook.LogbookSummary;
 import com.vaslabs.sdc.ui.R;
+import com.vaslabs.sdc.units.CompositeUnit;
+import com.vaslabs.sdc.units.DistanceUnit;
+import com.vaslabs.sdc.units.TimeUnit;
 
 import java.util.Calendar;
 
@@ -27,7 +30,7 @@ public class LogbookSummaryActivity extends Activity {
         logbookSummaryListView = (MaterialListView) findViewById(R.id.logbookSummaryListView);
         LogbookSummary logbookSummary = LogbookAPI.MOCK.getLogbookSummary(null, this);
 
-        Card[] viewCards = toCards(logbookSummary);
+        Card[] viewCards = toCards(logbookSummary, DistanceUnit.FEET, DistanceUnit.KM, TimeUnit.HOURS);
 
         for (Card card : viewCards) {
             logbookSummaryListView.add(card);
@@ -35,11 +38,37 @@ public class LogbookSummaryActivity extends Activity {
 
     }
 
-    private Card[] toCards(LogbookSummary logbookSummary) {
+    private Card[] toCards(LogbookSummary logbookSummary, DistanceUnit distancePref, TimeUnit timePref) {
+        return toCards(logbookSummary, distancePref, null, timePref);
+    }
+
+    private Card[] toCards(LogbookSummary logbookSummary, DistanceUnit metricPreference, DistanceUnit speedPreference, TimeUnit timeUnitPreference) {
+        if (speedPreference == null)
+            speedPreference = metricPreference;
         int averageDeployAltitude = logbookSummary.getAverageDeployAltitude();
+        double averageDeployAltitudeMetric = metricPreference.convert(DistanceUnit.METERS,
+                averageDeployAltitude);
+
         int averageExitAltitude = logbookSummary.getAverageExitAltitude();
+        double averageExitAltitudeMetric = metricPreference.convert(DistanceUnit.METERS,
+                averageExitAltitude);
+
         double averageSpeed = logbookSummary.getAverageSpeed();
+
+        CompositeUnit<DistanceUnit, TimeUnit> compositeUnitAverageSpeed =
+                new CompositeUnit<>(DistanceUnit.METERS, TimeUnit.SECONDS, averageSpeed);
+
+        compositeUnitAverageSpeed = compositeUnitAverageSpeed.convert(speedPreference,
+                timeUnitPreference);
+
+
         double averageMaxSpeed = logbookSummary.getAverageTopSpeed();
+        CompositeUnit<DistanceUnit, TimeUnit> compositeUnitAverageMaxSpeed =
+                new CompositeUnit<>(DistanceUnit.METERS, TimeUnit.SECONDS, averageMaxSpeed);
+
+        compositeUnitAverageMaxSpeed = compositeUnitAverageMaxSpeed.convert(speedPreference,
+                timeUnitPreference);
+
         int numberOfDives = logbookSummary.getNumberOfJumps();
         long latestJumpDate = logbookSummary.getLatestJumpDate();
 
@@ -49,21 +78,24 @@ public class LogbookSummaryActivity extends Activity {
                 R.drawable.ic_hash_small);
 
         cards[1] = toCard(R.string.average_speed,
-                String.valueOf(averageSpeed), R.drawable.speed_blue_small);
+                compositeUnitAverageSpeed.toString(), R.drawable.speed_blue_small);
 
-        cards[2] = toCard(R.string.average_top_speed, String.valueOf(averageMaxSpeed),
+        cards[2] = toCard(R.string.average_top_speed, compositeUnitAverageMaxSpeed.toString(),
                 R.drawable.speed_red_small);
 
-        cards[3] = toCard(R.string.average_exit_altitude, String.valueOf(averageExitAltitude),
+        cards[3] = toCard(R.string.average_exit_altitude,
+                String.valueOf(averageExitAltitudeMetric) + metricPreference.signature,
                 R.drawable.ic_ruler_small);
 
-        cards[4] = toCard(R.string.average_deploy_altitude, String.valueOf(averageDeployAltitude),
+        cards[4] = toCard(R.string.average_deploy_altitude,
+                String.valueOf(averageDeployAltitudeMetric) + metricPreference.signature,
                 R.drawable.ic_deploy_altitude_small);
 
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(latestJumpDate);
 
-        cards[5] = toCard(R.string.latest_jump_date, cal.getTime().toString(), R.drawable.ic_calendar);
+        cards[5] = toCard(R.string.latest_jump_date, cal.getTime().toString(),
+                R.drawable.ic_calendar);
 
         return cards;
 

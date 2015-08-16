@@ -49,8 +49,8 @@ public enum LogbookAPI implements ILogbookAPI {
                 summaryJS.accumulate("latestJumpDate", dMillis);
                 summaryJS.accumulate("averageExitAltitude", 3400);
                 summaryJS.accumulate("averageDeployAltitude", 1000);
-                summaryJS.accumulate("averageSpeed", 100.1);
-                summaryJS.accumulate("averageTopSpeed", 200.0);
+                summaryJS.accumulate("averageSpeed", 20.1);
+                summaryJS.accumulate("averageTopSpeed", 85.0);
                 jsonArray.put(summaryJS);
                 Response summaryLogbookResponse = summaryLogbookResponseConstructor.newInstance(jsonArray, 0);
 
