@@ -6,75 +6,75 @@ package com.vaslabs.sdc.units;
 public enum DistanceUnit {
     METERS("m") {
         @Override
-        double convert(DistanceUnit distanceUnit, double distance_value) {
+        public double convert(DistanceUnit distanceUnit, double distance_value) {
             return distanceUnit.toMeters(distance_value);
         }
 
         @Override
-        double toKm(double m) {
+        public double toKm(double m) {
             return m/CKM;
         }
 
         @Override
-        double toFeet(double m) {
+        public double toFeet(double m) {
             return m*CF;
         }
 
         @Override
-        double toMeters(double m) {
+        public double toMeters(double m) {
             return m;
         }
 
     }, FEET("ft") {
         @Override
-        double toKm(double ft) {
+        public double toKm(double ft) {
             return (ft/(CF*CKM));
         }
 
         @Override
-        double toFeet(double f) {
+        public double toFeet(double f) {
             return f;
         }
 
         @Override
-        double toMeters(double ft) {
+        public double toMeters(double ft) {
             return ft/CF;
         }
 
         @Override
-        double convert(DistanceUnit distanceUnit, double distance_value) {
+        public double convert(DistanceUnit distanceUnit, double distance_value) {
             return distanceUnit.toFeet(distance_value);
         }
     }, KM("km") {
         @Override
-        double toKm(double km) {
+        public double toKm(double km) {
             return km;
         }
 
         @Override
-        double toFeet(double km) {
+        public double toFeet(double km) {
             return km*CKM*CF;
         }
 
         @Override
-        double toMeters(double distance_value) {
-            return distance_value*CKM;
+        public double toMeters(double km) {
+            return km*CKM;
         }
 
         @Override
-        double convert(DistanceUnit distanceUnit, double distance_value) {
+        public double convert(DistanceUnit distanceUnit, double distance_value) {
             return distanceUnit.toKm(distance_value);
         }
     };
 
-    abstract double toKm(double km);
+    public abstract double toKm(double km);
 
     public final double CF = 3.2808;
     public final double CKM = 1000;
 
-    abstract double toFeet(double m);
+    public abstract double toFeet(double m);
 
-    abstract double toMeters(double distance_value);
+    public abstract double toMeters(double distance_value);
 
     public final String signature;
 
@@ -82,6 +82,6 @@ public enum DistanceUnit {
         this.signature = signature;
     }
 
-    abstract double convert(DistanceUnit distanceUnit, double distance_value);
+    public abstract double convert(DistanceUnit distanceUnit, double distance_value);
 
 }

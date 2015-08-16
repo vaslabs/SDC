@@ -10,28 +10,35 @@ public class CompositeUnit<D extends DistanceUnit, T extends TimeUnit> {
     public final TimeUnit TIME_UNIT;
 
     public final double DISTANCE_VALUE;
-    public final double TIME_VALUE;
 
-    public CompositeUnit(DistanceUnit distance_unit, TimeUnit time_unit, double distance_value, double time_value) {
+    public CompositeUnit(DistanceUnit distance_unit, TimeUnit time_unit, double distance_value) {
         DISTANCE_UNIT = distance_unit;
         TIME_UNIT = time_unit;
         DISTANCE_VALUE = distance_value;
-        TIME_VALUE = time_value;
     }
 
-    public double getValue(DistanceUnit distanceUnit, TimeUnit timeUnit) {
-        double value = DISTANCE_UNIT.convert(distanceUnit, DISTANCE_VALUE);
-        double time_value = TIME_UNIT.convert(TIME_VALUE, timeUnit);
-        return value/time_value;
+    public CompositeUnit<D, T> convert(DistanceUnit distance_unit, TimeUnit time_unit) {
+
+        if (distance_unit == DISTANCE_UNIT && TIME_UNIT == time_unit)
+            return this;
+
+        double newTimeUnitWorthOfCurrentTimeUnit = 1/time_unit.convert(1, TIME_UNIT);
+
+        double newTotalDistance = DISTANCE_VALUE*newTimeUnitWorthOfCurrentTimeUnit;
+
+        double newDistanceValue = distance_unit.convert(DISTANCE_UNIT, newTotalDistance);
+
+        return new CompositeUnit<>(distance_unit, time_unit, newDistanceValue);
+
     }
+
 
     public String getMetricSignature() {
         return DISTANCE_UNIT.signature + "/" + TIME_UNIT.signature;
     }
 
     public String toString() {
-        double calculatedDistancePerTime = DISTANCE_VALUE / TIME_VALUE;
-        return calculatedDistancePerTime + getMetricSignature();
+        return DISTANCE_VALUE + getMetricSignature();
     }
 
 }
