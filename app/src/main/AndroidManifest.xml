@@ -77,20 +77,20 @@
         <activity
             android:name=".charts.BarometerChartActivity"
             android:label="@string/title_activity_barometer_chart"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".charts.LogbookActivity"
             android:theme="@style/Theme.AppCompat.Light" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vaslabs.sdc.ui.MainActivity" />
+                android:value=".charts.LogbookActivity" />
         </activity>
         <activity
             android:name=".charts.VelocityChartActivity"
             android:label="@string/title_activity_velocity_chart"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".charts.LogbookActivity"
             android:theme="@style/Theme.AppCompat.Light" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vaslabs.sdc.ui.MainActivity" />
+                android:value=".charts.LogbookActivity" />
         </activity>
         <activity
             android:name=".charts.LogbookActivity"

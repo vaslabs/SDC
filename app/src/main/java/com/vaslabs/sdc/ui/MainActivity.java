@@ -53,11 +53,6 @@ public class MainActivity extends Activity {
             case R.id.action_settings:
                 intent = new Intent(this, SettingsActivity.class);
                 break;
-            case R.id.barometer_chart:
-                intent = new Intent(this, BarometerChartActivity.class);
-            case R.id.velocity_chart:
-                intent = new Intent(this, VelocityChartActivity.class);
-                break;
             case R.id.logbook:
                 intent = new Intent(this, LogbookSummaryActivity.class);
                 break;
