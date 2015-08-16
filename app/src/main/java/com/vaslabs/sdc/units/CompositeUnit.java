@@ -4,7 +4,7 @@ package com.vaslabs.sdc.units;
 /**
  * Created by vnicolaou on 07/08/15.
  */
-public class CompositeUnit<D extends DistanceUnit, T extends TimeUnit> {
+public class CompositeUnit {
 
     public final DistanceUnit DISTANCE_UNIT;
     public final TimeUnit TIME_UNIT;
@@ -17,7 +17,7 @@ public class CompositeUnit<D extends DistanceUnit, T extends TimeUnit> {
         DISTANCE_VALUE = distance_value;
     }
 
-    public CompositeUnit<D, T> convert(DistanceUnit distance_unit, TimeUnit time_unit) {
+    public CompositeUnit convert(DistanceUnit distance_unit, TimeUnit time_unit) {
 
         if (distance_unit == DISTANCE_UNIT && TIME_UNIT == time_unit)
             return this;
@@ -28,7 +28,7 @@ public class CompositeUnit<D extends DistanceUnit, T extends TimeUnit> {
 
         double newDistanceValue = distance_unit.convert(DISTANCE_UNIT, newTotalDistance);
 
-        return new CompositeUnit<>(distance_unit, time_unit, newDistanceValue);
+        return new CompositeUnit(distance_unit, time_unit, newDistanceValue);
 
     }
 

@@ -84,4 +84,8 @@ public enum DistanceUnit {
 
     public abstract double convert(DistanceUnit distanceUnit, double distance_value);
 
+    public String toString(double value) {
+        return String.format("%.2f%s", value, signature);
+    }
+
 }

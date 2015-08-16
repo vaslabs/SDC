@@ -1,14 +1,18 @@
 package com.vaslabs.sdc.ui.charts;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.dexafree.materialList.cards.SimpleCard;
 import com.dexafree.materialList.cards.SmallImageCard;
+import com.dexafree.materialList.controller.RecyclerItemClickListener;
 import com.dexafree.materialList.model.Card;
+import com.dexafree.materialList.model.CardItemView;
 import com.dexafree.materialList.view.MaterialListView;
 import com.vaslabs.logbook.LogbookAPI;
 import com.vaslabs.logbook.LogbookSummary;
@@ -22,6 +26,8 @@ import java.util.Calendar;
 public class LogbookSummaryActivity extends Activity {
 
     MaterialListView logbookSummaryListView = null;
+    Card[] viewCards;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,11 +36,27 @@ public class LogbookSummaryActivity extends Activity {
         logbookSummaryListView = (MaterialListView) findViewById(R.id.logbookSummaryListView);
         LogbookSummary logbookSummary = LogbookAPI.MOCK.getLogbookSummary(null, this);
 
-        Card[] viewCards = toCards(logbookSummary, DistanceUnit.FEET, DistanceUnit.KM, TimeUnit.HOURS);
+        viewCards = toCards(logbookSummary, DistanceUnit.FEET, DistanceUnit.KM, TimeUnit.HOURS);
 
         for (Card card : viewCards) {
             logbookSummaryListView.add(card);
         }
+
+        logbookSummaryListView.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(CardItemView view, int position) {
+                Card clickedCard = viewCards[position];
+                if (!(clickedCard instanceof SmallImageUnitsCard))
+                    return;
+                SmallImageUnitsCard unitsCard = (SmallImageUnitsCard)clickedCard;
+                unitsCard.switchToNext();
+            }
+
+            @Override
+            public void onItemLongClick(CardItemView view, int position) {
+            }
+        });
 
     }
 
@@ -55,16 +77,16 @@ public class LogbookSummaryActivity extends Activity {
 
         double averageSpeed = logbookSummary.getAverageSpeed();
 
-        CompositeUnit<DistanceUnit, TimeUnit> compositeUnitAverageSpeed =
-                new CompositeUnit<>(DistanceUnit.METERS, TimeUnit.SECONDS, averageSpeed);
+        CompositeUnit compositeUnitAverageSpeed =
+                new CompositeUnit(DistanceUnit.METERS, TimeUnit.SECONDS, averageSpeed);
 
         compositeUnitAverageSpeed = compositeUnitAverageSpeed.convert(speedPreference,
                 timeUnitPreference);
 
 
         double averageMaxSpeed = logbookSummary.getAverageTopSpeed();
-        CompositeUnit<DistanceUnit, TimeUnit> compositeUnitAverageMaxSpeed =
-                new CompositeUnit<>(DistanceUnit.METERS, TimeUnit.SECONDS, averageMaxSpeed);
+        CompositeUnit compositeUnitAverageMaxSpeed =
+                new CompositeUnit(DistanceUnit.METERS, TimeUnit.SECONDS, averageMaxSpeed);
 
         compositeUnitAverageMaxSpeed = compositeUnitAverageMaxSpeed.convert(speedPreference,
                 timeUnitPreference);
@@ -78,17 +100,17 @@ public class LogbookSummaryActivity extends Activity {
                 R.drawable.ic_hash_small);
 
         cards[1] = toCard(R.string.average_speed,
-                compositeUnitAverageSpeed.toString(), R.drawable.speed_blue_small);
+                compositeUnitAverageSpeed, R.drawable.speed_blue_small);
 
-        cards[2] = toCard(R.string.average_top_speed, compositeUnitAverageMaxSpeed.toString(),
+        cards[2] = toCard(R.string.average_top_speed, compositeUnitAverageMaxSpeed,
                 R.drawable.speed_red_small);
 
         cards[3] = toCard(R.string.average_exit_altitude,
-                String.valueOf(averageExitAltitudeMetric) + metricPreference.signature,
+                averageExitAltitudeMetric, metricPreference,
                 R.drawable.ic_ruler_small);
 
         cards[4] = toCard(R.string.average_deploy_altitude,
-                String.valueOf(averageDeployAltitudeMetric) + metricPreference.signature,
+                averageDeployAltitudeMetric, metricPreference,
                 R.drawable.ic_deploy_altitude_small);
 
         Calendar cal = Calendar.getInstance();
@@ -101,6 +123,13 @@ public class LogbookSummaryActivity extends Activity {
 
     }
 
+    private Card toCard(int title, double averageExitAltitudeMetric, DistanceUnit metricPreference, int ic_ruler_small) {
+        SmallImageUnitsCard smallImageUnitsCard = new SmallImageUnitsCard(this, metricPreference, averageExitAltitudeMetric);
+        smallImageUnitsCard.setTitle(title);
+        smallImageUnitsCard.setDrawable(ic_ruler_small);
+        return smallImageUnitsCard;
+    }
+
     private Card toCard(int title, String description, int icon) {
         SmallImageCard card = new SmallImageCard(this);
         card.setTitle(title);
@@ -108,6 +137,13 @@ public class LogbookSummaryActivity extends Activity {
         card.setDrawable(icon);
 
         return card;
+    }
+
+    private Card toCard(int title, CompositeUnit unit, int icon) {
+        SmallImageUnitsCard smallImageUnitsCard = new SmallImageUnitsCard(this, unit);
+        smallImageUnitsCard.setTitle(title);
+        smallImageUnitsCard.setDrawable(icon);
+        return smallImageUnitsCard;
     }
 
     @Override
@@ -130,5 +166,63 @@ public class LogbookSummaryActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+}
+
+class SmallImageUnitsCard extends SmallImageCard {
+
+    private DistanceUnit distanceUnit;
+    private CompositeUnit compositeUnit;
+
+    private double value;
+
+    public SmallImageUnitsCard(Context context, DistanceUnit du, double value) {
+        this(context, du, null);
+        this.setDescription(du.toString(value));
+        this.value = value;
+    }
+
+    public SmallImageUnitsCard(Context context, CompositeUnit cu) {
+        this(context, null, cu);
+        this.setDescription(cu.toString());
+    }
+
+    private SmallImageUnitsCard(Context context, DistanceUnit du, CompositeUnit cu) {
+        super(context);
+        distanceUnit = du;
+        compositeUnit = cu;
+    }
+
+    public void switchTo(CompositeUnit cu) {
+        if (compositeUnit == null)
+            return;
+
+        compositeUnit = compositeUnit.convert(cu.DISTANCE_UNIT, cu.TIME_UNIT);
+        this.setDescription(compositeUnit.toString());
+    }
+
+    private void switchTo(DistanceUnit du) {
+        if (distanceUnit == null) {
+            return;
+        }
+        value = du.convert(distanceUnit, value);
+        this.setDescription(du.toString(value));
+        this.distanceUnit = du;
+    }
+
+    public boolean areCompositeUnitOptionsAvailable() {
+        return compositeUnit != null;
+
+    }
+
+    public void switchToNext() {
+        if (distanceUnit == null)
+            return;
+        int next_ordinal = this.distanceUnit.ordinal() + 1;
+        DistanceUnit[] units = DistanceUnit.values();
+        if (next_ordinal >= units.length)
+            next_ordinal = 0;
+        DistanceUnit newDistanceUnit = units[next_ordinal];
+        switchTo(newDistanceUnit);
     }
 }
