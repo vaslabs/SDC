@@ -1,5 +1,6 @@
 package com.vaslabs.sdc.utils;
 
+import com.vaslabs.emergency.StrategyVisitor;
 import com.vaslabs.sdc.types.TrendPoint;
 
 import java.util.ArrayList;
@@ -156,6 +157,9 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         for (TrendListener listener : listeners) {
             if (shouldCallListener(listener)) {
                 listener.onTrendEvent();
+                if (listener instanceof StrategyVisitor) {
+                    ((StrategyVisitor) listener).visit(this);
+                }
             }
         }
     }

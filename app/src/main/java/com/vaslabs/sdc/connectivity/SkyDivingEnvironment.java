@@ -20,6 +20,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vaslabs.emergency.LandingTrendListener;
 import com.vaslabs.sdc.UserInformation;
 import com.vaslabs.sdc.sensors.BarometerListener;
 import com.vaslabs.sdc.sensors.BarometerSensor;
@@ -430,6 +431,12 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         trendListener.forCertainAltitude(new TrendPoint(new DifferentiableFloat(tp.altitudeLimit), 0.0));
         trendStrategy = new BarometerTrendStrategy<DifferentiableFloat>(tp.altitudeSensitivity, tp.timeDensity, 1+(int) (5000/tp.altitudeSensitivity));
         trendStrategy.registerEventListener(trendListener);
+
+        LandingTrendListener landingTrendListener = new LandingTrendListener(this.context);
+        landingTrendListener.forDirectionAction(TrendDirection.DOWN);
+        landingTrendListener.forCertainAltitude(new TrendPoint(new DifferentiableFloat(150f), 0.0));
+        trendStrategy.registerEventListener(landingTrendListener);
+
         barometerSensor.registerListener(this);
 
 

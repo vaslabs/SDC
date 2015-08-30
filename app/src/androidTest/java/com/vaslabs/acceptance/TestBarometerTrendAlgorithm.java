@@ -41,6 +41,7 @@ public class TestBarometerTrendAlgorithm extends AndroidTestCase{
 
     float currentHeight = 0;
     long currentTime = 0;
+    int callEmergencyChecker = 0;
     public void test_acceptance() {
         final AbstractTrendStrategy<DifferentiableFloat> trendStrategy = new BarometerTrendStrategy<DifferentiableFloat>(50, 1.0, 50);
         DefaultBarometerTrendListener trendListener = new DefaultBarometerTrendListener() {
@@ -51,6 +52,17 @@ public class TestBarometerTrendAlgorithm extends AndroidTestCase{
                 Log.i("trend event", String.valueOf(currentTime));
             }
         };
+
+        DefaultBarometerTrendListener landingTrendListener = new DefaultBarometerTrendListener() {
+            @Override
+            public void onTrendEvent() {
+                callEmergencyChecker++;
+            }
+        };
+
+        landingTrendListener.forDirectionAction(TrendDirection.DOWN);
+        landingTrendListener.forCertainAltitude(new TrendPoint(new DifferentiableFloat(150f), Double.valueOf(0)));
+        trendStrategy.registerEventListener(landingTrendListener);
 
         trendListener.forDirectionAction(TrendDirection.DOWN);
         trendListener.forCertainAltitude(new TrendPoint(new DifferentiableFloat(1000f), Double.valueOf(0)));
@@ -65,7 +77,8 @@ public class TestBarometerTrendAlgorithm extends AndroidTestCase{
 
         }
 
-        assertTrue(numbersCalled > 0);
+        assertEquals(1, numbersCalled);
+        assertEquals(1, callEmergencyChecker);
 
     }
 }
