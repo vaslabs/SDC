@@ -1,20 +1,14 @@
 package com.vaslabs.sdc.ui.charts;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.dexafree.materialList.cards.SimpleCard;
 import com.dexafree.materialList.cards.SmallImageCard;
 import com.dexafree.materialList.controller.RecyclerItemClickListener;
 import com.dexafree.materialList.model.Card;
@@ -23,12 +17,9 @@ import com.dexafree.materialList.view.MaterialListView;
 import com.vaslabs.logbook.LogbookAPI;
 import com.vaslabs.logbook.LogbookSummary;
 import com.vaslabs.sdc.ui.R;
-import com.vaslabs.sdc.units.CompositeUnit;
-import com.vaslabs.sdc.units.DistanceUnit;
-import com.vaslabs.sdc.units.TimeUnit;
-
 import java.util.Calendar;
-
+import com.vaslabs.units.*;
+import com.vaslabs.units.composite.VelocityUnit;
 public class LogbookSummaryActivity extends Activity {
 
     MaterialListView logbookSummaryListView = null;
@@ -134,16 +125,16 @@ public class LogbookSummaryActivity extends Activity {
 
         double averageSpeed = logbookSummary.getAverageSpeed();
 
-        CompositeUnit compositeUnitAverageSpeed =
-                new CompositeUnit(DistanceUnit.METERS, TimeUnit.SECONDS, averageSpeed);
+        VelocityUnit compositeUnitAverageSpeed =
+                new VelocityUnit(DistanceUnit.METERS, TimeUnit.SECONDS, averageSpeed);
 
         compositeUnitAverageSpeed = compositeUnitAverageSpeed.convert(speedPreference,
                 timeUnitPreference);
 
 
         double averageMaxSpeed = logbookSummary.getAverageTopSpeed();
-        CompositeUnit compositeUnitAverageMaxSpeed =
-                new CompositeUnit(DistanceUnit.METERS, TimeUnit.SECONDS, averageMaxSpeed);
+        VelocityUnit compositeUnitAverageMaxSpeed =
+                new VelocityUnit(DistanceUnit.METERS, TimeUnit.SECONDS, averageMaxSpeed);
 
         compositeUnitAverageMaxSpeed = compositeUnitAverageMaxSpeed.convert(speedPreference,
                 timeUnitPreference);
@@ -196,7 +187,7 @@ public class LogbookSummaryActivity extends Activity {
         return card;
     }
 
-    private Card toCard(int title, CompositeUnit unit, int icon) {
+    private Card toCard(int title, VelocityUnit unit, int icon) {
         SmallImageUnitsCard smallImageUnitsCard = new SmallImageUnitsCard(this, unit);
         smallImageUnitsCard.setTitle(title);
         smallImageUnitsCard.setDrawable(icon);
@@ -237,7 +228,7 @@ public class LogbookSummaryActivity extends Activity {
 class SmallImageUnitsCard extends SmallImageCard {
 
     private DistanceUnit distanceUnit;
-    private CompositeUnit compositeUnit;
+    private VelocityUnit compositeUnit;
 
     private double value;
 
@@ -247,12 +238,12 @@ class SmallImageUnitsCard extends SmallImageCard {
         this.value = value;
     }
 
-    public SmallImageUnitsCard(Context context, CompositeUnit cu) {
+    public SmallImageUnitsCard(Context context, VelocityUnit cu) {
         this(context, null, cu);
         this.setDescription(cu.toString());
     }
 
-    private SmallImageUnitsCard(Context context, DistanceUnit du, CompositeUnit cu) {
+    private SmallImageUnitsCard(Context context, DistanceUnit du, VelocityUnit cu) {
         super(context);
         distanceUnit = du;
         compositeUnit = cu;
