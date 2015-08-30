@@ -16,6 +16,10 @@ public class Position implements Differentiable<Position> {
         this.alt = alt;
     }
 
+    public Position() {
+
+    }
+
     public LongitudeSensorValue getLng() {
         return lng;
     }
@@ -49,5 +53,14 @@ public class Position implements Differentiable<Position> {
     @Override
     public int compareTo(Position another) {
         return 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Position{" +
+                "lng=" + lng +
+                ", lat=" + lat +
+                ", alt=" + alt +
+                '}';
     }
 }

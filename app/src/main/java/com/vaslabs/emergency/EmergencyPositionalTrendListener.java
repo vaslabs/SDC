@@ -1,5 +1,9 @@
 package com.vaslabs.emergency;
 
+import android.content.Context;
+import android.telephony.SmsManager;
+
+import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
 import com.vaslabs.sdc.types.TrendPoint;
 import com.vaslabs.sdc.utils.Position;
 import com.vaslabs.sdc.utils.TrendDirection;
@@ -18,11 +22,12 @@ public class EmergencyPositionalTrendListener implements TrendListener {
     double currentTimeLapse;
     final TimeUnit timeUnit = TimeUnit.MINUTES;
     final long firstTimeCalledTimestamp;
-
-    public EmergencyPositionalTrendListener(double timeLapse, TimeUnit timeUnit) {
+    final Context mContext;
+    public EmergencyPositionalTrendListener(double timeLapse, TimeUnit timeUnit, Context mContext) {
         this.timeLapse = timeUnit.convert(timeLapse, timeUnit);
         this.currentTimeLapse = timeLapse;
         firstTimeCalledTimestamp = System.currentTimeMillis();
+        this.mContext = mContext;
     }
 
     @Override
@@ -38,7 +43,12 @@ public class EmergencyPositionalTrendListener implements TrendListener {
     }
 
     private void sendEmergencySms() {
+
         noOfSentSms += 1;
+        SmsManager smsManager = SmsManager.getDefault();
+        EmergencyPreferences ep = EmergencyPreferences.load(mContext);
+        for (EmergencyContact ec : ep.getEmergencyContactList())
+            smsManager.sendTextMessage(ec.phoneNumber, null, SkyDivingEnvironment.getInstance().getLastPositionMessage(), null, null);
     }
 
     @Override

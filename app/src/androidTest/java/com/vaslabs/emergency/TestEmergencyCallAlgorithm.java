@@ -26,6 +26,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +79,14 @@ public class TestEmergencyCallAlgorithm extends AndroidTestCase {
         assertEquals("PhoneNumber", emergencyContactList.get(0).phoneNumber);
     }
 
+    public void test_send_sms() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        SkyDivingEnvironment.getInstance(this.mContext);
+        EmergencyPositionalTrendListener trendListener = new EmergencyPositionalTrendListener(0, TimeUnit.MINUTES, this.mContext);
+        Method sendSmsMethod = EmergencyPositionalTrendListener.class.getDeclaredMethod("sendEmergencySms");
+        sendSmsMethod.setAccessible(true);
+        sendSmsMethod.invoke(trendListener, null);
+    }
+
     private String readAll(FileInputStream fileInputStream) throws IOException {
         InputStreamReader isr = new InputStreamReader(fileInputStream);
         BufferedReader br = new BufferedReader(isr);
@@ -100,7 +111,7 @@ public class TestEmergencyCallAlgorithm extends AndroidTestCase {
 
         assertEquals(5*60*1000, allEntries.get(allEntries.size() - 1).getTimestamp() - allEntries.get(0).getTimestamp());
         final AbstractTrendStrategy<Position> trendStrategy = new PositionalTrendStrategy<Position>(0.0, 30.0, 50);
-        EmergencyPositionalTrendListener trendListener = new EmergencyPositionalTrendListener(5.0, TimeUnit.MINUTES);
+        EmergencyPositionalTrendListener trendListener = new EmergencyPositionalTrendListener(5.0, TimeUnit.MINUTES, this.mContext);
         trendStrategy.registerEventListener(trendListener);
 
         GpsEntry lastKnownLocation = positionDetails.get(0);

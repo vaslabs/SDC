@@ -3,6 +3,7 @@ package com.vaslabs.sdc.logs;
 import android.location.Location;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import com.vaslabs.sdc.sensors.HPASensorValue;
@@ -10,6 +11,7 @@ import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LocationSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
+import com.vaslabs.sdc.utils.Position;
 
 import java.util.HashMap;
 
@@ -23,6 +25,8 @@ public final class PositionGraph {
     public static final String BAROMETER_LOG_FILE = "PositionGraphBarometer.log";
     public static final String GPS_LOG_FILE = "PositionGraphGPS.log";
     private float lastValue = -1000;
+    private Position lastPosition = new Position();
+
     public PositionGraph() {
         barometerAltitudeValues = new HashMap<Long, MetersSensorValue>();
         //barometerPressureValues = new HashMap<Long, HPASensorValue>();
@@ -40,12 +44,15 @@ public final class PositionGraph {
         long now = System.currentTimeMillis();
 
         barometerAltitudeValues.put(now, altitude);
+        lastPosition.setAlt(altitude);
         //barometerPressureValues.put(now, pressure);
     }
 
     public synchronized void registerGPSValue(LatitudeSensorValue lat, LongitudeSensorValue lng) {
         long now = System.currentTimeMillis();
         gpsValues.put(now, new LatLng(lat, lng));
+        lastPosition.setLat(lat);
+        lastPosition.setLng(lng);
 
     }
 
@@ -91,4 +98,7 @@ public final class PositionGraph {
     }
 
 
+    public Position getLastPosition() {
+        return lastPosition;
+    }
 }

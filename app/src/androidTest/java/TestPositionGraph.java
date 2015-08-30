@@ -20,41 +20,9 @@ public class TestPositionGraph extends AndroidTestCase {
     }
 
 
-    public void test_that_values_are_converted_to_byte_stream() {
-        MetersSensorValue value = new MetersSensorValue();
-        value.setRawValue(1.0f);
-        long currentTime1 = System.currentTimeMillis();
-        positionGraph.registerBarometerValue(new HPASensorValue(), value);
-        value = new MetersSensorValue();
-        value.setRawValue(2f);
-        long currentTime2 = System.currentTimeMillis();
-        positionGraph.registerBarometerValue(new HPASensorValue(), value);
-        byte[] byteStream = positionGraph.getBarometerData();
-        long firstTimeRegistration = 0;
-        for (int i = 0; i < 8; i++) {
-            firstTimeRegistration |= (byteStream[i] & 0xffL) << (i*8);
-        }
-
-        int barometerValueBits = 0;
-        for (int i = 0; i < 4; i++) {
-            barometerValueBits |= ((0 | byteStream[8+i]) << (i*8));
-        }
-
-        float firstBarometerValue = Float.intBitsToFloat(barometerValueBits);
-
-        assertTrue(firstBarometerValue == 1f || firstBarometerValue == 2f);
-
-        if (firstBarometerValue == 1f) {
-            assertTrue(Math.abs(firstTimeRegistration - currentTime1) <= 1);
-        } else {
-            assertTrue(Math.abs(firstTimeRegistration - currentTime1) <= 2);
-        }
-
-    }
-
     public void test_position_graph_save_to_log_file() throws NoSuchFieldException, IllegalAccessException {
         SkyDivingEnvironment sde = SkyDivingEnvironment.getInstance(mContext);
-        Field positionGraphField = SkyDivingEnvironment.class.getField("positionGraph");
+        Field positionGraphField = SkyDivingEnvironment.class.getDeclaredField("positionGraph");
         positionGraphField.setAccessible(true);
         positionGraphField.set(sde, new PositionGraph());
         PositionGraph pg = (PositionGraph) positionGraphField.get(sde);

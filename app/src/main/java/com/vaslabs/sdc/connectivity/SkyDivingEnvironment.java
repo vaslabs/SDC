@@ -393,6 +393,10 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         }
     }
 
+    public String getLastPositionMessage() {
+        return positionGraph.getLastPosition().toString();
+    }
+
     private static class BarometerTrendOnDiveAltitudeListener extends DefaultBarometerTrendListener {
 
 
