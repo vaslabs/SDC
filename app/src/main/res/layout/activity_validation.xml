@@ -7,6 +7,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.vaslabs.sdc.ui.ValidationActivity">
 
+    <com.gc.materialdesign.views.ButtonRectangle
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/caution_proceed"
+        android:id="@+id/validationProceedButton"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"/>
+
     <com.dexafree.materialList.view.MaterialListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,15 +24,10 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_above="@id/validationProceedButton"
         />
 
 
-    <com.gc.materialdesign.views.ButtonRectangle
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/caution_proceed"
-        android:id="@+id/validationProceedButton"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"/>
+
 
 </RelativeLayout>

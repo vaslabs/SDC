@@ -60,4 +60,9 @@
     <string name="latest_jump_date">Latest activity</string>
     <string name="pick_distance_metric">Pick a metric unit for measuring distance</string>
     <string name="choose">OK</string>
+    <string name="title_activity_emergency_contacts">Emergency contacts</string>
+    <string name="emergency_contact_missing">Add emergency contacts so your phone will send sms if it detects immobility after landing</string>
+    <string name="emergency_contact_title">Emergency contacts</string>
+    <string name="label_search">Search</string>
+    <string name="label_multiple_numbers">Multiple numbers</string>
 </resources>

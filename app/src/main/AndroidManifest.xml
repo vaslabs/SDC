@@ -18,21 +18,19 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
-
-    <instrumentation
-        android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="com.vaslabs.sdc.ui" >
-    </instrumentation>
-
-    <android:uses-permission
+    <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
-    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <android:uses-permission
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <instrumentation
+        android:name="android.test.InstrumentationTestRunner"
+        android:targetPackage="com.vaslabs.acceptance" >
+    </instrumentation>
 
     <application
         android:allowBackup="true"
@@ -77,6 +75,15 @@
                 android:value="com.vaslabs.sdc.ui.MainActivity" />
         </activity>
         <activity
+            android:name=".contacts.ContactsPickerActivity"
+            android:label="@string/title_activity_emergency_contacts"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat.Light" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vaslabs.sdc.ui.MainActivity" />
+        </activity>
+        <activity
             android:name=".charts.BarometerChartActivity"
             android:label="@string/title_activity_barometer_chart"
             android:parentActivityName=".charts.LogbookActivity"
@@ -113,6 +120,14 @@
         <activity
             android:name=".charts.LogbookSummaryActivity"
             android:label="@string/title_activity_logbook_summary" >
+        </activity>
+        <activity
+            android:name=".contacts.EmergencyContactsActivity"
+            android:label="@string/title_activity_emergency_contacts"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vaslabs.sdc.ui.MainActivity" />
         </activity>
     </application>
 

@@ -14,10 +14,14 @@ import com.dexafree.materialList.controller.RecyclerItemClickListener;
 import com.dexafree.materialList.model.CardItemView;
 import com.dexafree.materialList.view.MaterialListView;
 import com.gc.materialdesign.views.ButtonRectangle;
+import com.vaslabs.emergency.EmergencyPreferences;
+import com.vaslabs.sdc.ui.contacts.ContactsPickerActivity;
 import com.vaslabs.sdc.ui.util.ValidationAdapter;
 import com.vaslabs.sdc.ui.util.ValidationChangeListener;
 import com.vaslabs.sdc.utils.BarometerValidator;
+import com.vaslabs.sdc.utils.EmergencyContactValidator;
 import com.vaslabs.sdc.utils.IValidator;
+import com.vaslabs.sdc.utils.InternallyFixableValidation;
 import com.vaslabs.sdc.utils.LocationValidator;
 import com.vaslabs.sdc.utils.ValidationMessageType;
 import com.vaslabs.sdc.utils.WifiValidator;
@@ -29,14 +33,18 @@ public class ValidationActivity extends Activity implements ValidationChangeList
     private MaterialListView validationListView;
     private IValidator[] validators;
     private ButtonRectangle validationProceedButton;
+    private static ValidationActivity va = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_validation);
-
+        va = this;
         validationProceedButton = (ButtonRectangle) findViewById(R.id.validationProceedButton);
 
-        validators = new IValidator[] {BarometerValidator.getInstance(this), LocationValidator.getInstance(this), WifiValidator.getInstance(this)};
+        validators = new IValidator[] {BarometerValidator.getInstance(this),
+                LocationValidator.getInstance(this),
+                WifiValidator.getInstance(this),
+                EmergencyContactValidator.getInstance(this)};
         validationAdapter = new ValidationAdapter(this, validators, this);
         validationListView = (MaterialListView) findViewById(R.id.validationStepsListView);
         validationListView.setAdapter(validationAdapter);
@@ -57,14 +65,19 @@ public class ValidationActivity extends Activity implements ValidationChangeList
 
             @Override
             public void onItemClick(CardItemView view, int position) {
-                onValidationChanged();
+
+                if (validators[position] instanceof InternallyFixableValidation) {
+                    ((InternallyFixableValidation)(validators[position])).launchActivityForResult(va);
+                } else {
+                    onValidationChanged();
+                }
             }
 
             @Override
             public void onItemLongClick(CardItemView view, int position) {
-                Toast.makeText(view.getContext(),
-                        "Is " + validators[position].getTitle() + " available?",
-                        Toast.LENGTH_LONG).show();
+                    Toast.makeText(view.getContext(),
+                            "Is " + validators[position].getTitle() + " available?",
+                            Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -93,7 +106,6 @@ public class ValidationActivity extends Activity implements ValidationChangeList
 
     @Override
     public void onValidationChanged() {
-        validationAdapter.notifyDataSetChanged();
         boolean isReadyToProceed = true;
         boolean hasErrors = false;
         boolean valid;
@@ -112,6 +124,39 @@ public class ValidationActivity extends Activity implements ValidationChangeList
             validationProceedButton.setText(this.getString(R.string.proceed));
         } else {
             validationProceedButton.setText(this.getString(R.string.caution_proceed));
+        }
+        validationAdapter.notifyDataSetChanged();
+    }
+
+    private static final int GET_PHONE_NUMBER = 3007;
+
+    public void getContact() {
+        startActivityForResult(new Intent(this, ContactsPickerActivity.class), GET_PHONE_NUMBER);
+    }
+
+    // Listen for results.
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        // See which child activity is calling us back.
+        switch (requestCode) {
+            case GET_PHONE_NUMBER:
+                // This is the standard resultCode that is sent back if the
+                // activity crashed or didn't doesn't supply an explicit result.
+                if (resultCode == RESULT_CANCELED){
+                    Toast.makeText(this, "No phone number found", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    String phoneNumber = (String) data.getExtras().get(ContactsPickerActivity.KEY_PHONE_NUMBER);
+                    String name = (String) data.getExtras().get(ContactsPickerActivity.KEY_CONTACT_NAME);
+                    EmergencyPreferences ep = EmergencyPreferences.load(this);
+                    try {
+                        ep.addEmergencyContact(name, phoneNumber);
+                    } catch (Exception e) {
+                        Toast.makeText(this, "Failed to add contact", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            default:
+                break;
         }
     }
 }
