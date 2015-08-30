@@ -2,6 +2,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.vaslabs.sdc.ui.contacts.EmergencyContactsActivity">
-    <item android:id="@+id/action_add_contact" android:title="@string/action_settings"
+    <item android:id="@+id/action_add_contact" android:title="@string/action_add_contact"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>

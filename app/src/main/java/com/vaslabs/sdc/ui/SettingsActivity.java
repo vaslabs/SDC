@@ -8,11 +8,16 @@ import com.vaslabs.sdc.sensors.BarometerSensor;
 import com.vaslabs.sdc.sensors.HPASensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
 import com.vaslabs.sdc.sensors.NoBarometerException;
+import com.vaslabs.sdc.ui.charts.LogbookSummaryActivity;
+import com.vaslabs.sdc.ui.contacts.EmergencyContactsActivity;
 import com.vaslabs.sdc.ui.util.TrendingPreferences;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -139,13 +144,39 @@ public class SettingsActivity extends Activity implements BarometerListener {
 
     private void updateTextFields() {
         massEditText.setText( String.valueOf(userInfo.getMass()) );
-        nameEditText.setText( userInfo.getName() );
-        seaLevelEditText.setText( String.valueOf(userInfo.getSeaLevelCalibration()) );
+        nameEditText.setText(userInfo.getName());
+        seaLevelEditText.setText(String.valueOf(userInfo.getSeaLevelCalibration()));
         
     }
 
     @Override
     public void onHPASensorValueChange( HPASensorValue pressure, MetersSensorValue altitude) {
         currentPressureButton.setText(pressure.toString());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu( Menu menu ) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_settings, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected( MenuItem item ) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        Intent intent = null;
+        switch (id) {
+            case R.id.action_emergency_contacts:
+                intent = new Intent(this, EmergencyContactsActivity.class);
+                break;
+        }
+        if (intent != null) {
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected( item );
     }
 }

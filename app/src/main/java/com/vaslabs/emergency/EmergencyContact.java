@@ -8,10 +8,10 @@ import com.google.gson.annotations.Expose;
 public class EmergencyContact {
 
     @Expose
-    protected final String name;
+    public final String name;
 
     @Expose
-    protected final String phoneNumber;
+    public final String phoneNumber;
 
     public EmergencyContact(String name, String phoneNumber) {
         this.name = name;

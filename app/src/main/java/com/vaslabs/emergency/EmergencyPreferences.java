@@ -93,4 +93,9 @@ public class EmergencyPreferences {
         this.minimumTimeBeforeCall = this.timeUnit.convert(v, timeUnit);
         this.save();
     }
+
+    public void removeContact(int i) throws Exception {
+        this.emergencyContactList.remove(i);
+        this.save();
+    }
 }
