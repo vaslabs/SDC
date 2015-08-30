@@ -110,6 +110,7 @@ class ConnectionEntry extends Entry {
     public static final int NEW_CONNECTION = 1;
     public static final int LOST_CONNECTION = -1;
     public static final int SCANNING_STARTED = 0;
+    public static final int LANDED_EVENT = 2;
     public static final String NEW_CONNECTION_INDICATOR = "New connection";
     public static final String LOST_CONNECTION_INDICATOR = "Lost connection";
     private ConnectionEntry(long timestamp, String deviceName, int connectionEvent) {
@@ -123,7 +124,12 @@ class ConnectionEntry extends Entry {
         long timestamp = Long.parseLong(parts[0]);
 
         if (parts.length < 3) {
-            return new ConnectionEntry(timestamp, "", SCANNING_STARTED);
+            if (parts[1].equals("Landed")) {
+                return new ConnectionEntry(timestamp, "", LANDED_EVENT);
+            }
+            else{
+                return new ConnectionEntry(timestamp, "", SCANNING_STARTED);
+            }
         }
 
         String deviceName = parts[2].trim();

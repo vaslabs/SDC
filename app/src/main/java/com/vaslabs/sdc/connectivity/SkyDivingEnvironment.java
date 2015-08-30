@@ -398,6 +398,10 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         return positionGraph.getLastPosition().toString();
     }
 
+    public void logLanding() {
+        SkyDivingEnvironmentLogger.Log(System.currentTimeMillis() + ": Landed");
+    }
+
     private static class BarometerTrendOnDiveAltitudeListener extends DefaultBarometerTrendListener {
 
 

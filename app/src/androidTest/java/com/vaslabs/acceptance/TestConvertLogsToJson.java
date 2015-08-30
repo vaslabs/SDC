@@ -45,9 +45,9 @@ public class TestConvertLogsToJson extends AndroidTestCase {
 
     private void validateDataFromJson() {
 
-        assertEquals(1790, sessionData.barometerEntriesSize());
-        assertEquals(1088, sessionData.gpsEntriesSize());
-        assertEquals(7, sessionData.connectionEventsSize());
+        assertEquals(2033, sessionData.barometerEntriesSize());
+        assertEquals(1032, sessionData.gpsEntriesSize());
+        assertEquals(2, sessionData.connectionEventsSize());
     }
 
     private void whenApplyFilters() {
@@ -74,8 +74,8 @@ public class TestConvertLogsToJson extends AndroidTestCase {
         cal.setTimeInMillis(sessionData.getBarometerEntry(0).getTimestamp());
         DateStruct ds = new DateStruct(cal);
         assertEquals(2015, ds.year);
-        assertEquals(Calendar.MAY, ds.month);
-        assertEquals(03, ds.day);
+        assertEquals(Calendar.JUNE, ds.month);
+        assertEquals(28, ds.day);
     }
 
     private void thenFindTheMostRecentOne() {
