@@ -174,9 +174,11 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
             case UP:
                 if (listener.getValueLimit().value.compareTo(value) < 0 )
                     return true;
+                return false;
             case DOWN:
                 if (listener.getValueLimit().value.compareTo(value) > 0 )
                     return true;
+                return false;
             case NEUTRAL:
                 return true;
             default:

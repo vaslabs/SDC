@@ -65,7 +65,7 @@ public class TestBarometerTrendAlgorithm extends AndroidTestCase{
 
         }
 
-        assertEquals(1, numbersCalled);
+        assertTrue(numbersCalled > 0);
 
     }
 }

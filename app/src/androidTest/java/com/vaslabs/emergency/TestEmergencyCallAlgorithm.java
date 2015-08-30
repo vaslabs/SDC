@@ -127,7 +127,7 @@ public class TestEmergencyCallAlgorithm extends AndroidTestCase {
         timesCalledField.setAccessible(true);
         int value = timesCalledField.getInt(trendListener);
         assertTrue(value > 0);
-        
+
     }
 
     private List<Entry> replicateData(List<Entry> allEntries, int minimumSize) {
