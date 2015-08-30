@@ -136,7 +136,7 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
 
         double difference = trendPoints.get(thisTrendPoint).value.differantiate(trendPoints.get(lastTrendPoint).value);
 
-        if (difference >= accuracy) {
+        if (difference > accuracy) {
             currentDirection = TrendDirection.UP;
         } else if (difference == 0) {
             currentDirection = TrendDirection.NEUTRAL;
@@ -178,6 +178,7 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
                 if (listener.getValueLimit().value.compareTo(value) > 0 )
                     return true;
             case NEUTRAL:
+                return true;
             default:
                 return false;
         }

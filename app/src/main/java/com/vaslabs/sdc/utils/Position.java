@@ -3,8 +3,9 @@ package com.vaslabs.sdc.utils;
 import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
+import com.vaslabs.sdc.types.DifferentiableFloat;
 
-public class Position {
+public class Position implements Differentiable<Position> {
     private LongitudeSensorValue lng;
     private LatitudeSensorValue lat;
     private MetersSensorValue alt;
@@ -38,8 +39,15 @@ public class Position {
     public void setAlt( MetersSensorValue alt ) {
         this.alt = alt;
     }
-    
-    
-    
-    
+
+
+    @Override
+    public double differantiate(Position differentiable) {
+        return GeoUtils.calculateDistance(this, differentiable);
+    }
+
+    @Override
+    public int compareTo(Position another) {
+        return 0;
+    }
 }

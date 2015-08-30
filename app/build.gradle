@@ -41,6 +41,7 @@ dependencies {
     compile 'com.github.dexafree:materiallist:2.5.0'
     compile 'com.afollestad:material-dialogs:0.7.8.1'
     compile 'com.github.vaslabs:vunits:0.3'
+    compile 'com.codinguser.android:contactpicker:3.0.0'
 
 }
 

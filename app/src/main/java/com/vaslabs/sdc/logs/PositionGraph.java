@@ -92,13 +92,3 @@ public final class PositionGraph {
 
 
 }
-
-class LatLng {
-    public final LatitudeSensorValue lat;
-    public final LongitudeSensorValue lng;
-
-    public LatLng(LatitudeSensorValue lat, LongitudeSensorValue lng) {
-        this.lat = lat;
-        this.lng = lng;
-    }
-}

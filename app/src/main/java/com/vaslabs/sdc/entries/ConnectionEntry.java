@@ -8,6 +8,10 @@ public final class ConnectionEntry extends Entry{
     private String deviceName;
     private int connectionEvent;
 
+    public ConnectionEntry(long newTimeStamTimestamp) {
+        super(newTimeStamTimestamp);
+    }
+
     public int getConnectionEvent() {
         return connectionEvent;
     }
@@ -17,5 +21,13 @@ public final class ConnectionEntry extends Entry{
     }
 
 
-
+    @Override
+    public Entry withTimestamp(long newTimeStamTimestamp) {
+        if (newTimeStamTimestamp == this.getTimestamp())
+            return this;
+        ConnectionEntry ce = new ConnectionEntry(newTimeStamTimestamp);
+        ce.deviceName = this.deviceName;
+        ce.connectionEvent = this.connectionEvent;
+        return ce;
+    }
 }
