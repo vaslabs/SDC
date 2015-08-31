@@ -3,10 +3,13 @@ package com.vaslabs.sdc.ui.charts;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.dexafree.materialList.cards.SmallImageCard;
@@ -14,33 +17,31 @@ import com.dexafree.materialList.controller.RecyclerItemClickListener;
 import com.dexafree.materialList.model.Card;
 import com.dexafree.materialList.model.CardItemView;
 import com.dexafree.materialList.view.MaterialListView;
+import com.vaslabs.logbook.Logbook;
 import com.vaslabs.logbook.LogbookAPI;
 import com.vaslabs.logbook.LogbookSummary;
+import com.vaslabs.pwa.CommunicationManager;
 import com.vaslabs.sdc.ui.R;
 import java.util.Calendar;
+import java.util.List;
+
 import com.vaslabs.units.*;
 import com.vaslabs.units.composite.VelocityUnit;
 public class LogbookSummaryActivity extends Activity {
 
-    MaterialListView logbookSummaryListView = null;
-    Card[] viewCards;
-    private DistanceUnit lastSelectedDistanceUnit = DistanceUnit.KM;
-    private TimeUnit lastSelectedTimeUnit = TimeUnit.HOURS;
+    static MaterialListView logbookSummaryListView = null;
+    static Card[] viewCards;
+    static DistanceUnit lastSelectedDistanceUnit = DistanceUnit.KM;
+    static TimeUnit lastSelectedTimeUnit = TimeUnit.HOURS;
+    private static Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logbook_summary);
-
+        CommunicationManager.getInstance(this);
+        context = this;
         logbookSummaryListView = (MaterialListView) findViewById(R.id.logbookSummaryListView);
-        LogbookSummary logbookSummary = LogbookAPI.MOCK.getLogbookSummary(null, this);
-
-        viewCards = toCards(logbookSummary, DistanceUnit.FEET, lastSelectedDistanceUnit, lastSelectedTimeUnit);
-
-        for (Card card : viewCards) {
-            logbookSummaryListView.add(card);
-        }
-
         logbookSummaryListView.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener() {
 
             @Override
@@ -49,7 +50,7 @@ public class LogbookSummaryActivity extends Activity {
                 if (!(clickedCard instanceof SmallImageUnitsCard))
                     return;
 
-                SmallImageUnitsCard unitsCard = (SmallImageUnitsCard)clickedCard;
+                SmallImageUnitsCard unitsCard = (SmallImageUnitsCard) clickedCard;
                 if (!unitsCard.areCompositeUnitOptionsAvailable()) {
                     unitsCard.switchToNext();
                     return;
@@ -81,6 +82,7 @@ public class LogbookSummaryActivity extends Activity {
             public void onItemLongClick(CardItemView view, int position) {
             }
         });
+        new LogbookFetchTask().execute();
 
     }
 
@@ -112,14 +114,14 @@ public class LogbookSummaryActivity extends Activity {
         return toCards(logbookSummary, distancePref, null, timePref);
     }
 
-    private Card[] toCards(LogbookSummary logbookSummary, DistanceUnit metricPreference, DistanceUnit speedPreference, TimeUnit timeUnitPreference) {
+    protected static Card[] toCards(LogbookSummary logbookSummary, DistanceUnit metricPreference, DistanceUnit speedPreference, TimeUnit timeUnitPreference) {
         if (speedPreference == null)
             speedPreference = metricPreference;
-        int averageDeployAltitude = logbookSummary.getAverageDeployAltitude();
+        float averageDeployAltitude = logbookSummary.getAverageDeployAltitude();
         double averageDeployAltitudeMetric = metricPreference.convert(DistanceUnit.METERS,
                 averageDeployAltitude);
 
-        int averageExitAltitude = logbookSummary.getAverageExitAltitude();
+        float averageExitAltitude = logbookSummary.getAverageExitAltitude();
         double averageExitAltitudeMetric = metricPreference.convert(DistanceUnit.METERS,
                 averageExitAltitude);
 
@@ -171,15 +173,15 @@ public class LogbookSummaryActivity extends Activity {
 
     }
 
-    private Card toCard(int title, double averageExitAltitudeMetric, DistanceUnit metricPreference, int ic_ruler_small) {
-        SmallImageUnitsCard smallImageUnitsCard = new SmallImageUnitsCard(this, metricPreference, averageExitAltitudeMetric);
+    private static Card toCard(int title, double averageExitAltitudeMetric, DistanceUnit metricPreference, int ic_ruler_small) {
+        SmallImageUnitsCard smallImageUnitsCard = new SmallImageUnitsCard(context, metricPreference, averageExitAltitudeMetric);
         smallImageUnitsCard.setTitle(title);
         smallImageUnitsCard.setDrawable(ic_ruler_small);
         return smallImageUnitsCard;
     }
 
-    private Card toCard(int title, String description, int icon) {
-        SmallImageCard card = new SmallImageCard(this);
+    private static Card toCard(int title, String description, int icon) {
+        SmallImageCard card = new SmallImageCard(context);
         card.setTitle(title);
         card.setDescription(description);
         card.setDrawable(icon);
@@ -187,8 +189,8 @@ public class LogbookSummaryActivity extends Activity {
         return card;
     }
 
-    private Card toCard(int title, VelocityUnit unit, int icon) {
-        SmallImageUnitsCard smallImageUnitsCard = new SmallImageUnitsCard(this, unit);
+    private static Card toCard(int title, VelocityUnit unit, int icon) {
+        SmallImageUnitsCard smallImageUnitsCard = new SmallImageUnitsCard(context, unit);
         smallImageUnitsCard.setTitle(title);
         smallImageUnitsCard.setDrawable(icon);
         return smallImageUnitsCard;
@@ -282,4 +284,35 @@ class SmallImageUnitsCard extends SmallImageCard {
         switchTo(newDistanceUnit);
     }
 
+}
+
+class LogbookFetchTask extends AsyncTask<Void, Void, List<Logbook>> {
+
+    private Exception exception = null;
+
+    @Override
+    protected List<Logbook> doInBackground(Void... params) {
+        List<Logbook> logbookEntries = null;
+        LogbookSummary logbookSummary = null;
+        try {
+            logbookEntries = LogbookAPI.INSTANCE.getLogbookEntries();
+            return logbookEntries;
+        } catch (Exception e) {
+            this.exception = e;
+            return null;
+        }
+    }
+
+    @Override
+    protected void onPostExecute(List<Logbook> logbookEntries) {
+        LogbookSummary logbookSummary = LogbookSummary.fromLogbookEntries(logbookEntries);
+
+        LogbookSummaryActivity.viewCards = LogbookSummaryActivity.toCards(logbookSummary, DistanceUnit.FEET,
+                LogbookSummaryActivity.lastSelectedDistanceUnit, LogbookSummaryActivity.lastSelectedTimeUnit);
+        for (Card card : LogbookSummaryActivity.viewCards) {
+            LogbookSummaryActivity.logbookSummaryListView.add(card);
+        }
+
+
+    }
 }

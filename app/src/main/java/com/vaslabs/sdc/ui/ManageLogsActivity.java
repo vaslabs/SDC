@@ -86,8 +86,7 @@ class SubmitLogs extends AsyncTask<Void, Void, String> {
     }
     @Override
     protected String doInBackground(Void... params) {
-        CommunicationManager cm = CommunicationManager.getInstance();
-        cm.setRemoteHost( context.getString(R.string.remote_host));
+        CommunicationManager.getInstance(context);
         SDCLogManager lm = SDCLogManager.getInstance(context);
         try {
             lm.manageLogSubmission();
