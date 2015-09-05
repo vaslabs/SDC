@@ -39,7 +39,6 @@ public class SDCLogManager {
     public static SDCLogManager getInstance( Context mContext ) {
         synchronized ( logManager ) {
             if ( logManager.context == null ) {
-
                 logManager.context = mContext;
             }
         }

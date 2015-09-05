@@ -33,7 +33,7 @@ public final class PositionGraph {
         gpsValues = new HashMap<Long, LatLng>();
     }
 
-    public synchronized void registerBarometerValue(HPASensorValue pressure, MetersSensorValue altitude) {
+    public void registerBarometerValue(HPASensorValue pressure, MetersSensorValue altitude) {
 
         if (altitude == null)
             return;
@@ -48,7 +48,7 @@ public final class PositionGraph {
         //barometerPressureValues.put(now, pressure);
     }
 
-    public synchronized void registerGPSValue(LatitudeSensorValue lat, LongitudeSensorValue lng) {
+    public void registerGPSValue(LatitudeSensorValue lat, LongitudeSensorValue lng) {
         long now = System.currentTimeMillis();
         gpsValues.put(now, new LatLng(lat, lng));
         lastPosition.setLat(lat);
@@ -64,7 +64,7 @@ public final class PositionGraph {
      next 4 bytes is the double representation of the altitude value of the barometer at that
      point of time
      */
-    public synchronized byte[] getBarometerData() {
+    public byte[] getBarometerData() {
         byte[] data = new byte[barometerAltitudeValues.size()*12];
         int index = 0;
         byte nextByte;
@@ -79,7 +79,7 @@ public final class PositionGraph {
         return data;
     }
 
-    public synchronized byte[] getGPSData() {
+    public byte[] getGPSData() {
         byte[] data = new byte[gpsValues.size()*24];
         ByteBuffer bf = ByteBuffer.wrap(data);
 

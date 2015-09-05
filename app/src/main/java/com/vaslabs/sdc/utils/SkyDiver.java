@@ -18,11 +18,11 @@ public class SkyDiver implements PositionalUpdate {
         userInformation = UserInformation.getUserInformationClone( ui );
     }
     
-    public synchronized void setConnectivityStrength(SDConnectivity connectivity) {
+    public void setConnectivityStrength(SDConnectivity connectivity) {
         this.connectivityStrength = connectivity;
     }
     
-    public synchronized int getConnectivityStrengthAsInt() {
+    public int getConnectivityStrengthAsInt() {
         return connectivityStrength.ordinal();
     }
 

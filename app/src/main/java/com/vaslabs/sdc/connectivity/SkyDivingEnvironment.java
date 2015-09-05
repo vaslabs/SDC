@@ -89,7 +89,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
 
     }
 
-    public synchronized static SkyDivingEnvironment getInstance( Context c ) {
+    public static SkyDivingEnvironment getInstance( Context c ) {
         if ( environmentInstance == null ) {
             environmentInstance = new SkyDivingEnvironment( c );
         }
@@ -126,7 +126,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     @Override
-    public synchronized void onNewSkydiverInfo( SkyDiver skydiver ) {
+    public void onNewSkydiverInfo( SkyDiver skydiver ) {
         if ( skydivers.containsKey( skydiver.getName() ) ) {
             onSkydiverInfoUpdate(skydiver);
 
@@ -145,7 +145,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     @Override
-    public synchronized void onSkydiverInfoUpdate( SkyDiver skydiver ) {
+    public void onSkydiverInfoUpdate( SkyDiver skydiver ) {
         if ( !this.skydivers.containsKey( skydiver.getName() ) ) {
             onNewSkydiverInfo(skydiver);
         } else {
@@ -166,7 +166,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     @Override
-    public synchronized void onConnectivityChange( SkyDiver skydiver ) {
+    public void onConnectivityChange( SkyDiver skydiver ) {
 
         if ( skydiver.getConnectivityStrengthAsInt() == SDConnectivity.CONNECTION_LOST
                 .ordinal() ) {
@@ -196,7 +196,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     @Override
-    public synchronized void onLooseConnection( SkyDiver skydiver ) {
+    public void onLooseConnection( SkyDiver skydiver ) {
         SkyDiver sd = skydivers.get( skydiver.getName() );
         if ( sd != null ) {
             SpeechCommunicationManager.getInstance().informAboutdisconnection(
@@ -209,12 +209,12 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     @Override
-    public synchronized void onMyAltitudeUpdate( MetersSensorValue altitude ) {
+    public void onMyAltitudeUpdate( MetersSensorValue altitude ) {
 
     }
 
     @Override
-    public synchronized void onMyGPSUpdate( LatitudeSensorValue lat,
+    public void onMyGPSUpdate( LatitudeSensorValue lat,
             LongitudeSensorValue lng ) {
         myself.getPosition().setLat(lat);
         myself.getPosition().setLng(lng);
@@ -446,7 +446,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
 
     }
 
-    private synchronized void beginScanning() {
+    private void beginScanning() {
         if (!hasStartedScanning) {
             hasStartedScanning = true;
             this.mManager.discoverPeers(this.mChannel, this.actionListener);

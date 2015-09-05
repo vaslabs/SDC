@@ -22,7 +22,7 @@ import java.util.Map;
 public class PeersChangedConnectivityActionResponder extends
         ConnectivityActionResponder {
 
-        private volatile boolean knownState = false;
+        private boolean knownState = false;
         private Map<String, Boolean> previouslyDiscoveredPresence;
         public PeersChangedConnectivityActionResponder() {
                 previouslyDiscoveredPresence = new HashMap<String, Boolean>();
@@ -40,14 +40,14 @@ public class PeersChangedConnectivityActionResponder extends
                 knownState = false;
         }
 
-        private synchronized void setAbsent(String skyDiver) {
+        private void setAbsent(String skyDiver) {
                 if (previouslyDiscoveredPresence.containsKey( skyDiver )) {
                         previouslyDiscoveredPresence.put( skyDiver, false );
                 }
         }
 
         @Override
-        public synchronized void onPeersAvailable( WifiP2pDeviceList peers ) {
+        public void onPeersAvailable( WifiP2pDeviceList peers ) {
 
                 Log.i("onPeersAvailable", "" + peers.getDeviceList().size());
                 SkyDivingEnvironment environment = SkyDivingEnvironment.getInstance( );
@@ -69,11 +69,11 @@ public class PeersChangedConnectivityActionResponder extends
 
         }
 
-        private synchronized void setPresent(String skyDiver) {
+        private void setPresent(String skyDiver) {
                 previouslyDiscoveredPresence.put( skyDiver, true );
         }
 
-        private synchronized void manageDisconnections() {
+        private void manageDisconnections() {
                 for (String key : previouslyDiscoveredPresence.keySet()) {
                         if (!previouslyDiscoveredPresence.get(key)) {
                                 SkyDivingEnvironment.getInstance().onLooseConnection(key);

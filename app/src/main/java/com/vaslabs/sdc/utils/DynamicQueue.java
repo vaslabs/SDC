@@ -8,7 +8,7 @@ public class DynamicQueue<T>{
         
     }
     
-    public synchronized void append(T obj) {
+    public void append(T obj) {
         if (head == null) {
             head = new Node<T>(obj);
         } else if (tail == null) {
@@ -24,7 +24,7 @@ public class DynamicQueue<T>{
         size++;
     }
     
-    public synchronized T pop() {
+    public T pop() {
         if (head == null)
             return null;
         Node<T> newHead = head.getNext();
@@ -39,7 +39,7 @@ public class DynamicQueue<T>{
         return size;
     }
 
-    public synchronized void appendInFront( T textMessage ) {
+    public void appendInFront( T textMessage ) {
         Node<T> newHead = new Node<T>(textMessage);
         newHead.setNext( head );
         head = newHead;

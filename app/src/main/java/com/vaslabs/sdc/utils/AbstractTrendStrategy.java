@@ -56,7 +56,7 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         trendVelocityStateMap = new HashMap<Double, VelocityState>();
     }
 
-    public final synchronized void acceptValue(Double point, V value) {
+    public final void acceptValue(Double point, V value) {
         if (accept(point, value)) {
             if (cycleIndex >= historySize) {
                 cycleIndex = 0;
@@ -190,7 +190,7 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         }
     }
 
-    public synchronized final List<TrendPoint<Double, V>> getTrendGraph(int startFrom, int endAt) {
+    public final List<TrendPoint<Double, V>> getTrendGraph(int startFrom, int endAt) {
         List<TrendPoint<Double, V>> trend = new ArrayList<TrendPoint<Double, V>>();
         if (startFrom < 0)
             startFrom = 0;
@@ -216,12 +216,12 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
         return trend;
     }
 
-    public synchronized List<TrendPoint<Double, V>> getTrendGraph(int latest) {
+    public List<TrendPoint<Double, V>> getTrendGraph(int latest) {
         int startFrom = historySize - latest;
         return getTrendGraph(startFrom, historySize);
     }
 
-    public synchronized Map<Double, VelocityState> getVelocityGraph(int startFrom, int endAt) {
+    public Map<Double, VelocityState> getVelocityGraph(int startFrom, int endAt) {
         Map<Double, VelocityState> velocityTrend = new HashMap<Double, VelocityState>();
         if (startFrom < 0)
             return velocityTrend;
@@ -237,14 +237,14 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
     }
 
 
-    public synchronized Map<Double, TrendDirection> getDirectionGraph(int latest) {
+    public Map<Double, TrendDirection> getDirectionGraph(int latest) {
         int startFrom = this.trendPoints.size() - latest;
         if (startFrom < 0)
             startFrom = 0;
         return getDirectionGraph(startFrom, historySize);
     }
 
-    public synchronized Map<Double, TrendDirection> getDirectionGraph(int startFrom, int endAt) {
+    public Map<Double, TrendDirection> getDirectionGraph(int startFrom, int endAt) {
         Map<Double, TrendDirection> directionTrend = new HashMap<Double, TrendDirection>();
         if (startFrom < 0)
             return directionTrend;
@@ -260,7 +260,7 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
     }
 
 
-    public synchronized Map<Double, VelocityState> getVelocityGraph(int latest) {
+    public Map<Double, VelocityState> getVelocityGraph(int latest) {
         int startFrom = historySize - latest;
         return getVelocityGraph(startFrom, historySize);
     }

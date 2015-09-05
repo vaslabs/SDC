@@ -38,9 +38,14 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
     }
 
     public static BarometerSensor getInstance(Context c) {
+        if (barometerSensor != null)
+            return barometerSensor;
         synchronized (barometerInitLock) {
-            if (barometerSensor == null)
-                barometerSensor = new BarometerSensor(c);
+            if (barometerSensor != null)
+                return barometerSensor;
+
+            BarometerSensor bs = new BarometerSensor(c);
+            barometerSensor = bs;
         }
         return barometerSensor;
     }
