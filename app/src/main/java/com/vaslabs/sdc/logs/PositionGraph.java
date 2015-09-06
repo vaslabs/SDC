@@ -19,8 +19,10 @@ import java.util.HashMap;
  * Created by vasilis on 04/04/2015.
  */
 public final class PositionGraph {
+    private static final int SEA_LEVEL = 0;
+    private static final int DELTA_GROUND_LEVEL = 1;
     //private Map<Long, HPASensorValue> barometerPressureValues;
-    private Map<Long, MetersSensorValue> barometerAltitudeValues;
+    private Map<Long, MetersSensorValue[]> barometerAltitudeValues;
     private Map<Long, LatLng> gpsValues;
     public static final String BAROMETER_LOG_FILE = "PositionGraphBarometer.log";
     public static final String GPS_LOG_FILE = "PositionGraphGPS.log";
@@ -28,22 +30,22 @@ public final class PositionGraph {
     private Position lastPosition = new Position();
 
     public PositionGraph() {
-        barometerAltitudeValues = new HashMap<Long, MetersSensorValue>();
+        barometerAltitudeValues = new HashMap<Long, MetersSensorValue[]>();
         //barometerPressureValues = new HashMap<Long, HPASensorValue>();
         gpsValues = new HashMap<Long, LatLng>();
     }
 
-    public void registerBarometerValue(HPASensorValue pressure, MetersSensorValue altitude) {
+    public void registerBarometerValue(HPASensorValue pressure, MetersSensorValue altitude, MetersSensorValue deltaAltitude) {
 
         if (altitude == null)
             return;
-        if (Math.abs(altitude.getRawValue() - lastValue) < 3) {
-            return;
-        }
+
         lastValue = altitude.getRawValue();
         long now = System.currentTimeMillis();
-
-        barometerAltitudeValues.put(now, altitude);
+        MetersSensorValue[] barometerEntries = new MetersSensorValue[2];
+        barometerEntries[SEA_LEVEL] =  altitude;
+        barometerEntries[DELTA_GROUND_LEVEL] = deltaAltitude;
+        barometerAltitudeValues.put(now, barometerEntries);
         lastPosition.setAlt(altitude);
         //barometerPressureValues.put(now, pressure);
     }
@@ -65,7 +67,7 @@ public final class PositionGraph {
      point of time
      */
     public byte[] getBarometerData() {
-        byte[] data = new byte[barometerAltitudeValues.size()*12];
+        byte[] data = new byte[barometerAltitudeValues.size()*16];
         int index = 0;
         byte nextByte;
         float sensorValue;
@@ -73,7 +75,9 @@ public final class PositionGraph {
         ByteBuffer bf = ByteBuffer.wrap(data);
         for (Long timestamp : barometerAltitudeValues.keySet()) {
             bf.putLong(timestamp);
-            sensorValue = barometerAltitudeValues.get(timestamp).getRawValue();
+            sensorValue = barometerAltitudeValues.get(timestamp)[SEA_LEVEL].getRawValue();
+            bf.putFloat(sensorValue);
+            sensorValue = barometerAltitudeValues.get(timestamp)[DELTA_GROUND_LEVEL].getRawValue();
             bf.putFloat(sensorValue);
         }
         return data;

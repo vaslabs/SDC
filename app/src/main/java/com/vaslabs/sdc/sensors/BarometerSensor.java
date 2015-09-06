@@ -4,6 +4,7 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 /**
  * @author Vasilis Nicolaou
@@ -14,6 +15,7 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
     
     private HPASensorValue value;
     private HPASensorValue seaLevelPressureValue;
+    private HPASensorValue groundPressureValue = null;
     private BarometerListener listener = null;
     private static BarometerSensor barometerSensor = null;
     private final static Object barometerInitLock = new Object();
@@ -25,6 +27,7 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
         SensorManager sm = SDSensorManager.getInstance();
         
         Sensor hwSensor = getSensor();
+
         if ( hwSensor == null ) {
             isDummy = true;
         } else
@@ -72,9 +75,26 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
         return altitudeValue;
     }
 
+    public MetersSensorValue getDeltaAltitude() {
+        float groundPressure = groundPressureValue == null ? seaLevelPressureValue.getRawValue() : groundPressureValue.getRawValue();
+        float meters = SensorManager.getAltitude(groundPressure, value.getRawValue());
+        MetersSensorValue deltaAltitudeValue = new MetersSensorValue();
+        deltaAltitudeValue.setRawValue(meters);
+        return deltaAltitudeValue;
+    }
+
     @Override
     public void onAccuracyChanged( Sensor arg0, int arg1 ) {
-        // TODO Auto-generated method stub
+        String accuracy = "Uknown";
+        switch (arg1) {
+            case SensorManager.SENSOR_STATUS_ACCURACY_HIGH:
+                accuracy = "High"; break;
+            case SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM:
+                accuracy = "Medium"; break;
+            case SensorManager.SENSOR_STATUS_ACCURACY_LOW:
+                accuracy= "Low"; break;
+        }
+        Log.i("BarometerAccuracy", accuracy);
     }
 
     @Override
@@ -87,8 +107,12 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
         }
 
         value.setRawValue( sensorValues[0] );
+        if (this.groundPressureValue == null) {
+            this.groundPressureValue = new HPASensorValue();
+            this.groundPressureValue.setRawValue(sensorValues[0]);
+        }
         if (listener != null) {
-            listener.onHPASensorValueChange( value, getAltitude() );
+            listener.onHPASensorValueChange( value, getAltitude(), getDeltaAltitude() );
         }
 
     }

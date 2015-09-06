@@ -175,18 +175,24 @@ class GPSEntry extends Entry {
 class BarometerEntry extends Entry {
 
     public final float altitude;
-
-    private BarometerEntry(long timestamp, float altitude) {
+    public final float deltaAltitude;
+    private BarometerEntry(long timestamp, float altitude, float deltaAltitude) {
         super(timestamp);
-        this.altitude = altitude;
+        this.altitude = deltaAltitude;
+        this.deltaAltitude = deltaAltitude;
     }
 
     public static BarometerEntry valueOf(String entry) {
         String[] parts = entry.split(":");
         long timestamp = Long.parseLong(parts[0]);
-
-        float altitude = Float.parseFloat(parts[1]);
-        return new BarometerEntry(timestamp, altitude);
+        String[] valueParts = parts[1].split(",");
+        float altitude = Float.parseFloat(valueParts[0]);
+        float deltaAltitude;
+        if (valueParts.length == 1)
+            deltaAltitude = altitude;
+        else
+            deltaAltitude = Float.parseFloat(valueParts[1]);
+        return new BarometerEntry(timestamp, altitude, deltaAltitude);
     }
 
     public String toString() {
@@ -233,8 +239,8 @@ class SkydivingData {
     }
 
     private void addGPSEntry(String entry) {
-        GPSEntry be = GPSEntry.valueOf(entry);
-        gpsEntries.add(be);
+        GPSEntry gps = GPSEntry.valueOf(entry);
+        gpsEntries.add(gps);
     }
 
     public String toString() {

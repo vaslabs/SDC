@@ -150,7 +150,7 @@ public class SettingsActivity extends Activity implements BarometerListener {
     }
 
     @Override
-    public void onHPASensorValueChange( HPASensorValue pressure, MetersSensorValue altitude) {
+    public void onHPASensorValueChange( HPASensorValue pressure, MetersSensorValue altitude, MetersSensorValue deltaAltitude) {
         currentPressureButton.setText(pressure.toString());
     }
 

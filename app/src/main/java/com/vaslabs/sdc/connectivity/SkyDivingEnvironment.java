@@ -272,9 +272,9 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     @Override
-    public void onHPASensorValueChange(HPASensorValue pressure, MetersSensorValue altitude) {
+    public void onHPASensorValueChange(HPASensorValue pressure, MetersSensorValue altitude, MetersSensorValue deltaAltitude) {
         myself.updatePositionInformation(altitude);
-        positionGraph.registerBarometerValue(pressure, altitude);
+        positionGraph.registerBarometerValue(pressure, altitude, deltaAltitude);
         this.trendStrategy.acceptValue(System.currentTimeMillis()/1000.0, new DifferentiableFloat(altitude.getRawValue()));
     }
 
@@ -342,13 +342,13 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         try {
             List<String> lines = new ArrayList<String>();
             int result = 0;
-            byte[] data = new byte[12];
-            while (result >= 0) {
-                result = logStream.read(data, 0, 12);
+            byte[] data = new byte[16];
+            while ((result = logStream.read(data, 0, 16)) >= 0) {
                 ByteBuffer bf = ByteBuffer.wrap(data);
                 long timestamp = bf.getLong();
                 float meterValue = bf.getFloat();
-                lines.add(String.valueOf(timestamp) + ":" + String.valueOf(meterValue));
+                float deltaMeterValue = bf.getFloat();
+                lines.add(String.valueOf(timestamp) + ":" + String.valueOf(meterValue) + ","+String.valueOf(deltaMeterValue));
 
             }
 
@@ -399,7 +399,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     public void logLanding() {
-        SkyDivingEnvironmentLogger.Log(System.currentTimeMillis() + ": Landed");
+        SkyDivingEnvironmentLogger.Log("Landed");
     }
 
     private static class BarometerTrendOnDiveAltitudeListener extends DefaultBarometerTrendListener {
