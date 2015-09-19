@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.util.Log;
@@ -23,6 +25,7 @@ import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.logs.utils.LogUtils;
 import com.vaslabs.logs.utils.SessionFilter;
 import com.vaslabs.pwa.CommunicationManager;
+import com.vaslabs.pwa.PWAServerError;
 import com.vaslabs.pwa.Response;
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
 import com.vaslabs.structs.DateStruct;
@@ -107,7 +110,13 @@ public class SDCLogManager {
                 continue;
             }
             json = buildRequest(sessionData);
-            responses[counter++] = CommunicationManager.submitLogs(json, this.context);
+            Response r = CommunicationManager.submitLogs(json, this.context);
+            JSONArray jsonArray = (JSONArray) r.getBody();
+            JSONObject responseObj = (JSONObject) jsonArray.get(0);
+            String message = responseObj.getString("message");
+            if (!"OK".equals(message))
+                throw new PWAServerError();
+            responses[counter++] = r;
         }
         this.responses = responses;
         sessionDates.clear();
