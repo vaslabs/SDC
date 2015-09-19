@@ -37,7 +37,7 @@ public final class PositionGraph {
 
     public void registerBarometerValue(HPASensorValue pressure, MetersSensorValue altitude, MetersSensorValue deltaAltitude) {
 
-        if (altitude == null)
+        if (altitude == null || Math.abs(lastValue - altitude.getRawValue()) < 1)
             return;
 
         lastValue = altitude.getRawValue();

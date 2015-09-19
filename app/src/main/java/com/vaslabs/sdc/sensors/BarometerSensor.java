@@ -32,9 +32,8 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
             isDummy = true;
         } else
             isDummy = false;
-        seaLevelPressureValue = new HPASensorValue();
-        seaLevelPressureValue
-                .setRawValue( SensorManager.PRESSURE_STANDARD_ATMOSPHERE );
+        seaLevelPressureValue = new HPASensorValue(SensorManager.PRESSURE_STANDARD_ATMOSPHERE);
+
         if (!isDummy) {
             sm.registerListener( this, hwSensor, SensorManager.SENSOR_DELAY_NORMAL );
         }
@@ -54,7 +53,7 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
     }
 
     public void calibrate( float seaLevel ) {
-        this.seaLevelPressureValue.setRawValue( seaLevel );
+        this.seaLevelPressureValue = new HPASensorValue( seaLevel );
     }
     
     public void registerListener(BarometerListener listener) {
@@ -70,16 +69,14 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
         float meters =
                 SensorManager.getAltitude( seaLevelPressureValue.getRawValue(),
                         value.getRawValue() );
-        MetersSensorValue altitudeValue = new MetersSensorValue();
-        altitudeValue.setRawValue( meters );
+        MetersSensorValue altitudeValue = new MetersSensorValue( meters );
         return altitudeValue;
     }
 
     public MetersSensorValue getDeltaAltitude() {
         float groundPressure = groundPressureValue == null ? seaLevelPressureValue.getRawValue() : groundPressureValue.getRawValue();
         float meters = SensorManager.getAltitude(groundPressure, value.getRawValue());
-        MetersSensorValue deltaAltitudeValue = new MetersSensorValue();
-        deltaAltitudeValue.setRawValue(meters);
+        MetersSensorValue deltaAltitudeValue = new MetersSensorValue(meters);
         return deltaAltitudeValue;
     }
 
@@ -103,13 +100,12 @@ public class BarometerSensor extends SDSensor<HPASensorValue>  {
         if ( sensorValues.length == 0 )
             return;
         if ( value == null ) {
-            value = new HPASensorValue();
+            value = new HPASensorValue(0);
         }
 
-        value.setRawValue( sensorValues[0] );
+        value = new HPASensorValue(sensorValues[0]);
         if (this.groundPressureValue == null) {
-            this.groundPressureValue = new HPASensorValue();
-            this.groundPressureValue.setRawValue(sensorValues[0]);
+            this.groundPressureValue = new HPASensorValue(sensorValues[0]);
         }
         if (listener != null) {
             listener.onHPASensorValueChange( value, getAltitude(), getDeltaAltitude() );

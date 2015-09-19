@@ -53,21 +53,18 @@ public class SkyDiver implements PositionalUpdate {
         Position position = null;
         try {
             alt = Float.parseFloat( altValue );
-            altitude = new MetersSensorValue();
-            altitude.setRawValue( alt );
+            altitude = new MetersSensorValue(alt);
             lat = Double.parseDouble( latValue );
-            latitude = new LatitudeSensorValue();
-            latitude.setRawValue( lat );
+            latitude = new LatitudeSensorValue(lat);
             lng = Double.parseDouble( lngValue );
-            longitude = new LongitudeSensorValue();
-            longitude.setRawValue( lng );
+            longitude = new LongitudeSensorValue(lng);
             seaLevel = Float.parseFloat( seaLevelValue );
             position = new Position(longitude, latitude, altitude);
             mass = Float.parseFloat( massValue );
 
         }
         catch (NumberFormatException nfe) {
-            Log.d( "InvalidSkyDiverStringValues", skydiverDeserialisedString );
+            Log.d( "InvalidSkyDiver", skydiverDeserialisedString );
         }
         
         UserPreferences up = new UserPreferences();

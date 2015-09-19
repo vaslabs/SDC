@@ -41,10 +41,8 @@ public class GPSSensor implements LocationListener {
     public void onLocationChanged( Location l ) {
         location = l;
         if (listener != null) {
-            LatitudeSensorValue lat = new LatitudeSensorValue();
-            lat.setRawValue(l.getLatitude());
-            LongitudeSensorValue lng = new LongitudeSensorValue();
-            lng.setRawValue(l.getLongitude());
+            LatitudeSensorValue lat = new LatitudeSensorValue(l.getLatitude());
+            LongitudeSensorValue lng = new LongitudeSensorValue(l.getLongitude());
             listener.onLatLngChange(lat, lng);
         }
     }

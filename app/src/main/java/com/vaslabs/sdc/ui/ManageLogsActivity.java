@@ -121,8 +121,11 @@ class SubmitLogs extends AsyncTask<Void, Void, String> {
                 notOk++;
             }
         }
-        if (notOk == 0)
+        if (notOk == 0 && skipped == 0)
             return "OK";
+        else if (skipped > 0) {
+            return "Skipped: " + skipped + " sessions because of not enough data entries";
+        }
         return "" + notOk + " out of " + (responses.length - skipped) + " failed submission";
     }
 
@@ -131,7 +134,7 @@ class SubmitLogs extends AsyncTask<Void, Void, String> {
         if ("OK".equals(status)) {
             Toast.makeText(context, "Success: Logs have been submitted. " + this.message, Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(context, "Error: " + status + ". " + this.message, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Error: " + status + ". ", Toast.LENGTH_LONG).show();
         }
     }
 }

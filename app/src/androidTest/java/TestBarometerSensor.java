@@ -13,7 +13,6 @@ public class TestBarometerSensor extends AndroidTestCase {
         BarometerSensor bs = BarometerSensor.getInstance( this.mContext );
 
         assertNotNull( bs.getValue() );
-        assertTrue( bs.getValue().hasBeenInitialised() );
         double rawValue = bs.getValue().getRawValue();
         assertTrue( rawValue > 0 );
     }

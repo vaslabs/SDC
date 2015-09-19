@@ -111,8 +111,7 @@ public class SDCLogManager {
             }
             json = buildRequest(sessionData);
             Response r = CommunicationManager.submitLogs(json, this.context);
-            JSONArray jsonArray = (JSONArray) r.getBody();
-            JSONObject responseObj = (JSONObject) jsonArray.get(0);
+            JSONObject responseObj = (JSONObject) r.getBody();;
             String message = responseObj.getString("message");
             if (!"OK".equals(message))
                 throw new PWAServerError();

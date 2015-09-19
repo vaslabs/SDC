@@ -124,12 +124,9 @@ public class TestEmergencyCallAlgorithm extends AndroidTestCase {
             } else if (e instanceof GpsEntry) {
                 lastKnownLocation = (GpsEntry)e;
             }
-            LatitudeSensorValue latSV = new LatitudeSensorValue();
-            latSV.setRawValue(lastKnownLocation.getLatitude());
-            LongitudeSensorValue lonSV = new LongitudeSensorValue();
-            lonSV.setRawValue(lastKnownLocation.getLongitude());
-            MetersSensorValue msv = new MetersSensorValue();
-            msv.setRawValue(lastKnownAltitude.getAltitude());
+            LatitudeSensorValue latSV = new LatitudeSensorValue(lastKnownLocation.getLatitude());
+            LongitudeSensorValue lonSV = new LongitudeSensorValue(lastKnownLocation.getLongitude());
+            MetersSensorValue msv = new MetersSensorValue(lastKnownAltitude.getAltitude());
             p = new Position(lonSV, latSV, msv);
             trendStrategy.acceptValue(e.getTimestamp()/1000.0, p);
         }
@@ -199,10 +196,8 @@ public class TestEmergencyCallAlgorithm extends AndroidTestCase {
 
     private List<GpsEntry> populateMockGpsValues() throws NoSuchFieldException, IllegalAccessException {
         List<GpsEntry> gpsEntries = new ArrayList<GpsEntry>(151);
-        LatitudeSensorValue lat = new LatitudeSensorValue();
-        lat.setRawValue(35.01647199);
-        LongitudeSensorValue lng = new LongitudeSensorValue();
-        lng.setRawValue(33.72351227);
+        LatitudeSensorValue lat = new LatitudeSensorValue(35.01647199);
+        LongitudeSensorValue lng = new LongitudeSensorValue(33.72351227);
         LatLng latLng = new LatLng(lat, lng);
         gpsEntries.add(GpsEntry.valueOf(System.currentTimeMillis(), latLng));
         for (int i = 1; i < 151; i++) {
