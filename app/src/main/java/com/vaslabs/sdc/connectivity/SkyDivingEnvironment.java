@@ -49,7 +49,7 @@ import com.vaslabs.sdc.logs.PositionGraph;
 import com.vaslabs.sdc.utils.TrendDirection;
 import com.vaslabs.sdc.utils.TrendListener;
 
-public class SkyDivingEnvironment extends BaseAdapter implements
+public class SkyDivingEnvironment implements
         OnSpeechSuccessListener, SkyDiverEnvironmentUpdate,
         SkyDiverPersonalUpdates, BarometerListener, GPSSensorListener {
     private static final String LOG_TAG = "SKYDIVING_ENVIRONMENT";
@@ -141,7 +141,6 @@ public class SkyDivingEnvironment extends BaseAdapter implements
             Log.v( LOG_TAG, "New connection: " + skydiver.toString() );
             SkyDivingEnvironmentLogger.Log("New connection: " + skydiver.toString());
         }
-        this.notifyDataSetChanged();
     }
 
     @Override
@@ -162,7 +161,6 @@ public class SkyDivingEnvironment extends BaseAdapter implements
                 // also speed && direction which are not yet available TODO
             }
         }
-        this.notifyDataSetChanged();
     }
 
     @Override
@@ -192,7 +190,6 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         Collections.sort( this.skydiversList, new SkyDiverPositionalComparator(
                 myself ) );
 
-        this.notifyDataSetChanged();
     }
 
     @Override
@@ -205,7 +202,6 @@ public class SkyDivingEnvironment extends BaseAdapter implements
             sd.setConnectivityStrength(SDConnectivity.CONNECTION_LOST);
         }
 
-        this.notifyDataSetChanged();
     }
 
     @Override
@@ -229,34 +225,6 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         return skydiversList.get(position);
     }
 
-    @Override
-    public int getCount() {
-        return skydiversList.size();
-    }
-
-    @Override
-    public SkyDiver getItem( int position ) {
-        return skydiversList.get(position);
-    }
-
-    @Override
-    public long getItemId( int position ) {
-        return 0;
-    }
-
-    @Override
-    public View getView( int position, View convertView, ViewGroup parent ) {
-        TextView tv = new TextView( parent.getContext() );
-        int connectivity = getItem( position ).getConnectivityStrengthAsInt();
-        int color =
-                connectivity < colors.length ? colors[connectivity]
-                        : defaultColor;
-        tv.setBackgroundColor( color );
-        tv.setText(getItem(position).getName());
-
-        return tv;
-    }
-
     public static SkyDivingEnvironment getInstance() {
         return environmentInstance;
     }
@@ -275,7 +243,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     public void onHPASensorValueChange(HPASensorValue pressure, MetersSensorValue altitude, MetersSensorValue deltaAltitude) {
         myself.updatePositionInformation(altitude);
         positionGraph.registerBarometerValue(pressure, altitude, deltaAltitude);
-        this.trendStrategy.acceptValue(System.currentTimeMillis()/1000.0, new DifferentiableFloat(altitude.getRawValue()));
+        this.trendStrategy.acceptValue(System.currentTimeMillis() / 1000.0, new DifferentiableFloat(altitude.getRawValue()));
     }
 
     public void writeSensorLogs() {
@@ -329,6 +297,14 @@ public class SkyDivingEnvironment extends BaseAdapter implements
                 }
         }
 
+        cleanUp();
+
+    }
+
+    private void cleanUp() {
+        this.positionGraph.cleanUp();
+        this.skydivers.clear();
+        this.initialiseStrategies();
     }
 
     public static List<String> getBarometerSensorLogsLinesUncompressed(Context context) {
@@ -429,6 +405,12 @@ public class SkyDivingEnvironment extends BaseAdapter implements
             return;
         }
 
+        initialiseStrategies();
+
+
+    }
+
+    private void initialiseStrategies() {
         TrendingPreferences tp = TrendingPreferences.getInstance();
         trendListener = new BarometerTrendOnDiveAltitudeListener();
         trendListener.forDirectionAction(TrendDirection.DOWN);
@@ -442,8 +424,6 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         trendStrategy.registerEventListener(landingTrendListener);
 
         barometerSensor.registerListener(this);
-
-
     }
 
     private void beginScanning() {

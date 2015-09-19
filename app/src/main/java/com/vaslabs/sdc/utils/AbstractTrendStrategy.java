@@ -316,4 +316,5 @@ public abstract class AbstractTrendStrategy<V extends Differentiable> implements
     public void registerEventListener(TrendListener trendListener) {
         listeners.add(trendListener);
     }
+
 }

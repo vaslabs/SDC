@@ -68,8 +68,6 @@ public final class PositionGraph {
      */
     public byte[] getBarometerData() {
         byte[] data = new byte[barometerAltitudeValues.size()*16];
-        int index = 0;
-        byte nextByte;
         float sensorValue;
         long ts;
         ByteBuffer bf = ByteBuffer.wrap(data);
@@ -86,9 +84,6 @@ public final class PositionGraph {
     public byte[] getGPSData() {
         byte[] data = new byte[gpsValues.size()*24];
         ByteBuffer bf = ByteBuffer.wrap(data);
-
-        int index = 0;
-        byte nextByte;
         double sensorValue;
         long ts;
         for (Long timestamp : gpsValues.keySet()) {
@@ -104,5 +99,12 @@ public final class PositionGraph {
 
     public Position getLastPosition() {
         return lastPosition;
+    }
+
+    public void cleanUp() {
+        this.lastPosition = new Position();
+        lastValue = -1000;
+        this.barometerAltitudeValues.clear();
+        this.gpsValues.clear();
     }
 }
