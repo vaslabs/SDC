@@ -84,6 +84,7 @@ class SubmitLogs extends AsyncTask<Void, Void, String> {
     protected SubmitLogs(Context context) {
         this.context = context;
     }
+    private String message;
     @Override
     protected String doInBackground(Void... params) {
         CommunicationManager.getInstance(context);
@@ -99,9 +100,11 @@ class SubmitLogs extends AsyncTask<Void, Void, String> {
         try {
             Response[] responses = lm.getResponses();
             message = buildMessage(responses);
+            this.message = message;
             return message;
         } catch (Exception e) {
             Log.e("Submitting logs", e.toString());
+            this.message = e.toString();
             return e.toString();
         }
     }
@@ -126,9 +129,9 @@ class SubmitLogs extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String status) {
         if ("OK".equals(status)) {
-            Toast.makeText(context, "Success: Logs have been submitted", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Success: Logs have been submitted. " + this.message, Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(context, "Error: " + status, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Error: " + status + ". " + this.message, Toast.LENGTH_LONG).show();
         }
     }
 }
