@@ -213,6 +213,7 @@ public class LogbookSummaryActivity extends Activity {
         switch (id) {
             case R.id.barometer_chart:
                 intent = new Intent(this, BarometerChartActivity.class);
+                break;
             case R.id.velocity_chart:
                 intent = new Intent(this, VelocityChartActivity.class);
                 break;

@@ -34,7 +34,7 @@ public class SDCLogManager {
     private static final int MIN_PERMITTED_SIZE = 200;
     private static SDCLogManager logManager = new SDCLogManager();
 
-    private static final String LATEST_SESSION_JSON_FILE = "latest.json";
+    public static final String LATEST_SESSION_JSON_FILE = "latest.json";
 
     private Context context = null;
     private Response[] responses;

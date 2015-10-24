@@ -1,5 +1,6 @@
 package com.vaslabs.sdc.entries;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,6 +9,12 @@ import java.util.List;
  */
 public final class BarometerEntries {
     private List<BarometerEntry> barometerEntries;
+
+    public BarometerEntries() {}
+
+    public BarometerEntries(List<BarometerEntry> arrayList) {
+        this.barometerEntries = arrayList;
+    }
 
     public BarometerEntry get(int i) {
         return barometerEntries.get(i);

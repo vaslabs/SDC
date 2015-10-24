@@ -19,7 +19,7 @@ public class SkydivingSessionLogbookData {
 
     public static SkydivingSessionLogbookData create(BarometerEntries barometerEntries) {
         SkydivingSessionLogbookData logbook = new SkydivingSessionLogbookData();
-        BarometerEntry[] avgBarometerEntries = LogbookStats.average(barometerEntries, 3);
+        BarometerEntry[] avgBarometerEntries = LogbookStats.average(barometerEntries, 1000);
         int takeOffIndex = findTakeOffIndex(avgBarometerEntries);
 
         int landedIndex = findLandingIndex(avgBarometerEntries);
