@@ -12,12 +12,16 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
+import com.vaslabs.sdc.entries.SessionEntry;
 import com.vaslabs.sdc.entries.VelocityEntry;
 import com.vaslabs.sdc.logs.LogbookStats;
+import com.vaslabs.sdc.logs.SDCLogManager;
 import com.vaslabs.sdc.ui.R;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -186,16 +190,21 @@ public class VelocityChartActivity extends ActionBarActivity {
 
         private void getBarometerValues() {
             Gson gson = new Gson();
-            InputStreamReader jsonReader = new InputStreamReader(
-                    this.getResources().openRawResource(R.raw.barometer_test_data));
-            BarometerEntries barometerEntries = gson.fromJson(jsonReader, BarometerEntries.class);
+            InputStreamReader jsonReader = null;
+            try {
+                jsonReader = new InputStreamReader(
+                        this.getActivity().openFileInput(SDCLogManager.LATEST_SESSION_JSON_FILE));
+            } catch (FileNotFoundException e) {
+                Toast.makeText(this.getActivity(), "No latest activity found!", Toast.LENGTH_SHORT).show();
+            }
+            SkydivingSessionData latestSessionData = gson.fromJson(jsonReader, SkydivingSessionData.class);
             try {
                 jsonReader.close();
             } catch (IOException e) {
 
             }
-            avgBarometerEntries = LogbookStats.average(barometerEntries, 3);
-            velocityEntries = LogbookStats.calculateVelocityValues(avgBarometerEntries);
+            avgBarometerEntries = LogbookStats.average(latestSessionData.getBarometerEntries(), 1000);
+            velocityEntries = LogbookStats.calculateVelocityValues(avgBarometerEntries, 8000);
         }
 
         private void reset() {
