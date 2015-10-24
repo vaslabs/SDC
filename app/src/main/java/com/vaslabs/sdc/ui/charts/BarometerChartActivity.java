@@ -203,6 +203,9 @@ public class BarometerChartActivity extends ActionBarActivity {
             }
             this.barometerEntries = latestSessionData.getBarometerEntries();
             avgBarometerEntries = LogbookStats.average(this.barometerEntries, 1000);
+            if (avgBarometerEntries.length < 100) {
+                Toast.makeText(this.getActivity(), "This doesn't look like a skydiving session", Toast.LENGTH_SHORT).show();
+            }
         }
 
         private void reset() {
