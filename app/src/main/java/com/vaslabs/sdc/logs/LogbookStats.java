@@ -4,10 +4,13 @@ import com.google.gson.Gson;
 import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
 import com.vaslabs.sdc.entries.VelocityEntry;
+import com.vaslabs.sdc.math.SDCMathUtils;
 import com.vaslabs.sdc.ui.R;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by vnicolao on 27/06/15.
@@ -32,7 +35,7 @@ public final class LogbookStats {
 
     public static LogbookStats generateLogbookStats(BarometerEntries barometerEntries) {
         LogbookStats stats = new LogbookStats();
-        stats.averagedBarometerEntries = average(barometerEntries, 3);
+        stats.averagedBarometerEntries = average(barometerEntries, 1000);
         stats.calculateMaxAltitude(barometerEntries);
         stats.calculateMaxSpeed(barometerEntries);
         stats.calculateDeployment();
@@ -68,36 +71,53 @@ public final class LogbookStats {
 
     }
 
-    public static VelocityEntry[] calculateVelocityValues(BarometerEntry[] barometerEntries) {
-        VelocityEntry[] velocityEntries = new VelocityEntry[barometerEntries.length];
-        velocityEntries[0] = new VelocityEntry(barometerEntries[0].getTimestamp(), 0f);
-        float dt, dx;
-        for (int i = 1; i < barometerEntries.length; i++)  {
-            dx = barometerEntries[i].getAltitude() - barometerEntries[i-1].getAltitude();
-            dt = (barometerEntries[i].getTimestamp() - barometerEntries[i-1].getTimestamp())/1000f;
-            velocityEntries[i] = new VelocityEntry(barometerEntries[i].getTimestamp(), dx/dt);
 
+    public static VelocityEntry[] calculateVelocityValues(BarometerEntry[] barometerEntries, int density) {
+        List<VelocityEntry> velocityEntries = new ArrayList<VelocityEntry>(barometerEntries.length);
+        velocityEntries.add(new VelocityEntry(barometerEntries[0].getTimestamp(), 0f));
+        float x1, x2;
+        x1 = barometerEntries[0].getAltitude();
+        long startTimestamp = barometerEntries[0].getTimestamp();
+        long endTimestamp = startTimestamp + density;
+        for (int i = 1; i < barometerEntries.length; i++)  {
+            if (barometerEntries[i].getTimestamp() > endTimestamp) {
+                x2 = barometerEntries[i].getAltitude();
+                final long avgTimestamp = (barometerEntries[i].getTimestamp()/2 + startTimestamp/2);
+                final float avgSpeed = (x2-x1)/((barometerEntries[i].getTimestamp() - startTimestamp)/1000f);
+                velocityEntries.add(new VelocityEntry(avgTimestamp, avgSpeed));
+                startTimestamp = barometerEntries[i].getTimestamp();
+                endTimestamp = startTimestamp + density;
+                x1 = x2;
+            }
         }
-        return velocityEntries;
+        VelocityEntry[] velocityEntriesArray = new VelocityEntry[velocityEntries.size()];
+        return velocityEntries.toArray(velocityEntriesArray);
     }
 
     public static BarometerEntry[] average(BarometerEntries barometerEntries, int density) {
-        BarometerEntry[] avgEntries = new BarometerEntry[barometerEntries.size()/density];
-        long timestampAvg = 0;
+        List<BarometerEntry> avgEntries = new ArrayList<BarometerEntry>();
         float altitudeAvg = 0;
+        List<Float> buffer = new ArrayList<Float>();
+        BarometerEntry barometerEntry = barometerEntries.get(0);
+        buffer.add(barometerEntry.getAltitude());
+        long bufferTimestamp = barometerEntry.getTimestamp();
+        long endTimestamp = barometerEntry.getTimestamp() + density;
         int counter = 0;
-        for (int i = 0; i < barometerEntries.size() - density; i+=density) {
-
-            for (int j=0; j < density; j++) {
-                altitudeAvg += (barometerEntries.get(i+j).getAltitude()/density);
-                timestampAvg += (barometerEntries.get(i+j).getTimestamp()/density);
+        for (int i = 0; i < barometerEntries.size(); i++) {
+            barometerEntry = barometerEntries.get(i);
+            if (barometerEntry.getTimestamp() <= endTimestamp) {
+                buffer.add(barometerEntry.getAltitude());
+            } else {
+                final float altitudeSum = SDCMathUtils.sumBuffer(buffer);
+                avgEntries.add(new BarometerEntry((bufferTimestamp/2 + endTimestamp/2), altitudeSum/buffer.size()));
+                buffer.clear();
+                buffer.add(barometerEntry.getAltitude());
+                bufferTimestamp = barometerEntry.getTimestamp();
+                endTimestamp = bufferTimestamp + density;
             }
-            avgEntries[counter++] = new BarometerEntry(timestampAvg, altitudeAvg);
-            timestampAvg = 0;
-            altitudeAvg = 0;
         }
-
-        return avgEntries;
+        BarometerEntry[] barometerEntriesArray = new BarometerEntry[avgEntries.size()];
+        return avgEntries.toArray(barometerEntriesArray);
     }
 
     private void calculateMaxAltitude(BarometerEntries barometerEntries) {

@@ -1,5 +1,6 @@
 package com.vaslabs.logbook;
 
+import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
 import com.vaslabs.sdc.entries.ConnectionEntry;
 import com.vaslabs.sdc.entries.GpsEntry;
@@ -56,5 +57,9 @@ public class SkydivingSessionData {
 
     public void insert(ConnectionEntry ce) {
         connectionEntries.add(ce);
+    }
+
+    public BarometerEntries getBarometerEntries() {
+        return new BarometerEntries(new ArrayList(barometerEntries));
     }
 }

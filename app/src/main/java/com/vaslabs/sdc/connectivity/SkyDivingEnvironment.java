@@ -49,7 +49,7 @@ import com.vaslabs.sdc.logs.PositionGraph;
 import com.vaslabs.sdc.utils.TrendDirection;
 import com.vaslabs.sdc.utils.TrendListener;
 
-public class SkyDivingEnvironment extends BaseAdapter implements
+public class SkyDivingEnvironment implements
         OnSpeechSuccessListener, SkyDiverEnvironmentUpdate,
         SkyDiverPersonalUpdates, BarometerListener, GPSSensorListener {
     private static final String LOG_TAG = "SKYDIVING_ENVIRONMENT";
@@ -89,7 +89,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
 
     }
 
-    public synchronized static SkyDivingEnvironment getInstance( Context c ) {
+    public static SkyDivingEnvironment getInstance( Context c ) {
         if ( environmentInstance == null ) {
             environmentInstance = new SkyDivingEnvironment( c );
         }
@@ -126,7 +126,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     @Override
-    public synchronized void onNewSkydiverInfo( SkyDiver skydiver ) {
+    public void onNewSkydiverInfo( SkyDiver skydiver ) {
         if ( skydivers.containsKey( skydiver.getName() ) ) {
             onSkydiverInfoUpdate(skydiver);
 
@@ -141,11 +141,10 @@ public class SkyDivingEnvironment extends BaseAdapter implements
             Log.v( LOG_TAG, "New connection: " + skydiver.toString() );
             SkyDivingEnvironmentLogger.Log("New connection: " + skydiver.toString());
         }
-        this.notifyDataSetChanged();
     }
 
     @Override
-    public synchronized void onSkydiverInfoUpdate( SkyDiver skydiver ) {
+    public void onSkydiverInfoUpdate( SkyDiver skydiver ) {
         if ( !this.skydivers.containsKey( skydiver.getName() ) ) {
             onNewSkydiverInfo(skydiver);
         } else {
@@ -162,11 +161,10 @@ public class SkyDivingEnvironment extends BaseAdapter implements
                 // also speed && direction which are not yet available TODO
             }
         }
-        this.notifyDataSetChanged();
     }
 
     @Override
-    public synchronized void onConnectivityChange( SkyDiver skydiver ) {
+    public void onConnectivityChange( SkyDiver skydiver ) {
 
         if ( skydiver.getConnectivityStrengthAsInt() == SDConnectivity.CONNECTION_LOST
                 .ordinal() ) {
@@ -192,11 +190,10 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         Collections.sort( this.skydiversList, new SkyDiverPositionalComparator(
                 myself ) );
 
-        this.notifyDataSetChanged();
     }
 
     @Override
-    public synchronized void onLooseConnection( SkyDiver skydiver ) {
+    public void onLooseConnection( SkyDiver skydiver ) {
         SkyDiver sd = skydivers.get( skydiver.getName() );
         if ( sd != null ) {
             SpeechCommunicationManager.getInstance().informAboutdisconnection(
@@ -205,16 +202,15 @@ public class SkyDivingEnvironment extends BaseAdapter implements
             sd.setConnectivityStrength(SDConnectivity.CONNECTION_LOST);
         }
 
-        this.notifyDataSetChanged();
     }
 
     @Override
-    public synchronized void onMyAltitudeUpdate( MetersSensorValue altitude ) {
+    public void onMyAltitudeUpdate( MetersSensorValue altitude ) {
 
     }
 
     @Override
-    public synchronized void onMyGPSUpdate( LatitudeSensorValue lat,
+    public void onMyGPSUpdate( LatitudeSensorValue lat,
             LongitudeSensorValue lng ) {
         myself.getPosition().setLat(lat);
         myself.getPosition().setLng(lng);
@@ -227,34 +223,6 @@ public class SkyDivingEnvironment extends BaseAdapter implements
 
     public SkyDiver getSkyDiver( int position ) {
         return skydiversList.get(position);
-    }
-
-    @Override
-    public int getCount() {
-        return skydiversList.size();
-    }
-
-    @Override
-    public SkyDiver getItem( int position ) {
-        return skydiversList.get(position);
-    }
-
-    @Override
-    public long getItemId( int position ) {
-        return 0;
-    }
-
-    @Override
-    public View getView( int position, View convertView, ViewGroup parent ) {
-        TextView tv = new TextView( parent.getContext() );
-        int connectivity = getItem( position ).getConnectivityStrengthAsInt();
-        int color =
-                connectivity < colors.length ? colors[connectivity]
-                        : defaultColor;
-        tv.setBackgroundColor( color );
-        tv.setText(getItem(position).getName());
-
-        return tv;
     }
 
     public static SkyDivingEnvironment getInstance() {
@@ -272,10 +240,10 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     @Override
-    public void onHPASensorValueChange(HPASensorValue pressure, MetersSensorValue altitude) {
+    public void onHPASensorValueChange(HPASensorValue pressure, MetersSensorValue altitude, MetersSensorValue deltaAltitude) {
         myself.updatePositionInformation(altitude);
-        positionGraph.registerBarometerValue(pressure, altitude);
-        this.trendStrategy.acceptValue(System.currentTimeMillis()/1000.0, new DifferentiableFloat(altitude.getRawValue()));
+        positionGraph.registerBarometerValue(pressure, altitude, deltaAltitude);
+        this.trendStrategy.acceptValue(System.currentTimeMillis() / 1000.0, new DifferentiableFloat(altitude.getRawValue()));
     }
 
     public void writeSensorLogs() {
@@ -329,6 +297,14 @@ public class SkyDivingEnvironment extends BaseAdapter implements
                 }
         }
 
+        cleanUp();
+
+    }
+
+    private void cleanUp() {
+        this.positionGraph.cleanUp();
+        this.skydivers.clear();
+        this.initialiseStrategies();
     }
 
     public static List<String> getBarometerSensorLogsLinesUncompressed(Context context) {
@@ -342,13 +318,13 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         try {
             List<String> lines = new ArrayList<String>();
             int result = 0;
-            byte[] data = new byte[12];
-            while (result >= 0) {
-                result = logStream.read(data, 0, 12);
+            byte[] data = new byte[16];
+            while ((result = logStream.read(data, 0, 16)) >= 0) {
                 ByteBuffer bf = ByteBuffer.wrap(data);
                 long timestamp = bf.getLong();
                 float meterValue = bf.getFloat();
-                lines.add(String.valueOf(timestamp) + ":" + String.valueOf(meterValue));
+                float deltaMeterValue = bf.getFloat();
+                lines.add(String.valueOf(timestamp) + ":" + String.valueOf(meterValue) + ","+String.valueOf(deltaMeterValue));
 
             }
 
@@ -399,7 +375,7 @@ public class SkyDivingEnvironment extends BaseAdapter implements
     }
 
     public void logLanding() {
-        SkyDivingEnvironmentLogger.Log(System.currentTimeMillis() + ": Landed");
+        SkyDivingEnvironmentLogger.Log("Landed");
     }
 
     private static class BarometerTrendOnDiveAltitudeListener extends DefaultBarometerTrendListener {
@@ -429,6 +405,12 @@ public class SkyDivingEnvironment extends BaseAdapter implements
             return;
         }
 
+        initialiseStrategies();
+
+
+    }
+
+    private void initialiseStrategies() {
         TrendingPreferences tp = TrendingPreferences.getInstance();
         trendListener = new BarometerTrendOnDiveAltitudeListener();
         trendListener.forDirectionAction(TrendDirection.DOWN);
@@ -442,11 +424,9 @@ public class SkyDivingEnvironment extends BaseAdapter implements
         trendStrategy.registerEventListener(landingTrendListener);
 
         barometerSensor.registerListener(this);
-
-
     }
 
-    private synchronized void beginScanning() {
+    private void beginScanning() {
         if (!hasStartedScanning) {
             hasStartedScanning = true;
             this.mManager.discoverPeers(this.mChannel, this.actionListener);

@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.util.Log;
@@ -23,6 +25,7 @@ import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.logs.utils.LogUtils;
 import com.vaslabs.logs.utils.SessionFilter;
 import com.vaslabs.pwa.CommunicationManager;
+import com.vaslabs.pwa.PWAServerError;
 import com.vaslabs.pwa.Response;
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
 import com.vaslabs.structs.DateStruct;
@@ -31,7 +34,7 @@ public class SDCLogManager {
     private static final int MIN_PERMITTED_SIZE = 200;
     private static SDCLogManager logManager = new SDCLogManager();
 
-    private static final String LATEST_SESSION_JSON_FILE = "latest.json";
+    public static final String LATEST_SESSION_JSON_FILE = "latest.json";
 
     private Context context = null;
     private Response[] responses;
@@ -39,7 +42,6 @@ public class SDCLogManager {
     public static SDCLogManager getInstance( Context mContext ) {
         synchronized ( logManager ) {
             if ( logManager.context == null ) {
-
                 logManager.context = mContext;
             }
         }
@@ -108,7 +110,12 @@ public class SDCLogManager {
                 continue;
             }
             json = buildRequest(sessionData);
-            responses[counter++] = CommunicationManager.submitLogs(json, this.context);
+            Response r = CommunicationManager.submitLogs(json, this.context);
+            JSONObject responseObj = (JSONObject) r.getBody();;
+            String message = responseObj.getString("message");
+            if (!"OK".equals(message))
+                throw new PWAServerError();
+            responses[counter++] = r;
         }
         this.responses = responses;
         sessionDates.clear();

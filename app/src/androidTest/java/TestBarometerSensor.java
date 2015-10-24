@@ -11,14 +11,8 @@ public class TestBarometerSensor extends AndroidTestCase {
 
     public void test_barometer_is_initialised() {
         BarometerSensor bs = BarometerSensor.getInstance( this.mContext );
-        try {
-            Thread.sleep( 1000 );
-        } catch ( InterruptedException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+
         assertNotNull( bs.getValue() );
-        assertTrue( bs.getValue().hasBeenInitialised() );
         double rawValue = bs.getValue().getRawValue();
         assertTrue( rawValue > 0 );
     }

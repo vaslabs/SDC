@@ -6,37 +6,20 @@
     tools:context="com.vaslabs.sdc.ui.SkyDivingSessionActivity" >
 
     <RelativeLayout
-        android:id="@+id/rlButtonWrapper"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" >
-
-        <Button
-            android:id="@+id/mockAddingSkydiver"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/mock_skydiver_addition" />
-
-        <Button
-            android:id="@+id/mockDisconnectSkydiver"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/mockAddingSkydiver"
-            android:text="@string/mock_skydiver_disconnect" />
-    </RelativeLayout>
-
-    <RelativeLayout
         android:id="@+id/rlWrapper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/rlButtonWrapper"
         android:background="#ffffff" >
+        <com.romainpiel.shimmer.ShimmerTextView
+            android:id="@+id/shimmer_session_started_tv"
+            android:text="@string/session_started_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#444"
+            android:textSize="22sp"
+            android:layout_centerInParent="true"
+            />
 
-        <ListView
-            android:id="@+id/skydiversListView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#000000" />
     </RelativeLayout>
 
 </RelativeLayout>

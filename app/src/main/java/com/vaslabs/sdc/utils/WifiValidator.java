@@ -42,9 +42,14 @@ public final class WifiValidator extends AbstractValidator {
     }
 
     public static IValidator getInstance(Context mContext) {
+        if (wifiValidator != null)
+            return wifiValidator;
         synchronized (initLock) {
-            if (wifiValidator == null)
-                wifiValidator = new WifiValidator(mContext);
+            if (wifiValidator != null)
+                return wifiValidator;
+
+            WifiValidator wv = new WifiValidator(mContext);
+            wifiValidator = wv;
         }
         return wifiValidator;
     }

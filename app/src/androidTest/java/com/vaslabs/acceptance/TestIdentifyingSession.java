@@ -38,7 +38,7 @@ public class TestIdentifyingSession extends AndroidTestCase {
     //1737013
 
     private void validateThatTimesAreRight() {
-        BarometerEntry[] barometerEntries = LogbookStats.average(this.barometerEntries, 3);
+        BarometerEntry[] barometerEntries = LogbookStats.average(this.barometerEntries, 1000);
         long startedLoggingAt = barometerEntries[0].getTimestamp();
         long filterStartsAt = logbook.getEntryAt(0).getTimestamp();
         long difference = filterStartsAt - startedLoggingAt;

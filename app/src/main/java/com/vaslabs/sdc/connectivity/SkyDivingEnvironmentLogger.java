@@ -25,9 +25,7 @@ public class SkyDivingEnvironmentLogger {
     }
     
     protected static void Log(String logLine) {
-        synchronized (logger) {
-            logger.writeLog(logLine);
-        }
+        logger.writeLog(logLine);
     }
 
     protected void writeLog( String logLine ) {

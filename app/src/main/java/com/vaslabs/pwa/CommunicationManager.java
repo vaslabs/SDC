@@ -19,27 +19,34 @@ import com.vaslabs.sdc.ui.R;
 import com.vaslabs.sdc_dashboard.API.API;
 
 import android.content.Context;
+import android.util.Log;
 
 public class CommunicationManager {
 
     private static CommunicationManager cm = null;
-    private String location;
-    private String apitoken;
-
-    private CommunicationManager() {
-
+    private final Context context;
+    private String apitoken = "";
+    private final String host;
+    private CommunicationManager(Context context) {
+        host = context.getString(R.string.remote_host);
+        this.context = context;
+        try {
+            apitoken = API.getApiToken(context);
+        } catch (IOException e) {
+            Log.e("CommunicationManager", e.toString());
+        }
     }
 
-    public static CommunicationManager getInstance() {
+    public static CommunicationManager getInstance(Context mContext) {
 
         if ( cm == null ) {
-            cm = new CommunicationManager();
+            cm = new CommunicationManager(mContext);
         }
         return cm;
     }
 
-    public void setRemoteHost( String location ) {
-        this.location = location;
+    public static CommunicationManager getInstance() {
+        return cm;
     }
 
     public Response
@@ -70,9 +77,9 @@ public class CommunicationManager {
 
     }
 
-    public Response sendRequest( String jsonString, String apitoken) throws Exception {
+    public Response sendRequest( String jsonString, String location) throws Exception {
 
-        URL url = new URL( location );
+        URL url = new URL( this.host + location );
         HttpURLConnection httpConnection =
                 (HttpsURLConnection) url.openConnection();
         httpConnection.setDoOutput(true);
@@ -119,13 +126,49 @@ public class CommunicationManager {
     }
 
     public static Response submitLogs(String json, Context context) throws Exception {
-        String token = API.getApiToken(context);
 
-        CommunicationManager cm = CommunicationManager.getInstance();
-        cm.setRemoteHost(context.getString(R.string.remote_host));
-        return cm.sendRequest(json, token);
+        CommunicationManager cm = CommunicationManager.getInstance(context);
+        return cm.sendRequest(json, "/dashboard/submit");
 
     }
 
 
+    public Response sendRequest(String location) throws Exception {
+        URL url = new URL( this.host + location );
+        HttpURLConnection httpConnection =
+                (HttpsURLConnection) url.openConnection();
+        httpConnection.setDoOutput(true);
+        httpConnection.setRequestMethod("GET");
+        httpConnection.setRequestProperty( "Authorization", "Token " + apitoken );
+
+        TestPersistentConnection
+                .setAcceptAllVerifier( (HttpsURLConnection) httpConnection );
+        httpConnection.connect();
+
+        int responseCode = httpConnection.getResponseCode();
+
+        if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED)
+            throw new PWAInvalidCredentialsException();
+
+        InputStream is = httpConnection.getInputStream();
+
+        String inputStr;
+        BufferedReader streamReader =
+                new BufferedReader( new InputStreamReader( is, "UTF-8" ) );
+        StringBuilder responseStrBuilder = new StringBuilder();
+        responseStrBuilder.append( "[" );
+        while ( ( inputStr = streamReader.readLine() ) != null )
+            responseStrBuilder.append( inputStr );
+        responseStrBuilder.append( "]" );
+
+        streamReader.close();
+        JSONArray json = null;
+        json = new JSONArray( responseStrBuilder.toString() );
+
+        Response res = new Response( json, httpConnection.getResponseCode() );
+        httpConnection.disconnect();
+
+        return res;
+
+    }
 }

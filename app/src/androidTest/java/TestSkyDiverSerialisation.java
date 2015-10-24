@@ -24,12 +24,9 @@ public class TestSkyDiverSerialisation extends AndroidTestCase {
 
         assertEquals( "Joe:50.00|1014.12|null|null|null", sd.toString() );
 
-        LongitudeSensorValue longitude = new LongitudeSensorValue();
-        longitude.setRawValue( 102.131 );
-        LatitudeSensorValue latitude = new LatitudeSensorValue();
-        latitude.setRawValue( 202.121 );
-        MetersSensorValue altitude = new MetersSensorValue();
-        altitude.setRawValue( 1000f );
+        LongitudeSensorValue longitude = new LongitudeSensorValue(102.131);
+        LatitudeSensorValue latitude = new LatitudeSensorValue(202.121);
+        MetersSensorValue altitude = new MetersSensorValue(1000f);
         Position newPosition = new Position( longitude, latitude, altitude );
 
         sd.updatePositionInformation( newPosition );

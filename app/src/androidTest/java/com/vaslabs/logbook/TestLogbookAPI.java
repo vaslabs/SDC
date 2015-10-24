@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import java.lang.reflect.Constructor;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by vnicolaou on 15/08/15.
@@ -25,40 +26,29 @@ public class TestLogbookAPI extends AndroidTestCase{
         super.setUp();
         System.setProperty("dexmaker.dexcache", this.mContext.getCacheDir().toString());
         logbookAPI = LogbookAPI.INSTANCE;
+        CommunicationManager.getInstance(this.mContext);
     }
 
-    public void test_logbook_summary_object_mock_data() throws Exception {
-        CommunicationManager cm = Mockito.mock(CommunicationManager.class);
-        Constructor<Response> summaryLogbookResponseConstructor = Response.class.getDeclaredConstructor(JSONArray.class, Integer.TYPE);
-        summaryLogbookResponseConstructor.setAccessible(true);
-        JSONArray jsonArray = new JSONArray();
-        JSONObject summaryJS = new JSONObject();
-        summaryJS.accumulate("numberOfJumps", 3);
-        long dMillis = Calendar.getInstance().getTimeInMillis();
-        summaryJS.accumulate("latestJumpDate", dMillis);
-        summaryJS.accumulate("averageExitAltitude", 3400);
-        summaryJS.accumulate("averageDeployAltitude", 1000);
-        summaryJS.accumulate("averageSpeed", 100.1);
-        summaryJS.accumulate("averageTopSpeed", 200.0);
-        jsonArray.put(summaryJS);
-        Response summaryLogbookResponse = summaryLogbookResponseConstructor.newInstance(jsonArray, 0);
-        Mockito.when(cm.sendRequest("{\"action\":0}", API.getApiToken(this.mContext))).thenReturn(summaryLogbookResponse);
-        LogbookSummary logbookSummary = logbookAPI.getLogbookSummary(cm, this.mContext);
-        assertEquals(3, logbookSummary.getNumberOfJumps());
-        assertEquals(dMillis, logbookSummary.getLatestJumpDate());
-        assertEquals(3400, logbookSummary.getAverageExitAltitude());
-        assertEquals(1000, logbookSummary.getAverageDeployAltitude());
-        assertEquals(100.1, logbookSummary.getAverageSpeed());
-        assertEquals(200.0, logbookSummary.getAverageTopSpeed());
+    public void test_connectivity() throws Exception {
+        CommunicationManager cm = CommunicationManager.getInstance();
+        Response response = cm.sendRequest("/logbook/api_get/");
+        assertTrue(response.getBody().toString().contains("latitude"));
     }
 
-    public void test_logbook_summary_object_mock_api() throws Exception {
-        LogbookSummary logbookSummary = LogbookAPI.MOCK.getLogbookSummary(null, this.mContext);
-        assertEquals(3, logbookSummary.getNumberOfJumps());
-        assertEquals(3400, logbookSummary.getAverageExitAltitude());
-        assertEquals(1000, logbookSummary.getAverageDeployAltitude());
-        assertEquals(100.1, logbookSummary.getAverageSpeed());
-        assertEquals(200.0, logbookSummary.getAverageTopSpeed());
+    public void test_logbook_details_object_mock_data() throws Exception {
+        List<Logbook> logbookList = logbookAPI.getLogbookEntries();
+        assertEquals(2, logbookList.size());
     }
+
+    public void test_logbook_summary_from_entries() throws Exception {
+        List<Logbook> logbookList = logbookAPI.getLogbookEntries();
+        LogbookSummary ls = LogbookSummary.fromLogbookEntries(logbookList);
+        assertEquals(668.26f, ls.getAverageDeployAltitude());
+        assertEquals(-85.18f, ls.getAverageTopSpeed());
+        assertEquals(3415.65f, ls.getAverageExitAltitude());
+        assertEquals(1434870982000L, ls.getLatestJumpDate());
+        assertEquals(2, ls.getNumberOfJumps());
+    }
+
 
 }

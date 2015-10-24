@@ -9,7 +9,7 @@ import android.test.AndroidTestCase;
 
 public class TestSkyDivingEnvironment extends AndroidTestCase {
 
-    public void test_skydiving_environment_engegements() {
+    public void test_skydiving_environment_engagements() {
         SkyDivingEnvironment sde = SkyDivingEnvironment.getInstance(this.mContext);
         
         UserPreferences up = new UserPreferences();

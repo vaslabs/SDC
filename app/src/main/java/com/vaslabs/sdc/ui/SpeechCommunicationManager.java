@@ -55,7 +55,7 @@ public class SpeechCommunicationManager implements TextToSpeech.OnInitListener, 
     }
 
     @Override
-    public synchronized <T> void onEventAdded( DynamicQueue<T> queue ) {
+    public <T> void onEventAdded( DynamicQueue<T> queue ) {
         if (textToSpeech == null) {
             return;
         }

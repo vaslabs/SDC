@@ -24,8 +24,7 @@ public class UserInformation {
 
     private UserInformation( float mass, float seaLevel, String name ) {
         this.mass = mass;
-        seaLevelCalibration = new HPASensorValue();
-        seaLevelCalibration.setRawValue( seaLevel );
+        seaLevelCalibration = new HPASensorValue(seaLevel);
         this.name = name;
     }
 
@@ -142,7 +141,7 @@ public class UserInformation {
             ui = new UserInformation( up.mass, up.seaLevel, up.name );
         } else {
             ui.mass = up.mass;
-            ui.seaLevelCalibration.setRawValue( up.seaLevel );
+            ui.seaLevelCalibration = new HPASensorValue( up.seaLevel );
             ui.name = up.name;
         }
         ui.save( c );

@@ -15,10 +15,10 @@ public final class DifferentiableFloat implements Differentiable<DifferentiableF
 
     @Override
     public double differantiate(DifferentiableFloat differentiable) {
-        if (!(differentiable instanceof DifferentiableFloat))
-            throw new IllegalArgumentException("Should be DifferentiableFloat");
+        if (differentiable == null)
+            throw new IllegalArgumentException("Does not accept nulls");
 
-        return this.value - ((DifferentiableFloat)differentiable).value;
+        return this.value - differentiable.value;
     }
 
     @Override
