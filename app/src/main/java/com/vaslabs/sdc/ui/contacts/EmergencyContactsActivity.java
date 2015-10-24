@@ -100,7 +100,7 @@ public class EmergencyContactsActivity extends Activity {
         if (selectedIndex < 0)
             selectedIndex = 1;
         new MaterialDialog.Builder(this)
-                .title(R.string.pick_distance_metric)
+                .title(R.string.set_emergency_time)
                 .items(items)
                 .itemsCallbackSingleChoice(selectedIndex, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
