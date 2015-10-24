@@ -67,5 +67,7 @@
     <string name="label_multiple_numbers">Multiple numbers</string>
     <string name="action_emergency_contacts">Emergency contacts</string>
     <string name="action_add_contact">Add emergency contact</string>
+    <string name="action_set_minimum_minutes_check">Emergency detection time</string>
     <string name="session_started_msg">Session started</string>
+    <string name="set_emergency_time">Set mimimum time to pass before emergency detection starts after landing</string>
 </resources>

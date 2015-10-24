@@ -2,12 +2,13 @@ package com.vaslabs.sdc.ui.contacts;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.dexafree.materialList.cards.SmallImageCard;
 import com.dexafree.materialList.controller.OnDismissCallback;
 import com.dexafree.materialList.model.Card;
@@ -15,7 +16,9 @@ import com.dexafree.materialList.view.MaterialListView;
 import com.vaslabs.emergency.EmergencyContact;
 import com.vaslabs.emergency.EmergencyPreferences;
 import com.vaslabs.sdc.ui.R;
+import com.vaslabs.units.TimeUnit;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class EmergencyContactsActivity extends Activity {
@@ -83,9 +86,35 @@ public class EmergencyContactsActivity extends Activity {
         if (id == R.id.action_add_contact) {
             getContact();
             return true;
+        } else if (id == R.id.action_set_minimum_time) {
+            setMinimumEmergencyTimeStartDetectionAfterLanding();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setMinimumEmergencyTimeStartDetectionAfterLanding() {
+        final String[] items = new String[] {"1", "5", "10", "15"};
+        final EmergencyPreferences ep = EmergencyPreferences.load(this);
+        int selectedIndex = Arrays.binarySearch(items, String.valueOf((int)Math.round(ep.getMinimumTimeBeforeCall(TimeUnit.MINUTES))));
+        if (selectedIndex < 0)
+            selectedIndex = 1;
+        new MaterialDialog.Builder(this)
+                .title(R.string.set_emergency_time)
+                .items(items)
+                .itemsCallbackSingleChoice(selectedIndex, new MaterialDialog.ListCallbackSingleChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        double selectedValue = Double.parseDouble(items[which]);
+                        try {
+                            ep.setMinimumTimeBeforeEmergencyCall(selectedValue, TimeUnit.MINUTES);
+                        } catch (Exception e) {
+                            Toast.makeText(view.getContext(), e.toString(), Toast.LENGTH_SHORT).show();
+                        }
+                        return true;
+                    }
+                })
+                .show();
     }
 
     private static final int GET_PHONE_NUMBER = 3007;

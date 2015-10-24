@@ -4,4 +4,6 @@
     tools:context="com.vaslabs.sdc.ui.contacts.EmergencyContactsActivity">
     <item android:id="@+id/action_add_contact" android:title="@string/action_add_contact"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_set_minimum_time" android:title="@string/action_set_minimum_minutes_check"
+        android:orderInCategory="100" app:showAsAction="never" />
 </menu>

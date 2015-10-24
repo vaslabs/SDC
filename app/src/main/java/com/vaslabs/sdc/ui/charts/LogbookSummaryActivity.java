@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +21,8 @@ import com.vaslabs.logbook.LogbookAPI;
 import com.vaslabs.logbook.LogbookSummary;
 import com.vaslabs.pwa.CommunicationManager;
 import com.vaslabs.sdc.ui.R;
+
+import java.io.FileNotFoundException;
 import java.util.Calendar;
 import java.util.List;
 
@@ -82,7 +83,7 @@ public class LogbookSummaryActivity extends Activity {
             public void onItemLongClick(CardItemView view, int position) {
             }
         });
-        new LogbookFetchTask().execute();
+        new LogbookFetchTask(context).execute();
 
     }
 
@@ -290,6 +291,12 @@ class SmallImageUnitsCard extends SmallImageCard {
 class LogbookFetchTask extends AsyncTask<Void, Void, List<Logbook>> {
 
     private Exception exception = null;
+    private final Context context;
+
+    LogbookFetchTask(Context context) {
+        this.context = context;
+    }
+
 
     @Override
     protected List<Logbook> doInBackground(Void... params) {
@@ -306,6 +313,13 @@ class LogbookFetchTask extends AsyncTask<Void, Void, List<Logbook>> {
 
     @Override
     protected void onPostExecute(List<Logbook> logbookEntries) {
+        if (exception != null) {
+            if (exception instanceof FileNotFoundException) {
+                Toast.makeText(context, "You need to scan your API QR code from dashboard.skydiver.ninja before using this feature", Toast.LENGTH_LONG).show();
+            } else
+                Toast.makeText(context, exception.toString(), Toast.LENGTH_LONG).show();
+            return;
+        }
         LogbookSummary logbookSummary = LogbookSummary.fromLogbookEntries(logbookEntries);
 
         LogbookSummaryActivity.viewCards = LogbookSummaryActivity.toCards(logbookSummary, DistanceUnit.FEET,
