@@ -188,12 +188,13 @@ public class BarometerChartActivity extends ActionBarActivity {
             InputStreamReader jsonReader = new InputStreamReader(
                     this.getResources().openRawResource(R.raw.barometer_test_data));
             barometerEntries = gson.fromJson(jsonReader, BarometerEntries.class);
+            barometerEntries.sort();
             try {
                 jsonReader.close();
             } catch (IOException e) {
 
             }
-            avgBarometerEntries = LogbookStats.average(barometerEntries, 3);
+            avgBarometerEntries = LogbookStats.average(barometerEntries, 1000);
         }
 
         private void reset() {

@@ -190,20 +190,16 @@ public class VelocityChartActivity extends ActionBarActivity {
 
         private void getBarometerValues() {
             Gson gson = new Gson();
-            InputStreamReader jsonReader = null;
-            try {
-                jsonReader = new InputStreamReader(
-                        this.getActivity().openFileInput(SDCLogManager.LATEST_SESSION_JSON_FILE));
-            } catch (FileNotFoundException e) {
-                Toast.makeText(this.getActivity(), "No latest activity found!", Toast.LENGTH_SHORT).show();
-            }
-            SkydivingSessionData latestSessionData = gson.fromJson(jsonReader, SkydivingSessionData.class);
+            InputStreamReader jsonReader = new InputStreamReader(
+                    this.getResources().openRawResource(R.raw.barometer_test_data));
+            BarometerEntries barometerEntries = gson.fromJson(jsonReader, BarometerEntries.class);
+            barometerEntries.sort();
             try {
                 jsonReader.close();
             } catch (IOException e) {
 
             }
-            avgBarometerEntries = LogbookStats.average(latestSessionData.getBarometerEntries(), 1000);
+            avgBarometerEntries = LogbookStats.average(barometerEntries, 1000);
             velocityEntries = LogbookStats.calculateVelocityValues(avgBarometerEntries, 8000);
         }
 
@@ -230,7 +226,7 @@ public class VelocityChartActivity extends ActionBarActivity {
             long lastTimestamp =velocityEntries[velocityEntries.length - 1].timestamp;
 
             final Viewport v = new Viewport(chart.getMaximumViewport());
-            v.bottom = -300;
+            v.bottom = -100;
             v.top = 100;
             v.left = 0;
             v.right = lastTimestamp - firstTimestamp;
