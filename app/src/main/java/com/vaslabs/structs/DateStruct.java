@@ -1,7 +1,6 @@
 package com.vaslabs.structs;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by vnicolao on 04/07/15.
@@ -10,12 +9,17 @@ public final class DateStruct implements Comparable<DateStruct> {
     public final int year;
     public final int month;
     public final int day;
-
+    public final int sessionRef;
 
     public DateStruct(int year, int month, int day) {
+        this(year, month, day, 0);
+    }
+
+    public DateStruct(int year, int month, int day, int sessionRef) {
         this.year = year;
         this.month = month;
         this.day = day;
+        this.sessionRef = sessionRef;
     }
 
     public DateStruct(Calendar cal) {
@@ -31,7 +35,8 @@ public final class DateStruct implements Comparable<DateStruct> {
 
         if (year != that.year) return false;
         if (month != that.month) return false;
-        return day == that.day;
+        if (day != that.day) return false;
+        return sessionRef == that.sessionRef;
 
     }
 
@@ -40,6 +45,7 @@ public final class DateStruct implements Comparable<DateStruct> {
         int result = year;
         result = 31 * result + month;
         result = 31 * result + day;
+        result = 31 * result + sessionRef;
         return result;
     }
 
@@ -60,6 +66,10 @@ public final class DateStruct implements Comparable<DateStruct> {
         if (this.day > dateStruct.day)
             return 1;
         else if (this.day < dateStruct.day)
+            return -1;
+        if (this.sessionRef > dateStruct.sessionRef)
+            return 1;
+        else if (this.sessionRef < dateStruct.sessionRef)
             return -1;
 
         return 0;

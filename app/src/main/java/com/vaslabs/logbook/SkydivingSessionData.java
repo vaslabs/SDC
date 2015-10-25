@@ -2,7 +2,9 @@ package com.vaslabs.logbook;
 
 import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
+import com.vaslabs.sdc.entries.ConnectionEntries;
 import com.vaslabs.sdc.entries.ConnectionEntry;
+import com.vaslabs.sdc.entries.GpsEntries;
 import com.vaslabs.sdc.entries.GpsEntry;
 
 import java.util.ArrayList;
@@ -21,6 +23,12 @@ public class SkydivingSessionData {
         barometerEntries = new ArrayList<BarometerEntry>();
         gpsEntries = new ArrayList<GpsEntry>();
         connectionEntries = new ArrayList<ConnectionEntry>();
+    }
+
+    public SkydivingSessionData(List<ConnectionEntry> connectionEntriesInThisSession, List<BarometerEntry> barometerEntriesInThisSession, List<GpsEntry> gpsEntriesInThisSession) {
+        this.connectionEntries = new ArrayList<ConnectionEntry>(connectionEntriesInThisSession);
+        this.barometerEntries = new ArrayList<BarometerEntry>(barometerEntriesInThisSession);
+        this.gpsEntries = new ArrayList<GpsEntry>(gpsEntriesInThisSession);
     }
 
     public int barometerEntriesSize() {
@@ -60,6 +68,14 @@ public class SkydivingSessionData {
     }
 
     public BarometerEntries getBarometerEntries() {
-        return new BarometerEntries(new ArrayList(barometerEntries));
+        return new BarometerEntries(barometerEntries);
+    }
+
+    public GpsEntries getGpsEntries() {
+        return new GpsEntries(gpsEntries);
+    }
+
+    public ConnectionEntries getConnectionEntries() {
+        return new ConnectionEntries(connectionEntries);
     }
 }

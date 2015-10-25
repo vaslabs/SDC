@@ -1,5 +1,7 @@
 package com.vaslabs.sdc.entries;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -9,6 +11,14 @@ public final class ConnectionEntries {
 
     private List<ConnectionEntry> connectionEntries;
 
+    public ConnectionEntries() {
+
+    }
+
+    public ConnectionEntries(List<ConnectionEntry> connectionEntries) {
+        this.connectionEntries = new ArrayList<>(connectionEntries);
+    }
+
     public int size() {
         return connectionEntries.size();
     }
@@ -17,5 +27,8 @@ public final class ConnectionEntries {
         return connectionEntries.get(i);
     }
 
+    public void sort() {
+        Collections.sort(connectionEntries);
+    }
 
 }

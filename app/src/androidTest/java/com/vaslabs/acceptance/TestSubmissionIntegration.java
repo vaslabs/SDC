@@ -37,4 +37,21 @@ public class TestSubmissionIntegration extends AndroidTestCase{
         }
     }
 
+    public void test_multiple_sessions_of_single_day() throws Exception {
+        SDCLogManager logManager = SDCLogManager.getInstance(mContext);
+        InputStreamReader isr = new InputStreamReader(mContext.getResources().openRawResource(R.raw.test_multiple_sessions));
+        Gson gson = new Gson();
+        SkydivingSessionData sessionData = gson.fromJson(isr, SkydivingSessionData.class);
+        Map<DateStruct, SkydivingSessionData> sessionDates = SessionFilter.filter(sessionData);
+        assertEquals(1, sessionDates.size());
+        Map<DateStruct, SkydivingSessionData> singleSessions = SessionFilter.filterMultiple(sessionDates);
+        assertEquals(2, singleSessions.size());
+        logManager.submitLogs(singleSessions);
+        try {
+            logManager.saveLatestSession(sessionData);
+        } catch (IOException ioe) {
+            fail(ioe.toString());
+        }
+    }
+
 }

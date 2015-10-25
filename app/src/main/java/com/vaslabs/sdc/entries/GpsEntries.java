@@ -1,5 +1,7 @@
 package com.vaslabs.sdc.entries;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -9,6 +11,14 @@ public final class GpsEntries {
 
     private List<GpsEntry> gpsEntries;
 
+    public GpsEntries() {
+
+    }
+
+    public GpsEntries(List<GpsEntry> gpsEntries) {
+        this.gpsEntries = new ArrayList<>(gpsEntries);
+    }
+
 
     public int size() {
         return gpsEntries.size();
@@ -16,5 +26,9 @@ public final class GpsEntries {
 
     public GpsEntry getEntry(int i) {
         return gpsEntries.get(i);
+    }
+
+    public void sort() {
+        Collections.sort(gpsEntries);
     }
 }

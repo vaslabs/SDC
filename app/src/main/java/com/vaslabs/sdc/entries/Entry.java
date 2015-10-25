@@ -29,4 +29,5 @@ public abstract class Entry implements Comparable<Entry>{
     }
 
     public abstract Entry withTimestamp(long newTimeStamTimestamp);
+
 }
