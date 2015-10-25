@@ -43,10 +43,8 @@ public class TestSubmissionIntegration extends AndroidTestCase{
         Gson gson = new Gson();
         SkydivingSessionData sessionData = gson.fromJson(isr, SkydivingSessionData.class);
         Map<DateStruct, SkydivingSessionData> sessionDates = SessionFilter.filter(sessionData);
-        assertEquals(1, sessionDates.size());
-        Map<DateStruct, SkydivingSessionData> singleSessions = SessionFilter.filterMultiple(sessionDates);
-        assertEquals(2, singleSessions.size());
-        logManager.submitLogs(singleSessions);
+        assertEquals(2, sessionDates.size());
+        logManager.submitLogs(sessionDates);
         try {
             logManager.saveLatestSession(sessionData);
         } catch (IOException ioe) {

@@ -25,7 +25,7 @@ public class TestSessionFilter extends AndroidTestCase {
         Gson gson = new Gson();
         SkydivingSessionData sessionData = gson.fromJson(isr, SkydivingSessionData.class);
         Map<DateStruct, SkydivingSessionData> sessionDates = SessionFilter.filter(sessionData);
-        assertEquals(1, sessionDates.size());
+        assertEquals(2, sessionDates.size());
 
         float min = SDCMathUtils.findMin(sessionData.getBarometerEntries());
         assertEquals(0.0, min, 5);
@@ -40,7 +40,7 @@ public class TestSessionFilter extends AndroidTestCase {
         Gson gson = new Gson();
         SkydivingSessionData sessionData = gson.fromJson(isr, SkydivingSessionData.class);
         Map<DateStruct, SkydivingSessionData> sessionDates = SessionFilter.filter(sessionData);
-        assertEquals(1, sessionDates.size());
+        assertEquals(2, sessionDates.size());
 
         float min = SDCMathUtils.findMin(sessionData.getBarometerEntries());
         assertEquals(0.0, min, 5);
