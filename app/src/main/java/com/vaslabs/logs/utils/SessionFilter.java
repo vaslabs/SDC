@@ -100,6 +100,9 @@ public class SessionFilter {
     }
 
     private static SkydivingSessionData[] rebuildSessions(int numberOfSessionsContained, List<Long> timestamps, SkydivingSessionData skydivingSessionData) {
+        if (numberOfSessionsContained == 0) {
+            return new SkydivingSessionData[]{skydivingSessionData};
+        }
         SkydivingSessionData[] singleSessionData = new SkydivingSessionData[numberOfSessionsContained];
         int sessionCounter = 0;
         BarometerEntries barometerEntries;
@@ -109,13 +112,12 @@ public class SessionFilter {
         int gpsEntryIndex = 0;
         int connectionEntriesIndex = 0;
         long timestampLimit;
-        for (int i = 0; i < timestamps.size(); i++) {
+
+        for (int i = 0; i < timestamps.size() - 1; i++) {
             barometerEntries = skydivingSessionData.getBarometerEntries();
-            if (i+1 >= timestamps.size()) {
-                timestampLimit = SDCMathUtils.findMaxTimestamp(skydivingSessionData);
-            } else {
-                timestampLimit = timestamps.get(i+1);
-            }
+            barometerEntries.sort();
+            timestampLimit = timestamps.get(i+1);
+
             final List<BarometerEntry> barometerEntriesInThisSession = new ArrayList<BarometerEntry>();
             while (barometerEntryIndex < barometerEntries.size() && barometerEntries.get(barometerEntryIndex).getTimestamp() <= timestampLimit) {
                 barometerEntriesInThisSession.add(barometerEntries.get(barometerEntryIndex));
@@ -132,6 +134,8 @@ public class SessionFilter {
 
             final List<ConnectionEntry> connectionEntriesInThisSession = new ArrayList<ConnectionEntry>();
             connectionEntries = skydivingSessionData.getConnectionEntries();
+            connectionEntries.sort();
+
             while (connectionEntriesIndex < connectionEntries.size() && connectionEntries.getEntry(connectionEntriesIndex).getTimestamp() <= timestampLimit) {
                 connectionEntriesInThisSession.add(connectionEntries.getEntry(connectionEntriesIndex));
                 connectionEntriesIndex++;
@@ -144,6 +148,7 @@ public class SessionFilter {
 
     private static List<Long> detectSessionsTimestamps(BarometerEntries barometerEntries, int expectedNumberOfSessions, float baseAltitude) {
         List<Long> timestamps = new ArrayList<Long>();
+        timestamps.add(0L);
         BarometerEntry be;
         boolean reset = true;
         for (int i = 0; i < barometerEntries.size(); i++) {
@@ -152,11 +157,12 @@ public class SessionFilter {
                 reset = false;
             } else if (!reset && be.getAltitude() < baseAltitude + 5) {
                 reset = true;
-                timestamps.add(be.getTimestamp());
+                timestamps.add(be.getTimestamp() + 1000*60*10);
                 if (timestamps.size() - 1 == expectedNumberOfSessions)
                     break;
             }
         }
+
         return timestamps;
     }
 
@@ -169,9 +175,9 @@ public class SessionFilter {
             be = barometerEntries.get(i);
             if (be.getAltitude() > 1000 && reset) {
                 reset = false;
+                numberOfSessions++;
             } else if (!reset && be.getAltitude() <= baseAltitude + 5) {
                 reset = true;
-                numberOfSessions++;
             }
         }
         return numberOfSessions;

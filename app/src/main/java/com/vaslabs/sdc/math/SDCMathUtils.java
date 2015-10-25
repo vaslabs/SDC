@@ -32,6 +32,9 @@ public class SDCMathUtils {
 
     public static long findMaxTimestamp(SkydivingSessionData skydivingSessionData) {
         long[] timestamps = new long[3];
+        skydivingSessionData.getBarometerEntries().sort();
+        skydivingSessionData.getConnectionEntries().sort();
+        skydivingSessionData.getGpsEntries().sort();
         int size = skydivingSessionData.getBarometerEntries().size();
         if (size > 0)
             timestamps[0] = skydivingSessionData.getBarometerEntries().get(size - 1).getTimestamp();
