@@ -13,7 +13,7 @@ public final class BarometerEntries {
     public BarometerEntries() {}
 
     public BarometerEntries(List<BarometerEntry> arrayList) {
-        this.barometerEntries = arrayList;
+        this.barometerEntries = new ArrayList<BarometerEntry>(arrayList);
     }
 
     public BarometerEntry get(int i) {
