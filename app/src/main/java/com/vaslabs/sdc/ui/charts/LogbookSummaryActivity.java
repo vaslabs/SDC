@@ -315,7 +315,7 @@ class LogbookFetchTask extends AsyncTask<Void, Void, List<Logbook>> {
     protected void onPostExecute(List<Logbook> logbookEntries) {
         if (exception != null) {
             if (exception instanceof FileNotFoundException) {
-                Toast.makeText(context, "You need to scan your API QR code from dashboard.skydiver.ninja and restart app before using this feature", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, R.string.api_token_problem, Toast.LENGTH_LONG).show();
             } else
                 Toast.makeText(context, exception.toString(), Toast.LENGTH_LONG).show();
             return;

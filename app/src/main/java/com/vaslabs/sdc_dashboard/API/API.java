@@ -14,7 +14,7 @@ import java.io.InputStreamReader;
 public class API {
     private static final String API_TOKEN_FILE = "apitoken.raw";
 
-    public static                                       String getApiToken(Context context) throws IOException {
+    public static String getApiToken(Context context) throws IOException {
         FileInputStream fis = context.openFileInput(API.API_TOKEN_FILE);
         BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
         String token;
