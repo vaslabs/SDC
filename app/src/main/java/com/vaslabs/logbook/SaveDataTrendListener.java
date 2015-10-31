@@ -13,12 +13,12 @@ public class SaveDataTrendListener implements TrendListener {
     boolean hasBeenCalled = false;
     @Override
     public void onTrendEvent() {
-        if (hasBeenCalled) {
+        if (!hasBeenCalled) {
             hasBeenCalled = true;
             try {
                 SkyDivingEnvironment.getInstance().writeSensorLogs();
             } catch (Exception e) {
-                
+
             }
         }
     }
