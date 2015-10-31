@@ -5,6 +5,7 @@ import com.vaslabs.sdc.entries.AccelerationEntry;
 import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
 import com.vaslabs.sdc.entries.Entry;
+import com.vaslabs.sdc.entries.GForceEntry;
 import com.vaslabs.sdc.entries.VelocityEntry;
 import com.vaslabs.sdc.math.SDCMathUtils;
 import com.vaslabs.sdc.ui.R;
@@ -200,5 +201,16 @@ public final class LogbookStats {
             }
         }
         return minY;
+    }
+
+    public static GForceEntry[] calculateGForce(Entry[] entries) {
+        if (entries.length == 0)
+            return new GForceEntry[0];
+        GForceEntry[] gForceEntries = new GForceEntry[entries.length];
+        int counter = 0;
+        for (Entry entry : entries) {
+            gForceEntries[counter++] = new GForceEntry(entry.getTimestamp(), entry.getY()/9.8f);
+        }
+        return gForceEntries;
     }
 }

@@ -72,4 +72,5 @@
     <string name="set_emergency_time">Set mimimum time to pass before emergency detection starts after landing</string>
     <string name="api_token_problem">\"You need to scan your API QR code from dashboard.skydiver.ninja and before using this feature\"</string>
     <string name="title_activity_acceleration_chart">Acceleration chart</string>
+    <string name="title_activity_gForce_chart">Gforce chart</string>
 </resources>

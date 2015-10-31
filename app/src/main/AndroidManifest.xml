@@ -112,6 +112,15 @@
                 android:value=".charts.LogbookActivity" />
         </activity>
         <activity
+            android:name=".charts.GforceChartActivity"
+            android:label="@string/title_activity_gForce_chart"
+            android:parentActivityName=".charts.LogbookActivity"
+            android:theme="@style/Theme.AppCompat.Light" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".charts.LogbookActivity" />
+        </activity>
+        <activity
             android:name=".charts.LogbookActivity"
             android:label="@string/title_activity_logbook"
             android:parentActivityName=".MainActivity" >

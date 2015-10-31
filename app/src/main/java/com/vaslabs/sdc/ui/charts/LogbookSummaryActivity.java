@@ -220,6 +220,10 @@ public class LogbookSummaryActivity extends Activity {
                 break;
             case R.id.acceleration_chart:
                 intent = new Intent(this, AccelerationChartActivity.class);
+                break;
+            case R.id.gforce_chart:
+                intent = new Intent(this, GforceChartActivity.class);
+                break;
         }
         if (intent != null) {
             startActivity(intent);
