@@ -243,7 +243,7 @@ public class SkyDivingEnvironment implements
     public void onHPASensorValueChange(HPASensorValue pressure, MetersSensorValue altitude, MetersSensorValue deltaAltitude) {
         myself.updatePositionInformation(altitude);
         positionGraph.registerBarometerValue(pressure, altitude, deltaAltitude);
-        this.trendStrategy.acceptValue(System.currentTimeMillis() / 1000.0, new DifferentiableFloat(altitude.getRawValue()));
+        this.trendStrategy.acceptValue(System.currentTimeMillis() / 1000.0, new DifferentiableFloat(deltaAltitude.getRawValue()));
     }
 
     public void writeSensorLogs() {
