@@ -2,6 +2,7 @@ package com.vaslabs.emergency;
 
 import android.content.Context;
 
+import com.vaslabs.logbook.SaveDataTrendListener;
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironmentLogger;
 import com.vaslabs.sdc.utils.AbstractTrendStrategy;
@@ -29,6 +30,7 @@ public class LandingTrendListener extends DefaultBarometerTrendListener implemen
             EmergencyPreferences ep = EmergencyPreferences.load(mContext);
             double minutes = ep.getMinimumTimeBeforeCall(TimeUnit.MINUTES);
             trendStrategy.registerEventListener(new EmergencyPositionalTrendListener(minutes, TimeUnit.MINUTES, mContext));
+            trendStrategy.registerEventListener(new SaveDataTrendListener());
             wasCalled = true;
         }
     }
