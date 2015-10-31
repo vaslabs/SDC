@@ -38,6 +38,6 @@ public final class BarometerEntry extends Entry {
 
     @Override
     public float getY() {
-        return this.getY();
+        return this.altitude;
     }
 }

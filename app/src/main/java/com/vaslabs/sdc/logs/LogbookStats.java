@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.vaslabs.sdc.entries.AccelerationEntry;
 import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
+import com.vaslabs.sdc.entries.Entry;
 import com.vaslabs.sdc.entries.VelocityEntry;
 import com.vaslabs.sdc.math.SDCMathUtils;
 import com.vaslabs.sdc.ui.R;
@@ -179,5 +180,25 @@ public final class LogbookStats {
             accelerationEntries[i] = new AccelerationEntry(velocityEntries[i].getTimestamp(), du/dt);
         }
         return accelerationEntries;
+    }
+
+    public static float maxY(Entry[] entries) {
+        float maxY = entries[0].getY();
+        for (int i = 1; i < entries.length; i++) {
+            if (entries[i].getY() > maxY) {
+                maxY = entries[i].getY();
+            }
+        }
+        return maxY;
+    }
+
+    public static float minY(Entry[] entries) {
+        float minY = entries[0].getY();
+        for (int i = 1; i < entries.length; i++) {
+            if (entries[i].getY() < minY) {
+                minY = entries[i].getY();
+            }
+        }
+        return minY;
     }
 }
