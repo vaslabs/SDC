@@ -1,6 +1,7 @@
 package com.vaslabs.sdc.logs;
 
 import com.google.gson.Gson;
+import com.vaslabs.sdc.entries.AccelerationEntry;
 import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
 import com.vaslabs.sdc.entries.VelocityEntry;
@@ -165,4 +166,18 @@ public final class LogbookStats {
         return exitAltitude;
     }
 
+    public static AccelerationEntry[] calculateAccelerationValues(VelocityEntry[] velocityEntries) {
+        if (velocityEntries.length == 0) {
+            return new AccelerationEntry[0];
+        }
+        AccelerationEntry[] accelerationEntries = new AccelerationEntry[velocityEntries.length];
+        accelerationEntries[0] = new AccelerationEntry(velocityEntries[0].getTimestamp(), velocityEntries[0].velocity);
+        float du, dt;
+        for (int i = 1; i < velocityEntries.length; i++) {
+            du = velocityEntries[i].velocity - velocityEntries[i-1].velocity;
+            dt = (velocityEntries[i].getTimestamp() - velocityEntries[i-1].getTimestamp())/1000.0f;
+            accelerationEntries[i] = new AccelerationEntry(velocityEntries[i].getTimestamp(), du/dt);
+        }
+        return accelerationEntries;
+    }
 }

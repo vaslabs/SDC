@@ -30,4 +30,14 @@ public final class BarometerEntry extends Entry {
         return be;
 
     }
+
+    @Override
+    public float getX() {
+        return this.getTimestamp()/1000f;
+    }
+
+    @Override
+    public float getY() {
+        return this.getY();
+    }
 }

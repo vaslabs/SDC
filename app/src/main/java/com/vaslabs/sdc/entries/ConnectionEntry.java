@@ -30,4 +30,14 @@ public final class ConnectionEntry extends Entry{
         ce.connectionEvent = this.connectionEvent;
         return ce;
     }
+
+    @Override
+    public float getX() {
+        return getTimestamp()/1000f;
+    }
+
+    @Override
+    public float getY() {
+        return connectionEvent;
+    }
 }

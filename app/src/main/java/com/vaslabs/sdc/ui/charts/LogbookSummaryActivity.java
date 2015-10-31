@@ -218,6 +218,8 @@ public class LogbookSummaryActivity extends Activity {
             case R.id.velocity_chart:
                 intent = new Intent(this, VelocityChartActivity.class);
                 break;
+            case R.id.acceleration_chart:
+                intent = new Intent(this, AccelerationChartActivity.class);
         }
         if (intent != null) {
             startActivity(intent);

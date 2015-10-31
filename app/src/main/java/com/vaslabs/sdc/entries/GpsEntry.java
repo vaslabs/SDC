@@ -23,6 +23,16 @@ public final class GpsEntry extends Entry {
         return gpsEntry;
     }
 
+    @Override
+    public float getX() {
+        return 0;
+    }
+
+    @Override
+    public float getY() {
+        return 0;
+    }
+
     private GpsEntry(Long key) {
         super(key);
     }

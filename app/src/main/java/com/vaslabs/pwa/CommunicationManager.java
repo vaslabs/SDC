@@ -42,11 +42,11 @@ public class CommunicationManager {
 
         if ( cm == null ) {
             cm = new CommunicationManager(mContext);
-            try {
-                cm.apitoken = API.getApiToken(mContext);
-            } catch (IOException e) {
-                Toast.makeText(mContext, R.string.api_token_problem, Toast.LENGTH_SHORT).show();
-            }
+        }
+        try {
+            cm.apitoken = API.getApiToken(mContext);
+        } catch (IOException e) {
+            Toast.makeText(mContext, R.string.api_token_problem, Toast.LENGTH_SHORT).show();
         }
         return cm;
     }

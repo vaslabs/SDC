@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
+import com.vaslabs.sdc.entries.Entry;
 import com.vaslabs.sdc.entries.SessionEntry;
 import com.vaslabs.sdc.entries.VelocityEntry;
 import com.vaslabs.sdc.logs.LogbookStats;
@@ -52,6 +53,35 @@ public class VelocityChartActivity extends ActionBarActivity {
         }
     }
 
+    private BarometerEntry[] avgBarometerEntries;
+    protected VelocityEntry[] velocityEntries;
+
+    protected void getValues() {
+        Gson gson = new Gson();
+        InputStreamReader jsonReader = null;
+        try {
+            jsonReader = new InputStreamReader(
+                    this.openFileInput(SDCLogManager.LATEST_SESSION_JSON_FILE));
+        } catch (FileNotFoundException e) {
+            Toast.makeText(this, "No latest activity found!", Toast.LENGTH_SHORT).show();
+        }
+        SkydivingSessionData latestSessionData = gson.fromJson(jsonReader, SkydivingSessionData.class);
+        try {
+            jsonReader.close();
+        } catch (IOException e) {
+
+        }
+        avgBarometerEntries = LogbookStats.average(latestSessionData.getBarometerEntries(), 1000);
+        if (avgBarometerEntries.length < 100) {
+            Toast.makeText(this, "This doesn't look like a skydiving session", Toast.LENGTH_SHORT).show();
+        }
+        velocityEntries = LogbookStats.calculateVelocityValues(avgBarometerEntries, 8000);
+    }
+
+    public Entry[] getEntries() {
+        return velocityEntries;
+    }
+
     /**
      * A fragment containing a line chart.
      */
@@ -70,8 +100,7 @@ public class VelocityChartActivity extends ActionBarActivity {
         private boolean hasLabels = false;
         private boolean isCubic = false;
         private boolean hasLabelForSelected = false;
-        private BarometerEntry[] avgBarometerEntries;
-        private VelocityEntry[] velocityEntries;
+
 
         public PlaceholderFragment() {
         }
@@ -85,7 +114,7 @@ public class VelocityChartActivity extends ActionBarActivity {
             chart.setOnValueTouchListener(new ValueTouchListener());
 
             // Generate some randome values.
-            getBarometerValues();
+            ((VelocityChartActivity)(this.getActivity())).getValues();
 
             generateData();
 
@@ -188,28 +217,6 @@ public class VelocityChartActivity extends ActionBarActivity {
             return super.onOptionsItemSelected(item);
         }
 
-        private void getBarometerValues() {
-            Gson gson = new Gson();
-            InputStreamReader jsonReader = null;
-            try {
-                jsonReader = new InputStreamReader(
-                        this.getActivity().openFileInput(SDCLogManager.LATEST_SESSION_JSON_FILE));
-            } catch (FileNotFoundException e) {
-                Toast.makeText(this.getActivity(), "No latest activity found!", Toast.LENGTH_SHORT).show();
-            }
-            SkydivingSessionData latestSessionData = gson.fromJson(jsonReader, SkydivingSessionData.class);
-            try {
-                jsonReader.close();
-            } catch (IOException e) {
-
-            }
-            avgBarometerEntries = LogbookStats.average(latestSessionData.getBarometerEntries(), 1000);
-            if (avgBarometerEntries.length < 100) {
-                Toast.makeText(this.getActivity(), "This doesn't look like a skydiving session", Toast.LENGTH_SHORT).show();
-            }
-            velocityEntries = LogbookStats.calculateVelocityValues(avgBarometerEntries, 8000);
-        }
-
         private void reset() {
             numberOfLines = 1;
 
@@ -229,8 +236,9 @@ public class VelocityChartActivity extends ActionBarActivity {
 
         private void resetViewport() {
             // Reset viewport height range to (0,100)
-            long firstTimestamp = velocityEntries[0].timestamp;
-            long lastTimestamp =velocityEntries[velocityEntries.length - 1].timestamp;
+            Entry[] entries = ((VelocityChartActivity)(this.getActivity())).getEntries();
+            long firstTimestamp = entries[0].getTimestamp();
+            long lastTimestamp =entries[entries.length - 1].getTimestamp();
 
             final Viewport v = new Viewport(chart.getMaximumViewport());
             v.bottom = -100;
@@ -244,14 +252,15 @@ public class VelocityChartActivity extends ActionBarActivity {
         private void generateData() {
 
             List<Line> lines = new ArrayList<Line>();
-            VelocityEntry ve;
-            long firstTimestamp = velocityEntries[0].timestamp;
+            Entry e;
+            long firstTimestamp = ((VelocityChartActivity)(this.getActivity())).getEntries()[0].getTimestamp();
             for (int i = 0; i < numberOfLines; ++i) {
 
                 List<PointValue> values = new ArrayList<PointValue>();
-                for (int j = 0; j < velocityEntries.length; ++j) {
-                    ve = velocityEntries[j];
-                    values.add(new PointValue(ve.timestamp - firstTimestamp, ve.velocity));
+                Entry[] entries = ((VelocityChartActivity)(this.getActivity())).getEntries();
+                for (int j = 0; j < entries.length; ++j) {
+                    e = entries[j];
+                    values.add(new PointValue(e.getTimestamp() - firstTimestamp, e.getY()));
                 }
 
                 Line line = new Line(values);

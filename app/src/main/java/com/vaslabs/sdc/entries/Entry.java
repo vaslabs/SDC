@@ -30,4 +30,6 @@ public abstract class Entry implements Comparable<Entry>{
 
     public abstract Entry withTimestamp(long newTimeStamTimestamp);
 
+    public abstract float getX();
+    public abstract float getY();
 }
