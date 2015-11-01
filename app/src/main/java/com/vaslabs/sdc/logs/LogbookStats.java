@@ -1,5 +1,8 @@
 package com.vaslabs.sdc.logs;
 
+import android.content.Context;
+import android.widget.Toast;
+
 import com.google.gson.Gson;
 import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.sdc.entries.AccelerationEntry;
@@ -13,6 +16,7 @@ import com.vaslabs.sdc.types.SkydivingEvent;
 import com.vaslabs.sdc.types.SkydivingEventDetails;
 import com.vaslabs.sdc.ui.R;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -47,6 +51,24 @@ public final class LogbookStats {
         stats.calculateMaxSpeed(barometerEntries);
         stats.calculateDeployment();
         return stats;
+    }
+
+    public static SkydivingSessionData getLatestSession(Context context) {
+        Gson gson = new Gson();
+        InputStreamReader jsonReader = null;
+        try {
+            jsonReader = new InputStreamReader(
+                    context.openFileInput(SDCLogManager.LATEST_SESSION_JSON_FILE));
+        } catch (FileNotFoundException e) {
+            Toast.makeText(context, "No latest activity found!", Toast.LENGTH_SHORT).show();
+        }
+        SkydivingSessionData latestSessionData = gson.fromJson(jsonReader, SkydivingSessionData.class);
+        try {
+            jsonReader.close();
+        } catch (IOException e) {
+
+        }
+        return latestSessionData;
     }
 
     private void calculateDeployment() {
@@ -274,22 +296,21 @@ public final class LogbookStats {
 
     public static int findBarometerEntry(BarometerEntry[] barometerEntries, long timestamp) {
         int leftIndex = 0;
-        int rightIndex = barometerEntries.length/2;
+        int rightIndex = barometerEntries.length - 1;
+        int midIndex = 0;
         long tmpTimestamp;
-        int diff;
-        while (leftIndex != rightIndex) {
-            tmpTimestamp = barometerEntries[rightIndex].getTimestamp();
+        while (leftIndex <= rightIndex) {
+            midIndex = leftIndex + (rightIndex - leftIndex)/2;
+            tmpTimestamp = barometerEntries[midIndex].getTimestamp();
             if (tmpTimestamp == timestamp) {
-                return rightIndex;
-            } else if (tmpTimestamp > timestamp) {
-                rightIndex = rightIndex/2;
+                return midIndex;
+            } else if (tmpTimestamp < timestamp) {
+                leftIndex = midIndex+1;
             } else {
-                diff = rightIndex - leftIndex;
-                leftIndex = rightIndex;
-                rightIndex = (rightIndex + diff/2);
+                rightIndex = midIndex - 1;
             }
         }
-        return rightIndex;
+        return midIndex;
     }
 
     private static AccelerationEntry findMaxPositiveAcceleration(AccelerationEntry[] accelerationEntries) {

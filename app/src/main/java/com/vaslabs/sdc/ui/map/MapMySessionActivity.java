@@ -9,7 +9,17 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.vaslabs.logbook.SkydivingSessionData;
+import com.vaslabs.sdc.entries.GpsEntries;
+import com.vaslabs.sdc.logs.LogbookStats;
+import com.vaslabs.sdc.types.SkydivingEvent;
+import com.vaslabs.sdc.types.SkydivingEventDetails;
 import com.vaslabs.sdc.ui.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapMySessionActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -43,5 +53,41 @@ public class MapMySessionActivity extends FragmentActivity implements OnMapReady
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+        SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(this);
+        createPolygons(skydivingSessionData, mMap);
+    }
+
+    private static void createPolygons(SkydivingSessionData skydivingSessionData, GoogleMap map) {
+        SkydivingEventDetails[] skydivingEventDetails = LogbookStats.identifyFlyingEvents(skydivingSessionData.getBarometerEntries());
+        map.addPolygon(new PolygonOptions()
+                .add(generatePath(skydivingSessionData, 0, skydivingEventDetails[0].timestamp))
+                .strokeColor(SkydivingEvent.WALKING.color));
+        map.addPolygon(new PolygonOptions()
+                .add(generatePath(skydivingSessionData, skydivingEventDetails[1].timestamp, skydivingEventDetails[2].timestamp))
+                .strokeColor(skydivingEventDetails[2].eventType.color));
+        map.addPolygon(new PolygonOptions()
+                .add(generatePath(skydivingSessionData, skydivingEventDetails[2].timestamp, skydivingEventDetails[3].timestamp))
+                .strokeColor(skydivingEventDetails[3].eventType.color));
+
+        GpsEntries gpsEntries = skydivingSessionData.getGpsEntries();
+        map.addPolygon(new PolygonOptions()
+                .add(generatePath(skydivingSessionData, skydivingEventDetails[3].timestamp, gpsEntries.getEntry(gpsEntries.size() - 1).getTimestamp()))
+                .strokeColor(SkydivingEvent.WALKING.color));
+    }
+
+    private static LatLng[] generatePath(SkydivingSessionData skydivingSessionData, long timestampLeft, long timestampRight ) {
+        GpsEntries gpsEntries = skydivingSessionData.getGpsEntries();
+        gpsEntries.sort();
+        List<LatLng> latLngList = new ArrayList<LatLng>();
+        for (int i = 0; i < gpsEntries.size(); i++) {
+            if (gpsEntries.getEntry(i).getTimestamp() > timestampRight)
+                break;
+            if (gpsEntries.getEntry(i).getTimestamp() < timestampLeft)
+                continue;
+            latLngList.add(new LatLng(gpsEntries.getEntry(i).getLatitude(), gpsEntries.getEntry(i).getLongitude()));
+        }
+        LatLng[] latLngArray = new LatLng[latLngList.size()];
+        return latLngList.toArray(latLngArray);
     }
 }
