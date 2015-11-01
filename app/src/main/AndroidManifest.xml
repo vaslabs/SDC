@@ -161,7 +161,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".map.MapMySessionActivity"
+            android:name=".MapMySessionActivity"
             android:label="@string/title_activity_map_my_session" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

@@ -1,4 +1,4 @@
-package com.vaslabs.sdc.ui.map;
+package com.vaslabs.sdc.ui;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.sdc.entries.GpsEntries;
+import com.vaslabs.sdc.entries.GpsEntry;
 import com.vaslabs.sdc.logs.LogbookStats;
 import com.vaslabs.sdc.types.SkydivingEvent;
 import com.vaslabs.sdc.types.SkydivingEventDetails;
@@ -49,31 +50,48 @@ public class MapMySessionActivity extends FragmentActivity implements OnMapReady
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+
 
         SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(this);
         createPolygons(skydivingSessionData, mMap);
+        try {
+            GpsEntry gpsEntry = skydivingSessionData.getGpsEntries().getEntry(0);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(gpsEntry.getLatitude(), gpsEntry.getLongitude()), 14f));
+        } catch (Exception e) {
+
+        }
+
     }
 
     private static void createPolygons(SkydivingSessionData skydivingSessionData, GoogleMap map) {
         SkydivingEventDetails[] skydivingEventDetails = LogbookStats.identifyFlyingEvents(skydivingSessionData.getBarometerEntries());
-        map.addPolygon(new PolygonOptions()
-                .add(generatePath(skydivingSessionData, 0, skydivingEventDetails[0].timestamp))
-                .strokeColor(SkydivingEvent.WALKING.color));
-        map.addPolygon(new PolygonOptions()
-                .add(generatePath(skydivingSessionData, skydivingEventDetails[1].timestamp, skydivingEventDetails[2].timestamp))
-                .strokeColor(skydivingEventDetails[2].eventType.color));
-        map.addPolygon(new PolygonOptions()
-                .add(generatePath(skydivingSessionData, skydivingEventDetails[2].timestamp, skydivingEventDetails[3].timestamp))
-                .strokeColor(skydivingEventDetails[3].eventType.color));
+        LatLng[] latLngArray = generatePath(skydivingSessionData, 0, skydivingEventDetails[0].timestamp);
+        if (latLngArray.length > 0) {
+            map.addPolygon(new PolygonOptions()
+                    .add(latLngArray)
+                    .strokeColor(SkydivingEvent.WALKING.color));
+        }
+        latLngArray = generatePath(skydivingSessionData, skydivingEventDetails[1].timestamp, skydivingEventDetails[2].timestamp);
+        if (latLngArray.length > 0) {
+            map.addPolygon(new PolygonOptions()
+                    .add(latLngArray)
+                    .strokeColor(skydivingEventDetails[2].eventType.color));
+        }
+        latLngArray = generatePath(skydivingSessionData, skydivingEventDetails[2].timestamp, skydivingEventDetails[3].timestamp);
+        if (latLngArray.length > 0) {
+            map.addPolygon(new PolygonOptions()
+                    .add(latLngArray)
+                    .strokeColor(skydivingEventDetails[2].eventType.color));
+        }
 
         GpsEntries gpsEntries = skydivingSessionData.getGpsEntries();
-        map.addPolygon(new PolygonOptions()
-                .add(generatePath(skydivingSessionData, skydivingEventDetails[3].timestamp, gpsEntries.getEntry(gpsEntries.size() - 1).getTimestamp()))
-                .strokeColor(SkydivingEvent.WALKING.color));
+        latLngArray = generatePath(skydivingSessionData, skydivingEventDetails[3].timestamp, gpsEntries.getEntry(gpsEntries.size() - 1).getTimestamp());
+        if (latLngArray.length > 0) {
+            map.addPolygon(new PolygonOptions()
+                    .add(latLngArray)
+                    .strokeColor(SkydivingEvent.WALKING.color));
+        }
     }
 
     private static LatLng[] generatePath(SkydivingSessionData skydivingSessionData, long timestampLeft, long timestampRight ) {
@@ -88,6 +106,9 @@ public class MapMySessionActivity extends FragmentActivity implements OnMapReady
             latLngList.add(new LatLng(gpsEntries.getEntry(i).getLatitude(), gpsEntries.getEntry(i).getLongitude()));
         }
         LatLng[] latLngArray = new LatLng[latLngList.size()];
+        if (latLngList.size() == 0) {
+            return latLngArray;
+        }
         return latLngList.toArray(latLngArray);
     }
 }

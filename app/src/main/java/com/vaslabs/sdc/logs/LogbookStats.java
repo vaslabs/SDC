@@ -241,13 +241,14 @@ public final class LogbookStats {
     }
 
     public static SkydivingEventDetails[] identifyFlyingEvents(BarometerEntries barometerEntries) {
+        barometerEntries.sort();
         BarometerEntry[] avgBarometerEntries = LogbookStats.average(barometerEntries, 1000);
         VelocityEntry[] velocityEntries = LogbookStats.calculateVelocityValues(avgBarometerEntries, 8000);
         AccelerationEntry[] accelerationEntries = LogbookStats.calculateAccelerationValues(velocityEntries);
         AccelerationEntry maxPositiveAcceleration = findMaxPositiveAcceleration(accelerationEntries);
         AccelerationEntry maxNegativeAcceleration = findMaxNegativeAcceleration(accelerationEntries);
         SkydivingEventDetails canopyEventDetail = new SkydivingEventDetails(SkydivingEvent.CANOPY, maxPositiveAcceleration.getTimestamp());
-        SkydivingEventDetails freeFallDetail = new SkydivingEventDetails(SkydivingEvent.FREE_FALL, maxPositiveAcceleration.getTimestamp());
+        SkydivingEventDetails freeFallDetail = new SkydivingEventDetails(SkydivingEvent.FREE_FALL, maxNegativeAcceleration.getTimestamp());
         SkydivingEventDetails landedEventDetail = getLandedEvent(avgBarometerEntries, maxNegativeAcceleration);
         SkydivingEventDetails takeOffEventDetail = getTakeOffEvent(avgBarometerEntries);
         return new SkydivingEventDetails[]{takeOffEventDetail, freeFallDetail, canopyEventDetail, landedEventDetail};
@@ -255,11 +256,11 @@ public final class LogbookStats {
 
     private static SkydivingEventDetails getTakeOffEvent(BarometerEntry[] barometerEntries) {
         int maxBarometerEntryIndex = findMax(barometerEntries);
-        for (int i = maxBarometerEntryIndex - 1; i < barometerEntries.length; i++) {
-            if (Math.abs(barometerEntries[i].getAltitude() - barometerEntries[0].getAltitude()) < 0.001f)
+        for (int i = maxBarometerEntryIndex - 1; i >= 0; i--) {
+            if (Math.abs(barometerEntries[i].getAltitude() - barometerEntries[0].getAltitude()) < 5f)
                 return new SkydivingEventDetails(SkydivingEvent.TAKE_OFF, barometerEntries[i].getTimestamp());
         }
-        return new SkydivingEventDetails(SkydivingEvent.LANDING, barometerEntries[maxBarometerEntryIndex - ((barometerEntries.length - maxBarometerEntryIndex)/2)].getTimestamp());
+        return new SkydivingEventDetails(SkydivingEvent.TAKE_OFF, barometerEntries[maxBarometerEntryIndex - ((barometerEntries.length - maxBarometerEntryIndex)/2)].getTimestamp());
     }
 
     private static int findMax(Entry[] avgBarometerEntries) {
@@ -268,6 +269,7 @@ public final class LogbookStats {
         for (int i = 1; i < avgBarometerEntries.length; i++) {
             if (avgBarometerEntries[i].getY() > maxEntry.getY()) {
                 maxIndex = i;
+                maxEntry = avgBarometerEntries[i];
             }
         }
         return maxIndex;
