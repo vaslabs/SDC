@@ -71,7 +71,9 @@ public class MapMySessionActivity extends FragmentActivity implements OnMapReady
         int speedUp = 100;
         GpsEntry gpsEntry = gpsEntries[0];
         LatLng startPosition = new LatLng(gpsEntry.getLatitude(), gpsEntry.getLongitude());
-        Marker marker = mMap.addMarker(new MarkerOptions().position(startPosition).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        Marker marker = mMap.addMarker(new MarkerOptions()
+                .position(startPosition)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.arrow)));
         MarkerAnimation markerAnimation = new MarkerAnimation(gpsEntries, marker, speedUp);
         markerAnimation.animateMarkerToGB();
     }

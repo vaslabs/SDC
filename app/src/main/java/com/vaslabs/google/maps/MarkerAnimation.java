@@ -3,15 +3,18 @@
 
 package com.vaslabs.google.maps;
 
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.vaslabs.sdc.entries.GpsEntry;
-
+import com.google.maps.android.SphericalUtil;
 import java.util.Arrays;
 
 /**
@@ -58,7 +61,7 @@ public class MarkerAnimation {
                 LatLng startPosition = new LatLng(entries[entryIndex - 1].getLatitude(), entries[entryIndex - 1].getLongitude());
                 LatLng finalPosition = new LatLng(entries[entryIndex].getLatitude(), entries[entryIndex].getLongitude());
                 marker.setPosition(latLngInterpolator.interpolate(1, startPosition, finalPosition));
-
+                marker.setRotation((float) SphericalUtil.computeHeading(startPosition, finalPosition));
                 entryIndex++;
                 if (entryIndex < entries.length - 1) {
                     handler.postDelayed(this, durationInMs);
