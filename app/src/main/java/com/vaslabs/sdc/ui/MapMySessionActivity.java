@@ -2,15 +2,21 @@ package com.vaslabs.sdc.ui;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.vaslabs.google.maps.MarkerAnimation;
 import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.sdc.entries.GpsEntries;
 import com.vaslabs.sdc.entries.GpsEntry;
@@ -36,6 +42,39 @@ public class MapMySessionActivity extends FragmentActivity implements OnMapReady
         mapFragment.getMapAsync(this);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_map_session, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.animate_session) {
+            animateMySession();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void animateMySession() {
+        SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(this);
+        GpsEntry[] gpsEntries = skydivingSessionData.getGpsEntriesAsArray();
+        int speedUp = 100;
+        GpsEntry gpsEntry = gpsEntries[0];
+        LatLng startPosition = new LatLng(gpsEntry.getLatitude(), gpsEntry.getLongitude());
+        Marker marker = mMap.addMarker(new MarkerOptions().position(startPosition).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        MarkerAnimation markerAnimation = new MarkerAnimation(gpsEntries, marker, speedUp);
+        markerAnimation.animateMarkerToGB();
+    }
 
     /**
      * Manipulates the map once available.
@@ -49,9 +88,6 @@ public class MapMySessionActivity extends FragmentActivity implements OnMapReady
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-
-
 
         SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(this);
         createPolygons(skydivingSessionData, mMap);

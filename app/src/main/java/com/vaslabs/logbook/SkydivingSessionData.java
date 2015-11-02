@@ -78,4 +78,9 @@ public class SkydivingSessionData {
     public ConnectionEntries getConnectionEntries() {
         return new ConnectionEntries(connectionEntries);
     }
+
+    public GpsEntry[] getGpsEntriesAsArray() {
+        GpsEntry[] array = new GpsEntry[this.gpsEntries.size()];
+        return this.gpsEntries.toArray(array);
+    }
 }
