@@ -1,5 +1,7 @@
 package com.vaslabs.sdc.ui;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,6 +20,7 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.vaslabs.google.maps.MarkerAnimation;
 import com.vaslabs.logbook.SkydivingSessionData;
+import com.vaslabs.sdc.entries.Entry;
 import com.vaslabs.sdc.entries.GpsEntries;
 import com.vaslabs.sdc.entries.GpsEntry;
 import com.vaslabs.sdc.logs.LogbookStats;
@@ -65,16 +68,20 @@ public class MapMySessionActivity extends FragmentActivity implements OnMapReady
         return super.onOptionsItemSelected(item);
     }
 
+
+
     private void animateMySession() {
         SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(this);
         GpsEntry[] gpsEntries = skydivingSessionData.getGpsEntriesAsArray();
         int speedUp = 100;
         GpsEntry gpsEntry = gpsEntries[0];
         LatLng startPosition = new LatLng(gpsEntry.getLatitude(), gpsEntry.getLongitude());
+
+        Entry[] entries = skydivingSessionData.allEntries();
         Marker marker = mMap.addMarker(new MarkerOptions()
                 .position(startPosition)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.arrow)));
-        MarkerAnimation markerAnimation = new MarkerAnimation(gpsEntries, marker, speedUp);
+                .icon(BitmapDescriptorFactory.fromBitmap(MarkerAnimation.getMarkerIcon(this))));
+        MarkerAnimation markerAnimation = new MarkerAnimation(entries, marker, speedUp);
         markerAnimation.animateMarkerToGB();
     }
 

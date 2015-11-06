@@ -4,6 +4,7 @@ import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
 import com.vaslabs.sdc.entries.ConnectionEntries;
 import com.vaslabs.sdc.entries.ConnectionEntry;
+import com.vaslabs.sdc.entries.Entry;
 import com.vaslabs.sdc.entries.GpsEntries;
 import com.vaslabs.sdc.entries.GpsEntry;
 
@@ -82,5 +83,31 @@ public class SkydivingSessionData {
     public GpsEntry[] getGpsEntriesAsArray() {
         GpsEntry[] array = new GpsEntry[this.gpsEntries.size()];
         return this.gpsEntries.toArray(array);
+    }
+
+    public Entry[] allEntries() {
+        Entry[] entries = new Entry[gpsEntries.size() + barometerEntries.size()];
+        int gpsEntriesIndex = 0;
+        int barometerEntriesIndex = 0;
+        int generalIndex = 0;
+        while (gpsEntriesIndex < gpsEntries.size() && barometerEntriesIndex < barometerEntries.size()) {
+            final GpsEntry gpsEntry = gpsEntries.get(gpsEntriesIndex);
+            final BarometerEntry barometerEntry = barometerEntries.get(barometerEntriesIndex);
+            if (gpsEntry.getTimestamp() < barometerEntry.getTimestamp()) {
+                entries[generalIndex++] = gpsEntry;
+                gpsEntriesIndex++;
+            } else {
+                entries[generalIndex++] = barometerEntry;
+                barometerEntriesIndex++;
+            }
+        }
+
+        for (int i = barometerEntriesIndex; i < barometerEntries.size(); i++) {
+            entries[generalIndex++] = barometerEntries.get(i);
+        }
+        for (int i = gpsEntriesIndex; i < gpsEntries.size(); i++) {
+            entries[generalIndex++] = gpsEntries.get(i);
+        }
+        return entries;
     }
 }
