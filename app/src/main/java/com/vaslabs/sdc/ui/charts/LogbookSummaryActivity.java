@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.util.Calendar;
 import java.util.List;
 
+import com.vaslabs.sdc.ui.MapMySessionActivity;
 import com.vaslabs.units.*;
 import com.vaslabs.units.composite.VelocityUnit;
 public class LogbookSummaryActivity extends Activity {
@@ -223,6 +224,9 @@ public class LogbookSummaryActivity extends Activity {
                 break;
             case R.id.gforce_chart:
                 intent = new Intent(this, GforceChartActivity.class);
+                break;
+            case R.id.map_visualisation:
+                intent = new Intent(this, MapMySessionActivity.class);
                 break;
         }
         if (intent != null) {

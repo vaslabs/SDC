@@ -25,4 +25,20 @@ public class AccelerationEntry extends Entry {
     public float getY() {
         return acceleration;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AccelerationEntry that = (AccelerationEntry) o;
+
+        return Float.compare(that.acceleration, acceleration) == 0;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return (acceleration != +0.0f ? Float.floatToIntBits(acceleration) : 0);
+    }
 }

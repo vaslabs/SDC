@@ -53,20 +53,7 @@ public class BarometerChartActivity extends ChartActivity {
 
     @Override
     protected void getValues() {
-        Gson gson = new Gson();
-        InputStreamReader jsonReader = null;
-        try {
-            jsonReader = new InputStreamReader(
-                    this.openFileInput(SDCLogManager.LATEST_SESSION_JSON_FILE));
-        } catch (FileNotFoundException e) {
-            Toast.makeText(this, "No latest activity found!", Toast.LENGTH_SHORT).show();
-        }
-        SkydivingSessionData latestSessionData = gson.fromJson(jsonReader, SkydivingSessionData.class);
-        try {
-            jsonReader.close();
-        } catch (IOException e) {
-
-        }
+        SkydivingSessionData latestSessionData = LogbookStats.getLatestSession(this);
         this.barometerEntries = latestSessionData.getBarometerEntries();
         this.avgBarometerEntries = LogbookStats.average(this.barometerEntries, 1000);
         if (this.avgBarometerEntries.length < 100) {

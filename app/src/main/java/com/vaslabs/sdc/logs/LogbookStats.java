@@ -1,6 +1,10 @@
 package com.vaslabs.sdc.logs;
 
+import android.content.Context;
+import android.widget.Toast;
+
 import com.google.gson.Gson;
+import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.sdc.entries.AccelerationEntry;
 import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
@@ -8,11 +12,15 @@ import com.vaslabs.sdc.entries.Entry;
 import com.vaslabs.sdc.entries.GForceEntry;
 import com.vaslabs.sdc.entries.VelocityEntry;
 import com.vaslabs.sdc.math.SDCMathUtils;
+import com.vaslabs.sdc.types.SkydivingEvent;
+import com.vaslabs.sdc.types.SkydivingEventDetails;
 import com.vaslabs.sdc.ui.R;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -43,6 +51,24 @@ public final class LogbookStats {
         stats.calculateMaxSpeed(barometerEntries);
         stats.calculateDeployment();
         return stats;
+    }
+
+    public static SkydivingSessionData getLatestSession(Context context) {
+        Gson gson = new Gson();
+        InputStreamReader jsonReader = null;
+        try {
+            jsonReader = new InputStreamReader(
+                    context.openFileInput(SDCLogManager.LATEST_SESSION_JSON_FILE));
+        } catch (FileNotFoundException e) {
+            Toast.makeText(context, "No latest activity found!", Toast.LENGTH_SHORT).show();
+        }
+        SkydivingSessionData latestSessionData = gson.fromJson(jsonReader, SkydivingSessionData.class);
+        try {
+            jsonReader.close();
+        } catch (IOException e) {
+
+        }
+        return latestSessionData;
     }
 
     private void calculateDeployment() {
@@ -212,5 +238,100 @@ public final class LogbookStats {
             gForceEntries[counter++] = new GForceEntry(entry.getTimestamp(), entry.getY()/9.8f);
         }
         return gForceEntries;
+    }
+
+    public static SkydivingEventDetails[] identifyFlyingEvents(BarometerEntries barometerEntries) {
+        barometerEntries.sort();
+        BarometerEntry[] avgBarometerEntries = LogbookStats.average(barometerEntries, 1000);
+        VelocityEntry[] velocityEntries = LogbookStats.calculateVelocityValues(avgBarometerEntries, 8000);
+        AccelerationEntry[] accelerationEntries = LogbookStats.calculateAccelerationValues(velocityEntries);
+        AccelerationEntry maxPositiveAcceleration = findMaxPositiveAcceleration(accelerationEntries);
+        AccelerationEntry maxNegativeAcceleration = findMaxNegativeAcceleration(accelerationEntries);
+        SkydivingEventDetails canopyEventDetail = new SkydivingEventDetails(SkydivingEvent.CANOPY, maxPositiveAcceleration.getTimestamp());
+        SkydivingEventDetails freeFallDetail = new SkydivingEventDetails(SkydivingEvent.FREE_FALL, maxNegativeAcceleration.getTimestamp());
+        SkydivingEventDetails landedEventDetail = getLandedEvent(avgBarometerEntries, maxNegativeAcceleration);
+        SkydivingEventDetails takeOffEventDetail = getTakeOffEvent(avgBarometerEntries);
+        return new SkydivingEventDetails[]{takeOffEventDetail, freeFallDetail, canopyEventDetail, landedEventDetail};
+    }
+
+    private static SkydivingEventDetails getTakeOffEvent(BarometerEntry[] barometerEntries) {
+        int maxBarometerEntryIndex = findMax(barometerEntries);
+        for (int i = maxBarometerEntryIndex - 1; i >= 0; i--) {
+            if (Math.abs(barometerEntries[i].getAltitude() - barometerEntries[0].getAltitude()) < 5f)
+                return new SkydivingEventDetails(SkydivingEvent.TAKE_OFF, barometerEntries[i].getTimestamp());
+        }
+        return new SkydivingEventDetails(SkydivingEvent.TAKE_OFF, barometerEntries[maxBarometerEntryIndex - ((barometerEntries.length - maxBarometerEntryIndex)/2)].getTimestamp());
+    }
+
+    private static int findMax(Entry[] avgBarometerEntries) {
+        int maxIndex = 0;
+        Entry maxEntry = avgBarometerEntries[0];
+        for (int i = 1; i < avgBarometerEntries.length; i++) {
+            if (avgBarometerEntries[i].getY() > maxEntry.getY()) {
+                maxIndex = i;
+                maxEntry = avgBarometerEntries[i];
+            }
+        }
+        return maxIndex;
+    }
+
+    public static SkydivingEventDetails getLandedEvent(BarometerEntry[] barometerEntries, AccelerationEntry maxNegativeAcceleration) {
+        BarometerEntry minBarometerEntryBeforeTakeOff = findMinBarometerEntryBefore(barometerEntries, maxNegativeAcceleration.getTimestamp());
+        int barometerEntryIndex = findBarometerEntry(barometerEntries, maxNegativeAcceleration.getTimestamp());
+        for (int i = barometerEntryIndex + 1; i < barometerEntries.length; i++) {
+            if (barometerEntries[i].getAltitude() - 1 < minBarometerEntryBeforeTakeOff.getAltitude())
+                return new SkydivingEventDetails(SkydivingEvent.LANDING, barometerEntries[barometerEntryIndex].getTimestamp());
+        }
+        return new SkydivingEventDetails(SkydivingEvent.LANDING, barometerEntries[barometerEntryIndex + ((barometerEntries.length - barometerEntryIndex)/2)].getTimestamp());
+    }
+
+    private static BarometerEntry findMinBarometerEntryBefore(BarometerEntry[] barometerEntries, long timestamp) {
+        int barometerEntryIndex = findBarometerEntry(barometerEntries, timestamp);
+        BarometerEntry be = barometerEntries[barometerEntryIndex];
+        for (int i = barometerEntryIndex - 1; i >= 0; i--) {
+            if (barometerEntries[i].getAltitude() < be.getAltitude()) {
+                be = barometerEntries[i];
+            }
+        }
+        return be;
+    }
+
+    public static int findBarometerEntry(BarometerEntry[] barometerEntries, long timestamp) {
+        int leftIndex = 0;
+        int rightIndex = barometerEntries.length - 1;
+        int midIndex = 0;
+        long tmpTimestamp;
+        while (leftIndex <= rightIndex) {
+            midIndex = leftIndex + (rightIndex - leftIndex)/2;
+            tmpTimestamp = barometerEntries[midIndex].getTimestamp();
+            if (tmpTimestamp == timestamp) {
+                return midIndex;
+            } else if (tmpTimestamp < timestamp) {
+                leftIndex = midIndex+1;
+            } else {
+                rightIndex = midIndex - 1;
+            }
+        }
+        return midIndex;
+    }
+
+    private static AccelerationEntry findMaxPositiveAcceleration(AccelerationEntry[] accelerationEntries) {
+        AccelerationEntry maxPositive = accelerationEntries[0];
+        for (AccelerationEntry ae : accelerationEntries) {
+            if (ae.acceleration > maxPositive.acceleration) {
+                maxPositive = ae;
+            }
+        }
+        return maxPositive;
+    }
+
+    private static AccelerationEntry findMaxNegativeAcceleration(AccelerationEntry[] accelerationEntries) {
+        AccelerationEntry maxNegative = accelerationEntries[0];
+        for (AccelerationEntry ae : accelerationEntries) {
+            if (ae.acceleration < maxNegative.acceleration) {
+                maxNegative = ae;
+            }
+        }
+        return maxNegative;
     }
 }
