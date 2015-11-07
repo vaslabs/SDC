@@ -93,6 +93,9 @@ public class SessionFilter {
         BarometerEntries barometerEntries = skydivingSessionData.getBarometerEntries();
         float findMinimumAltitude = SDCMathUtils.findMin(barometerEntries);
         int numberOfSessionsContained = detectNumberOfSessions(barometerEntries, findMinimumAltitude);
+        if (numberOfSessionsContained == 1) {
+            return new SkydivingSessionData[]{skydivingSessionData};
+        }
         List<Long> timestamps = detectSessionsTimestamps(barometerEntries, numberOfSessionsContained, findMinimumAltitude);
 
         SkydivingSessionData[] sessions = rebuildSessions(numberOfSessionsContained, timestamps, skydivingSessionData);
