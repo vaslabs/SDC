@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -99,7 +100,12 @@ public class MapMySessionActivity extends FragmentActivity implements OnMapReady
         mMap = googleMap;
 
         SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(this);
-        createPolygons(skydivingSessionData, mMap);
+        try {
+            createPolygons(skydivingSessionData, mMap);
+        } catch (Exception e) {
+            Toast.makeText(this, "Could not create visualisation from latest skydiving session", Toast.LENGTH_SHORT).show();
+            return;
+        }
         try {
             GpsEntry gpsEntry = skydivingSessionData.getGpsEntries().getEntry(0);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(gpsEntry.getLatitude(), gpsEntry.getLongitude()), 14f));
@@ -121,7 +127,7 @@ public class MapMySessionActivity extends FragmentActivity implements OnMapReady
         if (latLngArray.length > 0) {
             map.addPolygon(new PolygonOptions()
                     .add(latLngArray)
-                    .strokeColor(skydivingEventDetails[2].eventType.color));
+                    .strokeColor(skydivingEventDetails[1].eventType.color));
         }
         latLngArray = generatePath(skydivingSessionData, skydivingEventDetails[2].timestamp, skydivingEventDetails[3].timestamp);
         if (latLngArray.length > 0) {

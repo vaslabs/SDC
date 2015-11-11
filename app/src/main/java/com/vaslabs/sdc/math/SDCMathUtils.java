@@ -19,6 +19,7 @@ public class SDCMathUtils {
 
 
     public static float findMin(BarometerEntries barometerEntries) {
+        barometerEntries.sort();
         float min = barometerEntries.get(0).getAltitude();
         for (int i = 1; i < barometerEntries.size(); i++) {
             if (barometerEntries.get(i).getAltitude() < min) {
