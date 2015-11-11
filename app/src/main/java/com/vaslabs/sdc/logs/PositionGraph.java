@@ -107,4 +107,12 @@ public final class PositionGraph {
         this.barometerAltitudeValues.clear();
         this.gpsValues.clear();
     }
+
+    public int getAltitudeValuesSize() {
+        return this.barometerAltitudeValues.size();
+    }
+
+    public int getGpsValuesSize() {
+        return this.gpsValues.size();
+    }
 }

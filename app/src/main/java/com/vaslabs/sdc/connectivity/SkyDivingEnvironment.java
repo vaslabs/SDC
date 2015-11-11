@@ -259,7 +259,8 @@ public class SkyDivingEnvironment implements
         }
 
         try {
-            logStream.write(positionGraph.getBarometerData());
+            if (positionGraph.getAltitudeValuesSize() > 100)
+                logStream.write(positionGraph.getBarometerData());
         } catch (IOException ioE) {
             Toast.makeText(this.context, ioE.toString(), Toast.LENGTH_LONG).show();
         } finally {
@@ -284,7 +285,8 @@ public class SkyDivingEnvironment implements
         }
 
         try {
-            logStream.write(positionGraph.getGPSData());
+            if (positionGraph.getGpsValuesSize() > 30)
+                logStream.write(positionGraph.getGPSData());
         } catch (IOException ioE) {
             Toast.makeText(this.context, ioE.toString(), Toast.LENGTH_LONG).show();
 
