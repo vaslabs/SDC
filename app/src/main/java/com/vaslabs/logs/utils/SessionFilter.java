@@ -57,7 +57,7 @@ public class SessionFilter {
             }
             sessionMap.get(ds).insert(ce);
         }
-        sessionMap = filterMultiple(sessionMap);
+        //sessionMap = filterMultiple(sessionMap);
         return sessionMap;
     }
 
