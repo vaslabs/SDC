@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -97,8 +99,9 @@ public class SDCLogManager {
         return this.responses;
     }
 
-    public void submitLogs(Map<DateStruct, SkydivingSessionData> sessionDates) throws Exception {
+    public Map<DateStruct, SkydivingSessionData> submitLogs(Map<DateStruct, SkydivingSessionData> sessionDates) throws Exception {
         Set<DateStruct> dates = sessionDates.keySet();
+        Map<DateStruct, SkydivingSessionData> successfulSessionData = new HashMap<DateStruct, SkydivingSessionData>();
         SkydivingSessionData sessionData;
         String json;
         Response[] responses = new Response[dates.size()];
@@ -116,9 +119,11 @@ public class SDCLogManager {
             if (!"OK".equals(message))
                 throw new PWAServerError();
             responses[counter++] = r;
+            successfulSessionData.put(key, sessionData);
         }
         this.responses = responses;
         sessionDates.clear();
+        return successfulSessionData;
     }
 
     public void saveLatestSession(SkydivingSessionData sessionData) throws IOException {
@@ -136,9 +141,9 @@ public class SDCLogManager {
         Gson gson = new Gson();
         SkydivingSessionData sessionData = gson.fromJson(jsonString, SkydivingSessionData.class);
         Map<DateStruct, SkydivingSessionData> sessionDates = SessionFilter.filter(sessionData);
-        sessionData = SessionFilter.mostRecent(sessionDates);
         SDCLogManager logManager = SDCLogManager.getInstance(context);
-        logManager.submitLogs(sessionDates);
+        Map<DateStruct, SkydivingSessionData> successfullySubmittedSessionDates = logManager.submitLogs(sessionDates);
+        sessionData = SessionFilter.mostRecent(successfullySubmittedSessionDates);
         try {
             this.saveLatestSession(sessionData);
         } catch (IOException ioe) {

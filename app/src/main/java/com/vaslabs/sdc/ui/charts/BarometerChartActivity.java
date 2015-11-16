@@ -55,6 +55,7 @@ public class BarometerChartActivity extends ChartActivity {
     protected void getValues() {
         SkydivingSessionData latestSessionData = LogbookStats.getLatestSession(this);
         this.barometerEntries = latestSessionData.getBarometerEntries();
+        this.barometerEntries.sort();
         this.avgBarometerEntries = LogbookStats.average(this.barometerEntries, 1000);
         if (this.avgBarometerEntries.length < 100) {
             Toast.makeText(this, "This doesn't look like a skydiving session", Toast.LENGTH_SHORT).show();

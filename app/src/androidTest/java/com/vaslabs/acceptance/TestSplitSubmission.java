@@ -26,9 +26,10 @@ public class TestSplitSubmission extends AndroidTestCase {
         SkydivingSessionData sessionData = gson.fromJson(isr, SkydivingSessionData.class);
         Map<DateStruct, SkydivingSessionData> sessionDates = SessionFilter.filter(sessionData);
         assertEquals(1, sessionDates.size());
-        sessionData = SessionFilter.mostRecent(sessionDates);
         SDCLogManager logManager = SDCLogManager.getInstance(this.getContext());
-        logManager.submitLogs(sessionDates);
+        Map<DateStruct, SkydivingSessionData> successfullySubmittedSessions = logManager.submitLogs(sessionDates);
+        sessionData = SessionFilter.mostRecent(successfullySubmittedSessions);
+
         SDCLogManager.getInstance(this.getContext()).saveLatestSession(sessionData);
     }
 

@@ -11,6 +11,7 @@ import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.logs.SDCLogManager;
 import com.vaslabs.sdc.math.SDCMathUtils;
 import com.vaslabs.sdc.ui.R;
+import com.vaslabs.sdc_dashboard.API.API;
 import com.vaslabs.structs.DateStruct;
 
 import java.io.IOException;
@@ -24,7 +25,22 @@ import java.util.Map;
  */
 public class TestSubmissionIntegration extends AndroidTestCase{
 
+    @Override
+    public void setUp() throws Exception {
+        try {
+            String apiKey = API.getApiToken(this.getContext());
+        } catch (Exception e) {
+            try {
+                API.saveApiToken(this.getContext(), this.getContext().getString(R.string.test_token));
+            } catch (IOException e1) {
+                fail(e1.toString());
+            }
+        }
+        super.setUp();
+    }
+
     public void test_that_data_can_be_submitted() throws Exception {
+
         SDCLogManager logManager = SDCLogManager.getInstance(mContext);
         InputStreamReader isr = new InputStreamReader(mContext.getResources().openRawResource(R.raw.sample_log));
         String jsonString = LogUtils.parse(isr);
@@ -47,9 +63,9 @@ public class TestSubmissionIntegration extends AndroidTestCase{
             assertEquals(0, dates.sessionRef);
         }
 
-        sessionData = SessionFilter.mostRecent(sessionDates);
+        Map<DateStruct, SkydivingSessionData> successfullySubmittedSessionDates = logManager.submitLogs(sessionDates);
+        sessionData = SessionFilter.mostRecent(successfullySubmittedSessionDates);
 
-        logManager.submitLogs(sessionDates);
         try {
             logManager.saveLatestSession(sessionData);
         } catch (IOException ioe) {
@@ -64,7 +80,8 @@ public class TestSubmissionIntegration extends AndroidTestCase{
         SkydivingSessionData sessionData = gson.fromJson(isr, SkydivingSessionData.class);
         Map<DateStruct, SkydivingSessionData> sessionDates = SessionFilter.filter(sessionData);
         assertEquals(2, sessionDates.size());
-        logManager.submitLogs(sessionDates);
+        Map<DateStruct, SkydivingSessionData> successfullySubmittedSessionDates = logManager.submitLogs(sessionDates);
+        sessionData = SessionFilter.mostRecent(successfullySubmittedSessionDates);
         try {
             logManager.saveLatestSession(sessionData);
         } catch (IOException ioe) {
