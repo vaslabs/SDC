@@ -91,9 +91,11 @@ public class SessionFilter {
         skydivingSessionData.getGpsEntries().sort();
         skydivingSessionData.getConnectionEntries().sort();
         BarometerEntries barometerEntries = skydivingSessionData.getBarometerEntries();
+        if (barometerEntries.size() <= 0)
+            return new SkydivingSessionData[]{skydivingSessionData};
         float findMinimumAltitude = SDCMathUtils.findMin(barometerEntries);
         int numberOfSessionsContained = detectNumberOfSessions(barometerEntries, findMinimumAltitude);
-        if (numberOfSessionsContained == 1) {
+        if (numberOfSessionsContained <= 1) {
             return new SkydivingSessionData[]{skydivingSessionData};
         }
         List<Long> timestamps = detectSessionsTimestamps(barometerEntries, numberOfSessionsContained, findMinimumAltitude);
