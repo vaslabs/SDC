@@ -6,13 +6,13 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
-import com.vaslabs.sdc.types.DifferentiableFloat;
-import com.vaslabs.sdc.types.TrendPoint;
 import com.vaslabs.sdc.ui.R;
-import com.vaslabs.sdc.utils.AbstractTrendStrategy;
 import com.vaslabs.sdc.utils.BarometerTrendStrategy;
 import com.vaslabs.sdc.utils.DefaultBarometerTrendListener;
-import com.vaslabs.sdc.utils.TrendDirection;
+import com.vaslabs.vtrends.impl.AbstractTrendStrategy;
+import com.vaslabs.vtrends.types.DifferentiableFloat;
+import com.vaslabs.vtrends.types.TrendDirection;
+import com.vaslabs.vtrends.types.TrendPoint;
 
 
 import java.io.InputStreamReader;

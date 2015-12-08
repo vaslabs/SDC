@@ -7,19 +7,12 @@ import com.vaslabs.sdc.entries.BarometerEntry;
 import com.vaslabs.sdc.entries.Entry;
 import com.vaslabs.sdc.entries.GpsEntry;
 import com.vaslabs.sdc.logs.LatLng;
-import com.vaslabs.sdc.logs.PositionGraph;
 import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
-import com.vaslabs.sdc.types.DifferentiableFloat;
-import com.vaslabs.sdc.types.TrendPoint;
-import com.vaslabs.sdc.utils.AbstractTrendStrategy;
-import com.vaslabs.sdc.utils.BarometerTrendStrategy;
 import com.vaslabs.sdc.utils.Position;
-import com.vaslabs.sdc.utils.TrendDirection;
-import com.vaslabs.sdc.utils.TrendListener;
-import com.vaslabs.sdc.utils.VelocityState;
 import com.vaslabs.units.TimeUnit;
+import com.vaslabs.vtrends.impl.AbstractTrendStrategy;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -28,11 +21,9 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
 
 import android.provider.ContactsContract;
 

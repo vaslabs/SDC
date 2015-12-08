@@ -3,7 +3,7 @@ package com.vaslabs.sdc.utils;
 import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
-import com.vaslabs.sdc.types.DifferentiableFloat;
+import com.vaslabs.vtrends.types.Differentiable;
 
 public class Position implements Differentiable<Position> {
     private LongitudeSensorValue lng;

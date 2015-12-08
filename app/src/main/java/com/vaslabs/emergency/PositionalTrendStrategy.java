@@ -1,9 +1,8 @@
 package com.vaslabs.emergency;
 
-import com.vaslabs.sdc.types.DifferentiableFloat;
-import com.vaslabs.sdc.types.TrendPoint;
-import com.vaslabs.sdc.utils.AbstractTrendStrategy;
 import com.vaslabs.sdc.utils.Position;
+import com.vaslabs.vtrends.impl.AbstractTrendStrategy;
+import com.vaslabs.vtrends.types.TrendPoint;
 
 import java.util.List;
 

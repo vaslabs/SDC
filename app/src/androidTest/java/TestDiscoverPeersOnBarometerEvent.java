@@ -5,12 +5,13 @@ import android.util.Log;
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
 import com.vaslabs.sdc.connectivity.WirelessBroadcastReceiver;
 import com.vaslabs.sdc.sensors.BarometerSensor;
-import com.vaslabs.sdc.types.DifferentiableFloat;
-import com.vaslabs.sdc.types.TrendPoint;
-import com.vaslabs.sdc.utils.AbstractTrendStrategy;
 import com.vaslabs.sdc.utils.BarometerTrendStrategy;
 import com.vaslabs.sdc.utils.DefaultBarometerTrendListener;
-import com.vaslabs.sdc.utils.TrendDirection;
+import com.vaslabs.vtrends.impl.AbstractTrendStrategy;
+import com.vaslabs.vtrends.types.DifferentiableFloat;
+import com.vaslabs.vtrends.types.TrendDirection;
+import com.vaslabs.vtrends.types.TrendPoint;
+
 
 import java.lang.reflect.Field;
 import java.util.Map;

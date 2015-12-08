@@ -1,10 +1,10 @@
 package com.vaslabs.logbook;
 
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
-import com.vaslabs.sdc.types.TrendPoint;
-import com.vaslabs.sdc.utils.TrendDirection;
-import com.vaslabs.sdc.utils.TrendListener;
-import com.vaslabs.sdc.utils.VelocityState;
+import com.vaslabs.vtrends.TrendListener;
+import com.vaslabs.vtrends.types.TrendDirection;
+import com.vaslabs.vtrends.types.TrendPoint;
+import com.vaslabs.vtrends.types.VelocityState;
 
 /**
  * Created by vnicolaou on 31/10/15.

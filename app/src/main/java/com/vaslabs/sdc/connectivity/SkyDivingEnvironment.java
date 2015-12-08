@@ -14,10 +14,6 @@ import java.util.Map;
 import android.content.Context;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vaslabs.emergency.LandingTrendListener;
@@ -31,13 +27,10 @@ import com.vaslabs.sdc.sensors.LatitudeSensorValue;
 import com.vaslabs.sdc.sensors.LongitudeSensorValue;
 import com.vaslabs.sdc.sensors.MetersSensorValue;
 import com.vaslabs.sdc.sensors.NoBarometerException;
-import com.vaslabs.sdc.types.DifferentiableFloat;
-import com.vaslabs.sdc.types.TrendPoint;
 import com.vaslabs.sdc.ui.OnSpeechSuccessListener;
 import com.vaslabs.sdc.ui.SpeechCommunicationManager;
 import com.vaslabs.sdc.ui.util.SkyDiverListAdapterHelper;
 import com.vaslabs.sdc.ui.util.TrendingPreferences;
-import com.vaslabs.sdc.utils.AbstractTrendStrategy;
 import com.vaslabs.sdc.utils.BarometerTrendStrategy;
 import com.vaslabs.sdc.utils.DefaultBarometerTrendListener;
 import com.vaslabs.sdc.utils.SDConnectivity;
@@ -46,8 +39,10 @@ import com.vaslabs.sdc.utils.SkyDiverEnvironmentUpdate;
 import com.vaslabs.sdc.utils.SkyDiverPersonalUpdates;
 import com.vaslabs.sdc.utils.SkyDiverPositionalComparator;
 import com.vaslabs.sdc.logs.PositionGraph;
-import com.vaslabs.sdc.utils.TrendDirection;
-import com.vaslabs.sdc.utils.TrendListener;
+import com.vaslabs.vtrends.impl.AbstractTrendStrategy;
+import com.vaslabs.vtrends.types.DifferentiableFloat;
+import com.vaslabs.vtrends.types.TrendDirection;
+import com.vaslabs.vtrends.types.TrendPoint;
 
 public class SkyDivingEnvironment implements
         OnSpeechSuccessListener, SkyDiverEnvironmentUpdate,

@@ -4,10 +4,10 @@ import android.content.Context;
 
 import com.vaslabs.logbook.SaveDataTrendListener;
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
-import com.vaslabs.sdc.connectivity.SkyDivingEnvironmentLogger;
-import com.vaslabs.sdc.utils.AbstractTrendStrategy;
 import com.vaslabs.sdc.utils.DefaultBarometerTrendListener;
 import com.vaslabs.units.TimeUnit;
+import com.vaslabs.vtrends.StrategyVisitor;
+import com.vaslabs.vtrends.impl.AbstractTrendStrategy;
 
 /**
  * Created by vnicolaou on 30/08/15.

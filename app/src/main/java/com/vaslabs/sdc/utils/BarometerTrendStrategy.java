@@ -1,7 +1,9 @@
 package com.vaslabs.sdc.utils;
 
-import com.vaslabs.sdc.types.DifferentiableFloat;
-import com.vaslabs.sdc.types.TrendPoint;
+
+import com.vaslabs.vtrends.impl.AbstractTrendStrategy;
+import com.vaslabs.vtrends.types.DifferentiableFloat;
+import com.vaslabs.vtrends.types.TrendPoint;
 
 import java.util.List;
 
