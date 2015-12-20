@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vaslabs.logbook.LogbookSummary;
@@ -17,14 +18,17 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
         // each data item is just a string in this case
         public TextView contentTextView;
         public TextView titleTextView;
+        public ImageView iconImageView;
         public ViewHolder(View v) {
             super(v);
             titleTextView = (TextView) v.findViewById(R.id.title_text_view);
             contentTextView = (TextView) v.findViewById(R.id.content_text_view);
+            iconImageView = (ImageView)v.findViewById(R.id.summary_entry_image_view);
         }
         public void makeView(LogbookSummaryEntry lse) {
             titleTextView.setText(lse.getTitle());
             contentTextView.setText(lse.getContent());
+            iconImageView.setImageDrawable(contentTextView.getContext().getDrawable(lse.getDrawable()));
         }
     }
 

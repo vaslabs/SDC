@@ -12,10 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.vaslabs.logbook.LogbookSummary;
-import com.vaslabs.sdc.logs.LogbookStats;
 import com.vaslabs.sdc.ui.R;
 import com.vaslabs.sdc.ui.charts.LogbookFetchTask;
-
+import com.vaslabs.sdc.ui.util.DividerItemDecoration;
 
 /**
  * A fragment representing a list of Items.
@@ -66,6 +65,7 @@ public class CardViewFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {

@@ -29,7 +29,6 @@ import com.vaslabs.sdc.sensors.MetersSensorValue;
 import com.vaslabs.sdc.sensors.NoBarometerException;
 import com.vaslabs.sdc.ui.OnSpeechSuccessListener;
 import com.vaslabs.sdc.ui.SpeechCommunicationManager;
-import com.vaslabs.sdc.ui.util.SkyDiverListAdapterHelper;
 import com.vaslabs.sdc.ui.util.TrendingPreferences;
 import com.vaslabs.sdc.utils.BarometerTrendStrategy;
 import com.vaslabs.sdc.utils.DefaultBarometerTrendListener;
@@ -54,14 +53,12 @@ public class SkyDivingEnvironment implements
     private Context context;
     private static SkyDivingEnvironment environmentInstance = null;
     private SpeechCommunicationManager scm;
-    private int[] colors = SkyDiverListAdapterHelper.getColors();
     private BarometerSensor barometerSensor;
     private GPSSensor gpsSensor;
     private PositionGraph positionGraph;
     private DefaultBarometerTrendListener trendListener;
     private AbstractTrendStrategy<DifferentiableFloat> trendStrategy;
-    private final int defaultColor = SkyDiverListAdapterHelper
-            .getDefaultColor();
+
     private WirelessBroadcastReceiver mReceiver;
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;

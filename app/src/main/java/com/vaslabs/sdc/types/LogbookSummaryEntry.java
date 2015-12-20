@@ -13,21 +13,23 @@ import com.vaslabs.units.composite.VelocityUnit;
  */
 public abstract class LogbookSummaryEntry implements ILogbookSummaryEntry {
     private final String title;
+    private final int drawable;
 
-    private LogbookSummaryEntry(String title) {
+    private LogbookSummaryEntry(String title, int drawable) {
         this.title = title;
+        this.drawable = drawable;
     }
 
     public static LogbookSummaryEntry[] fromLogbookSummary(LogbookSummary logbookSummary, Context context) {
         LogbookSummaryEntry[] logbookSummaryEntries = new LogbookSummaryEntry[4];
         logbookSummaryEntries[0] = new LogbookSummaryEntryNumerical(logbookSummary.getNumberOfJumps(),
-                context.getString(R.string.number_of_dives_title));
+                context.getString(R.string.number_of_dives_title), R.drawable.ic_hash_small);
         logbookSummaryEntries[1] = new LogbookSummaryEntryDistance(logbookSummary.getAverageDeployAltitude(),
-                context.getString(R.string.average_deploy_altitude));
+                context.getString(R.string.average_deploy_altitude), R.drawable.ic_deploy_altitude_small);
         logbookSummaryEntries[2] = new LogbookSummaryEntryDistance(logbookSummary.getAverageExitAltitude(),
-                context.getString(R.string.average_exit_altitude));
+                context.getString(R.string.average_exit_altitude), R.drawable.ic_ruler_small);
         logbookSummaryEntries[3] = new LogbookSummaryEntryVelocity(logbookSummary.getAverageTopSpeed(),
-                context.getString(R.string.average_top_speed));
+                context.getString(R.string.average_top_speed), R.drawable.speed_red_small);
         return logbookSummaryEntries;
     }
 
@@ -36,13 +38,17 @@ public abstract class LogbookSummaryEntry implements ILogbookSummaryEntry {
         return title;
     }
 
+    public int getDrawable() {
+        return drawable;
+    }
+
     private static class LogbookSummaryEntryDistance extends LogbookSummaryEntry {
         private final float value;
         private final DistanceUnit myUnit = DistanceUnit.METERS;
         private DistanceUnit preferredUnit = DistanceUnit.METERS;
 
-        private LogbookSummaryEntryDistance(float value, String title) {
-            super(title);
+        private LogbookSummaryEntryDistance(float value, String title, int drawable) {
+            super(title, drawable);
             this.value = value;
         }
 
@@ -70,8 +76,8 @@ public abstract class LogbookSummaryEntry implements ILogbookSummaryEntry {
 
         private final VelocityUnit velocityUnit;
 
-        private LogbookSummaryEntryVelocity(float value, String title) {
-            super(title);
+        private LogbookSummaryEntryVelocity(float value, String title, int drawable) {
+            super(title, drawable);
             velocityUnit = new VelocityUnit(myDistanceUnit, myTimeUnit, value);
         }
 
@@ -97,8 +103,8 @@ public abstract class LogbookSummaryEntry implements ILogbookSummaryEntry {
         private TimeUnit preferredUnit = TimeUnit.SECONDS;
 
 
-        private LogbookSummaryEntryTime(float value, String title) {
-            super(title);
+        private LogbookSummaryEntryTime(float value, String title, int drawable) {
+            super(title, drawable);
             this.value = value;
         }
 
@@ -120,8 +126,8 @@ public abstract class LogbookSummaryEntry implements ILogbookSummaryEntry {
     private static class LogbookSummaryEntryNumerical extends LogbookSummaryEntry {
         private final int value;
 
-        private LogbookSummaryEntryNumerical(int value, String title) {
-            super(title);
+        private LogbookSummaryEntryNumerical(int value, String title, int drawable) {
+            super(title, drawable);
             this.value = value;
         }
 
