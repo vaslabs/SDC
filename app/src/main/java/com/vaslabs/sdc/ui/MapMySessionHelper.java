@@ -1,23 +1,15 @@
 package com.vaslabs.sdc.ui;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.content.Context;
+
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.vaslabs.google.maps.MarkerAnimation;
 import com.vaslabs.logbook.SkydivingSessionData;
@@ -27,52 +19,16 @@ import com.vaslabs.sdc.entries.GpsEntry;
 import com.vaslabs.sdc.logs.LogbookStats;
 import com.vaslabs.sdc.types.SkydivingEvent;
 import com.vaslabs.sdc.types.SkydivingEventDetails;
-import com.vaslabs.sdc.ui.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapMySessionActivity extends FragmentActivity implements OnMapReadyCallback {
-
-    private GoogleMap mMap;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map_my_session);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_map_session, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.animate_session) {
-            animateMySession();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+public class MapMySessionHelper {
 
 
 
-    private void animateMySession() {
-        SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(this);
+    private static void animateMySession(Context c, GoogleMap mMap) {
+        SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(c);
         GpsEntry[] gpsEntries = skydivingSessionData.getGpsEntriesAsArray();
         int speedUp = 100;
         GpsEntry gpsEntry = gpsEntries[0];
@@ -81,29 +37,18 @@ public class MapMySessionActivity extends FragmentActivity implements OnMapReady
         Entry[] entries = skydivingSessionData.allEntries();
         Marker marker = mMap.addMarker(new MarkerOptions()
                 .position(startPosition)
-                .icon(BitmapDescriptorFactory.fromBitmap(MarkerAnimation.getMarkerIcon(this))));
+                .icon(BitmapDescriptorFactory.fromBitmap(MarkerAnimation.getMarkerIcon(c))));
         MarkerAnimation markerAnimation = new MarkerAnimation(entries, marker, speedUp);
         markerAnimation.animateMarkerToGB();
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+    public static void onMapReady(GoogleMap mMap, Context context) {
 
-        SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(this);
+        SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(context);
         try {
             createPolygons(skydivingSessionData, mMap);
         } catch (Exception e) {
-            Toast.makeText(this, "Could not create visualisation from latest skydiving session", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Could not create visualisation from latest skydiving session", Toast.LENGTH_SHORT).show();
             return;
         }
         try {

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.vaslabs.sdc.ui"
     android:versionCode="13"
-    android:versionName="0.0.3.2" >
+    android:versionName="0.0.3.2">
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -30,143 +30,34 @@
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="com.vaslabs.acceptance" >
-    </instrumentation>
+        android:targetPackage="com.vaslabs.acceptance"></instrumentation>
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:name=".Main2Activity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <uses-library android:name="android.test.runner" />
-
-        <activity
-            android:name=".SensorsActivity"
-            android:label="@string/title_activity_sensors" >
-        </activity>
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings" >
-        </activity>
-        <activity
-            android:name=".SkyDivingSessionActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_sky_diving_session" >
-        </activity>
-        <activity
-            android:name=".ManageLogsActivity"
-            android:label="@string/title_activity_manage_logs" >
-        </activity>
-        <activity
-            android:name=".ValidationActivity"
-            android:label="@string/title_activity_validation"
-            android:parentActivityName=".MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vaslabs.sdc.ui.MainActivity" />
-        </activity>
-        <activity
-            android:name=".contacts.ContactsPickerActivity"
-            android:label="@string/title_activity_emergency_contacts"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat.Light" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vaslabs.sdc.ui.MainActivity" />
-        </activity>
-        <activity
-            android:name=".charts.BarometerChartActivity"
-            android:label="@string/title_activity_barometer_chart"
-            android:parentActivityName=".charts.LogbookActivity"
-            android:theme="@style/Theme.AppCompat.Light" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".charts.LogbookActivity" />
-        </activity>
-        <activity
-            android:name=".charts.VelocityChartActivity"
-            android:label="@string/title_activity_velocity_chart"
-            android:parentActivityName=".charts.LogbookActivity"
-            android:theme="@style/Theme.AppCompat.Light" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".charts.LogbookActivity" />
-        </activity>
-        <activity
-            android:name=".charts.AccelerationChartActivity"
-            android:label="@string/title_activity_acceleration_chart"
-            android:parentActivityName=".charts.LogbookActivity"
-            android:theme="@style/Theme.AppCompat.Light" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".charts.LogbookActivity" />
-        </activity>
-        <activity
-            android:name=".charts.GforceChartActivity"
-            android:label="@string/title_activity_gForce_chart"
-            android:parentActivityName=".charts.LogbookActivity"
-            android:theme="@style/Theme.AppCompat.Light" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".charts.LogbookActivity" />
-        </activity>
-        <activity
-            android:name=".charts.LogbookActivity"
-            android:label="@string/title_activity_logbook"
-            android:parentActivityName=".MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vaslabs.sdc.ui.MainActivity" />
-        </activity>
         <activity
             android:name=".QRApiScannerActivity"
-            android:label="@string/title_activity_qrapi_scanner"
-            android:parentActivityName=".MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vaslabs.sdc.ui.MainActivity" />
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity
-            android:name=".charts.LogbookSummaryActivity"
-            android:label="@string/title_activity_logbook_summary" >
-        </activity>
-        <activity
-            android:name=".contacts.EmergencyContactsActivity"
-            android:label="@string/title_activity_emergency_contacts"
-            android:parentActivityName=".MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vaslabs.sdc.ui.MainActivity" />
-        </activity>
-        <!--
-             The API key for Google Maps-based APIs is defined as a string resource.
-             (See the file "res/values/google_maps_api.xml").
-             Note that the API key is linked to the encryption key used to sign the APK.
-             You need a different API key for each encryption key, including the release key that is used to
-             sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
-        -->
+        <uses-library android:name="android.test.runner" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity
-            android:name=".MapMySessionActivity"
-            android:label="@string/title_activity_map_my_session" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.vaslabs.sdc.ui.charts.LogbookSummaryActivity" />
-        </activity>
     </application>
 
 </manifest>

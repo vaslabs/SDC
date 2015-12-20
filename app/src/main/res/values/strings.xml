@@ -76,4 +76,8 @@
     <string name="title_activity_map_my_session">Skydive visualisation</string>
     <string name="title_activity_map_visualisation">Map visualisation</string>
     <string name="action_animate_session">Start animation</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_logbook"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/logbook" />
+        <item
+            android:id="@+id/nav_api"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/apisetup" />
+        <item
+            android:id="@+id/nav_logsmanagement"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/manage_logs" />
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_account"
+                android:icon="@drawable/ic_menu_share"
+                android:title="@string/account" />
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_menu_send"
+                android:title="@string/title_activity_settings" />
+        </menu>
+    </item>
+
+</menu>
