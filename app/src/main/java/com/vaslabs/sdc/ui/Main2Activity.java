@@ -1,5 +1,6 @@
 package com.vaslabs.sdc.ui;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -18,12 +19,15 @@ import com.vaslabs.logbook.LogbookSummary;
 import com.vaslabs.pwa.CommunicationManager;
 import com.vaslabs.sdc.ui.charts.LogbookFetchTask;
 import com.vaslabs.sdc.ui.fragments.CardViewFragment;
+import com.vaslabs.sdc.ui.fragments.ManageLogsFragment;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, CardViewFragment.OnListFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, CardViewFragment.OnListFragmentInteractionListener,
+        ManageLogsFragment.OnFragmentInteractionListener
+{
 
     private Map<Integer, ActionManager> actionManagerHolder = new HashMap<Integer, ActionManager>();
 
@@ -34,14 +38,6 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -53,6 +49,7 @@ public class Main2Activity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         actionManagerHolder.put(R.id.nav_logbook, new LogbookSummaryActionManager());
         actionManagerHolder.put(R.id.nav_api, new QRApiScannerActionManager());
+        actionManagerHolder.put(R.id.nav_logsmanagement, new LogsSubmissionActionManager());
         CommunicationManager.getInstance(this);
     }
 
@@ -108,6 +105,10 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public void onListFragmentInteraction(LogbookSummary logbookSummary) {
-        Toast.makeText(this, "Called", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
