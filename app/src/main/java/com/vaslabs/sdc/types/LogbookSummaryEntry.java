@@ -26,8 +26,8 @@ public abstract class LogbookSummaryEntry implements ILogbookSummaryEntry {
                 context.getString(R.string.average_deploy_altitude));
         logbookSummaryEntries[2] = new LogbookSummaryEntryDistance(logbookSummary.getAverageExitAltitude(),
                 context.getString(R.string.average_exit_altitude));
-        logbookSummaryEntries[3] = new LogbookSummaryEntryVelocity(logbookSummary.getAverageSpeed(),
-                context.getString(R.string.average_speed));
+        logbookSummaryEntries[3] = new LogbookSummaryEntryVelocity(logbookSummary.getAverageTopSpeed(),
+                context.getString(R.string.average_top_speed));
         return logbookSummaryEntries;
     }
 

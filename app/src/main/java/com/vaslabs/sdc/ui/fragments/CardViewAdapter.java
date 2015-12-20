@@ -39,7 +39,7 @@ public class CardViewAdapter extends RecyclerView.Adapter<CardViewAdapter.ViewHo
                                                    int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_cardview_list, parent, false);
+                .inflate(R.layout.fragment_cardview, parent, false);
 
         ViewHolder vh = new ViewHolder(v);
         return vh;
