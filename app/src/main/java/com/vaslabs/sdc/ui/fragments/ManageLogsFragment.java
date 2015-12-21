@@ -45,7 +45,6 @@ public class ManageLogsFragment extends Fragment {
 
     public static ManageLogsFragment newInstance(String param1, String param2) {
         ManageLogsFragment fragment = new ManageLogsFragment();
-        Bundle args = new Bundle();
         return fragment;
     }
 
