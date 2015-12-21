@@ -84,4 +84,17 @@
     <string name="account">My Account</string>
     <string name="manage">Manage</string>
     <string name="action_exit">Saving data and exiting</string>
+    <string name="title_readme">Readme</string>
+    <string name="readme_text">
+        This is the new interface of Skydiving Companion by skydiver ninja. Some functionality is not available but the use case of logging
+        during a skydiving session and submitting the logs should be unaffected. \nThe only difference is that the logging is done in the background
+        and you don\'t need to worry about an activity. \nWhen you finish, simply close the notification and the data will be saved on persistent
+        memory.\n
+        Enjoy the new user interface and assess it while we are adding all the functionality back. As always, any feedback is appreciated.
+\n\n
+        The skydiver ninja team.
+    </string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
