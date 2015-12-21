@@ -1,25 +1,26 @@
 package com.vaslabs.sdc.ui;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.vaslabs.logbook.LogbookSummary;
 import com.vaslabs.pwa.CommunicationManager;
-import com.vaslabs.sdc.ui.charts.LogbookFetchTask;
+import com.vaslabs.sdc.SkydivingSessionService;
+import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
 import com.vaslabs.sdc.ui.fragments.CardViewFragment;
 import com.vaslabs.sdc.ui.fragments.ManageLogsFragment;
+import com.vaslabs.sdc.ui.fragments.actions.ActionManager;
+import com.vaslabs.sdc.ui.fragments.actions.LogbookSummaryActionManager;
+import com.vaslabs.sdc.ui.fragments.actions.LogsSubmissionActionManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,8 @@ public class Main2Activity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        processIntent(intent);
         setContentView(R.layout.activity_main2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -94,5 +97,30 @@ public class Main2Activity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        processIntent(intent);
+    }
+
+    private void processIntent(Intent intent) {
+        if (intent == null)
+            return;
+        String action = intent.getAction();
+        if (action == null) {
+            return;
+        }
+        switch (action) {
+            case SkydivingSessionService.CLOSE_ACTION:
+                exit();
+                break;
+        }
+    }
+
+    private void exit() {
+        stopService(new Intent(this, SkydivingSessionService.class));
+        finish();
     }
 }

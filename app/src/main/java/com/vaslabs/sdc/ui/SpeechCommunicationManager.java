@@ -31,7 +31,11 @@ public class SpeechCommunicationManager implements TextToSpeech.OnInitListener, 
     
     public void initialiseTextToSpeech(Context c, OnSpeechSuccessListener listener) {
         this.successListener = listener;
-        textToSpeech = new TextToSpeech( c, this );
+        try {
+            textToSpeech = new TextToSpeech( c, this );
+        } catch (Exception e) {
+
+        }
     }
     
     public void getProximityWarning(Context c) {

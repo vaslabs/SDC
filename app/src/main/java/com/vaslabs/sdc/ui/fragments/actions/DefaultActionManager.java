@@ -1,11 +1,11 @@
-package com.vaslabs.sdc.ui;
+package com.vaslabs.sdc.ui.fragments.actions;
 
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.util.Log;
 
-import com.vaslabs.sdc.ui.fragments.ManageLogsFragment;
+import com.vaslabs.sdc.ui.R;
 
 /**
  * Created by vnicolaou on 21/12/15.

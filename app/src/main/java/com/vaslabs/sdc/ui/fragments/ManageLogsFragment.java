@@ -39,6 +39,7 @@ public class ManageLogsFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private TextView logsTextView;
 
+
     public ManageLogsFragment() {
         // Required empty public constructor
     }
@@ -76,7 +77,7 @@ public class ManageLogsFragment extends Fragment {
                     new SubmitLogs(v.getContext()).execute();
                 }
             });
-
+            logsTextView.setText(content.toString());
         } catch ( IOException e ) {
             logsTextView.setText(e.toString());
             fab.hide();

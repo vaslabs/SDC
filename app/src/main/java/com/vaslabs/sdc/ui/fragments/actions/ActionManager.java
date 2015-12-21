@@ -1,4 +1,4 @@
-package com.vaslabs.sdc.ui;
+package com.vaslabs.sdc.ui.fragments.actions;
 
 import android.app.Activity;
 

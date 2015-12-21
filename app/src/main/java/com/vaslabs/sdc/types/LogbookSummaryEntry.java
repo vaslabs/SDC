@@ -38,6 +38,7 @@ public abstract class LogbookSummaryEntry implements ILogbookSummaryEntry {
         return title;
     }
 
+    @Override
     public int getDrawable() {
         return drawable;
     }

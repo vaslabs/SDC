@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.vaslabs.logbook.LogbookSummary;
 import com.vaslabs.sdc.ui.R;
 import com.vaslabs.sdc.ui.charts.LogbookFetchTask;
+import com.vaslabs.sdc.ui.fragments.actions.ValidationActionManager;
 import com.vaslabs.sdc.ui.util.DividerItemDecoration;
 
 /**
@@ -23,13 +24,15 @@ import com.vaslabs.sdc.ui.util.DividerItemDecoration;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class CardViewFragment extends Fragment {
+public class CardViewFragment extends Fragment implements ICardViewFragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+    protected RecyclerView recyclerView;
+    protected View view;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -60,24 +63,10 @@ public class CardViewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_cardview_list, container, false);
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.card_recycler_view);
-        Context context = view.getContext();
+        view = inflater.inflate(R.layout.fragment_cardview_list, container, false);
+        recyclerView = (RecyclerView) view.findViewById(R.id.card_recycler_view);
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
-        if (mColumnCount <= 1) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-        }
-        new LogbookFetchTask(recyclerView).execute();
-        FloatingActionButton startNewSessionFloatingActionButton = (FloatingActionButton)view.findViewById(R.id.fab_start_new);
-        startNewSessionFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
+        special();
         return view;
     }
 
@@ -97,6 +86,26 @@ public class CardViewFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    ValidationActionManager fabActionManager = new ValidationActionManager();
+    @Override
+    public void special() {
+        Context context = recyclerView.getContext();
+        if (mColumnCount <= 1) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        } else {
+            recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+        }
+        new LogbookFetchTask(recyclerView).execute();
+        FloatingActionButton startNewSessionFloatingActionButton = (FloatingActionButton)view.findViewById(R.id.fab_start_new);
+        startNewSessionFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                fabActionManager.manageAction(getActivity());
+            }
+        });
     }
 
     /**

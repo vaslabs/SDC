@@ -83,4 +83,5 @@
 
     <string name="account">My Account</string>
     <string name="manage">Manage</string>
+    <string name="action_exit">Saving data and exiting</string>
 </resources>

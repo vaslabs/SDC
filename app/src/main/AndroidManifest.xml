@@ -30,7 +30,7 @@
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="com.vaslabs.acceptance"></instrumentation>
+        android:targetPackage="com.vaslabs.acceptance" />
 
     <application
         android:allowBackup="true"
@@ -51,13 +51,18 @@
         <activity
             android:name=".QRApiScannerActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
         <uses-library android:name="android.test.runner" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <service
+            android:name="com.vaslabs.sdc.SkydivingSessionService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
