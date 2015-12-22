@@ -4,12 +4,11 @@ import android.content.Context;
 
 import com.vaslabs.emergency.EmergencyPreferences;
 import com.vaslabs.sdc.ui.R;
-import com.vaslabs.sdc.ui.ValidationActivity;
 
 /**
  * Created by vnicolaou on 30/08/15.
  */
-public class EmergencyContactValidator extends AbstractValidator implements InternallyFixableValidation {
+public class EmergencyContactValidator extends AbstractValidator {
     private static EmergencyContactValidator validator = null;
     private static Object initLock = new Object();
     protected EmergencyContactValidator(Context c) {
@@ -49,8 +48,4 @@ public class EmergencyContactValidator extends AbstractValidator implements Inte
         return validator;
     }
 
-    @Override
-    public void launchActivityForResult(ValidationActivity va) {
-        va.getContact();
-    }
 }

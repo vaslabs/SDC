@@ -5,6 +5,7 @@ buildscript {
         maven { url 'http://maven.livotovlabs.pro/content/groups/public/' }
         mavenLocal()
         mavenCentral()
+        maven { url "https://jitpack.io" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.1.0'

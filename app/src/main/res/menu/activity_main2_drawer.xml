@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_logbook"
+            android:icon="@drawable/ic_logbook"
+            android:title="@string/logbook" />
+        <item
+            android:id="@+id/nav_api"
+            android:icon="@drawable/ic_api"
+            android:title="@string/apisetup" />
+        <item
+            android:id="@+id/nav_logsmanagement"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/manage_logs" />
+    </group>
+
+    <item android:title="@string/manage">
+        <menu>
+            <item
+                android:id="@+id/nav_account"
+                android:icon="@drawable/ic_account"
+                android:title="@string/account" />
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_setting_light"
+                android:title="@string/title_activity_settings" />
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@android:drawable/ic_dialog_info"
+                android:title="@string/title_readme" />
+        </menu>
+    </item>
+
+</menu>

@@ -1,44 +1,36 @@
 package com.vaslabs.sdc.utils;
 
 import android.content.Context;
-
-import com.dexafree.materialList.cards.SmallImageCard;
-import com.vaslabs.sdc.ui.R;
+import android.widget.AutoCompleteTextView;
 
 /**
- * Created by vnicolao on 20/06/15.
+ * Created by vnicolaou on 20/12/15.
  */
-public abstract class AbstractValidator implements IValidator {
+public class AbstractValidator implements IValidator {
     protected final Context mContext;
-    private SmallImageCard card;
 
-    protected AbstractValidator(Context c) {
+    public AbstractValidator(Context c) {
         this.mContext = c;
     }
 
     @Override
-    public void attachCard(SmallImageCard card) {
-        this.card = card;
+    public boolean validate() {
+        return false;
     }
 
     @Override
-    public void refreshImage(boolean valid) {
-        int drawable = R.drawable.ic_success;
-        if (!valid) {
-            drawable = getResource(this.getMessageType());
-            this.card.setDrawable(drawable);
-        }
-
+    public ValidationMessageType getMessageType() {
+        return null;
     }
 
-    private static int getResource(ValidationMessageType ordinal) {
-        switch (ordinal) {
-            case WARNING:
-                return R.drawable.ic_warning;
-            case ERROR:
-                return R.drawable.ic_error;
-            default:
-                return R.drawable.ic_success;
-        }
+    @Override
+    public CharSequence getMessage() {
+        return null;
     }
+
+    @Override
+    public CharSequence getTitle() {
+        return null;
+    }
+
 }
