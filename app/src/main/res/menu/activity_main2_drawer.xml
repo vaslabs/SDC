@@ -14,6 +14,11 @@
             android:id="@+id/nav_logsmanagement"
             android:icon="@drawable/ic_menu_send"
             android:title="@string/manage_logs" />
+        <item
+            android:id="@+id/nav_stats"
+            android:title="@string/title_activity_charts"
+            />
+
     </group>
 
     <item android:title="@string/manage">

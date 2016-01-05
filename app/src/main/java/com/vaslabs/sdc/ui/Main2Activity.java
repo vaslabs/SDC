@@ -54,6 +54,7 @@ public class Main2Activity extends AppCompatActivity
         actionManagerHolder.put(R.id.nav_api, new QRApiScannerActionManager());
         actionManagerHolder.put(R.id.nav_logsmanagement, new LogsSubmissionActionManager());
         actionManagerHolder.put(R.id.nav_about, new AboutActionManager());
+        actionManagerHolder.put(R.id.nav_stats, new StatsActionManager());
         CommunicationManager.getInstance(this);
         start();
     }
