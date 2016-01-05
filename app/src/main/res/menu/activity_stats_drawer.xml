@@ -4,19 +4,19 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_altitude"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_deploy_altitude_small"
             android:title="@string/altitude" />
         <item
             android:id="@+id/nav_velocity"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/speed_blue"
             android:title="@string/title_activity_velocity_chart" />
         <item
             android:id="@+id/nav_acceleration"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_acceleration"
             android:title="@string/title_activity_acceleration_chart" />
         <item
             android:id="@+id/nav_gforce"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_g"
             android:title="@string/title_activity_gForce_chart" />
     </group>
 
