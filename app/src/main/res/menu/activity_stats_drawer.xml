@@ -18,7 +18,9 @@
             android:id="@+id/nav_gforce"
             android:icon="@drawable/ic_g"
             android:title="@string/title_activity_gForce_chart" />
+
         <item android:id="@+id/nav_map"
+            android:icon="@drawable/ic_map"
             android:title="@string/title_activity_map_visualisation"
             />
     </group>

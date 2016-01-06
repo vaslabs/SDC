@@ -52,7 +52,7 @@ public class MapMySessionActivity extends AppCompatActivity implements OnMapRead
         this.fab.hide();
         SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(this);
         GpsEntry[] gpsEntries = skydivingSessionData.getGpsEntriesAsArray();
-        int speedUp = 100;
+        int speedUp = 1000;
         GpsEntry gpsEntry = gpsEntries[0];
         LatLng startPosition = new LatLng(gpsEntry.getLatitude(), gpsEntry.getLongitude());
 
