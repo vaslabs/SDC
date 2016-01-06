@@ -68,6 +68,16 @@
             android:name=".charts.StatsActivity"
             android:label="@string/title_activity_stats"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".MapMySessionActivity"
+            android:label="@string/title_activity_stats"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".charts.StatsActivity"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".charts.StatsActivity" />
+        </activity>
     </application>
 
 </manifest>

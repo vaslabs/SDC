@@ -27,21 +27,6 @@ public class MapMySessionHelper {
 
 
 
-    private static void animateMySession(Context c, GoogleMap mMap) {
-        SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(c);
-        GpsEntry[] gpsEntries = skydivingSessionData.getGpsEntriesAsArray();
-        int speedUp = 100;
-        GpsEntry gpsEntry = gpsEntries[0];
-        LatLng startPosition = new LatLng(gpsEntry.getLatitude(), gpsEntry.getLongitude());
-
-        Entry[] entries = skydivingSessionData.allEntries();
-        Marker marker = mMap.addMarker(new MarkerOptions()
-                .position(startPosition)
-                .icon(BitmapDescriptorFactory.fromBitmap(MarkerAnimation.getMarkerIcon(c))));
-        MarkerAnimation markerAnimation = new MarkerAnimation(entries, marker, speedUp);
-        markerAnimation.animateMarkerToGB();
-    }
-
     public static void onMapReady(GoogleMap mMap, Context context) {
 
         SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(context);
