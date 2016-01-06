@@ -52,7 +52,7 @@ public class SkyDivingEnvironment implements
     private SkyDiver myself;
     private Context context;
     private static SkyDivingEnvironment environmentInstance = null;
-    private SpeechCommunicationManager scm;
+    //private SpeechCommunicationManager scm;
     private BarometerSensor barometerSensor;
     private GPSSensor gpsSensor;
     private PositionGraph positionGraph;
@@ -70,8 +70,8 @@ public class SkyDivingEnvironment implements
         this.context = context;
         UserInformation ui = UserInformation.getUserInfo( context );
         myself = new SkyDiver( ui );
-        scm = SpeechCommunicationManager.getInstance();
-        scm.initialiseTextToSpeech( context, this );
+        //scm = SpeechCommunicationManager.getInstance();
+        //scm.initialiseTextToSpeech( context, this );
         skydiversList = new ArrayList<SkyDiver>();
 
         SkyDivingEnvironmentLogger.initLogger( context );
@@ -90,7 +90,7 @@ public class SkyDivingEnvironment implements
 
     @Override
     public void onSuccess() {
-        scm.getTalkingAvailable( context );
+        //scm.getTalkingAvailable( context );
 
     }
 
@@ -127,9 +127,7 @@ public class SkyDivingEnvironment implements
             skydiversList.add( skydiver );
             Collections.sort( this.skydiversList,
                     new SkyDiverPositionalComparator( myself ) );
-            SpeechCommunicationManager scm =
-                    SpeechCommunicationManager.getInstance();
-            scm.getProximityWarning( context );
+            //scm.getProximityWarning( context );
             Log.v( LOG_TAG, "New connection: " + skydiver.toString() );
             SkyDivingEnvironmentLogger.Log("New connection: " + skydiver.toString());
         }
@@ -169,9 +167,7 @@ public class SkyDivingEnvironment implements
                 return;
             if (sd.getConnectivityStrengthAsInt() == SDConnectivity.CONNECTION_LOST.ordinal())
             {
-                SpeechCommunicationManager scm =
-                        SpeechCommunicationManager.getInstance();
-                scm.getProximityWarning(context);
+                //scm.getProximityWarning(context);
             }
 
             sd.setConnectivityStrength( SDConnectivity.values()[skydiver
