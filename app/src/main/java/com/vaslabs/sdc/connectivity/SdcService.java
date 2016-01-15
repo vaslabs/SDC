@@ -1,5 +1,6 @@
 package com.vaslabs.sdc.connectivity;
 
+import com.android.volley.Response;
 import com.vaslabs.accounts.Account;
 import com.vaslabs.accounts.RequestOutcome;
 import com.vaslabs.logbook.SkydivingSessionData;
@@ -13,12 +14,12 @@ public interface SdcService {
     void createTemporaryAccount(Account account, com.android.volley.Response.Listener<JSONObject> listener,
                                   com.android.volley.Response.ErrorListener errorListener);
 
-    int getNumberOfSessions(String api_token);
+    void getSession(String api_token, int sessionId, com.android.volley.Response.Listener<String> sessionListFetcherListener,
+                                    com.android.volley.Response.ErrorListener errorListener);
 
-    SkydivingSessionData getSession(String api_token);
-
-    String getApiToken(Account account, int id);
 
     void submitSession(String apiToken, String json, com.android.volley.Response.Listener<JSONObject> listener,
                                  com.android.volley.Response.ErrorListener errorListener);
+
+    void getSessionList(String apiToken, com.android.volley.Response.Listener<String> sessionListFetcherListener, com.android.volley.Response.ErrorListener errorListener);
 }

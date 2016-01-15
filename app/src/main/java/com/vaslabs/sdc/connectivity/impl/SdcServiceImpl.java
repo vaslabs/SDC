@@ -7,6 +7,7 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -27,6 +28,8 @@ import java.util.Map;
  * Created by vnicolaou on 14/01/16.
  */
 public class SdcServiceImpl implements SdcService{
+    private static final String GET_SESSIONS = "/get_sessions/";
+    private static final String GET_SESSION = "/get_session/%d/";
     private final String url;
     private static final String CREATE_ACCOUNT = "/create_account/";
     private static final String SUBMIT_SESSION = "/submit_session/";
@@ -56,19 +59,12 @@ public class SdcServiceImpl implements SdcService{
     }
 
     @Override
-    public int getNumberOfSessions(String api_token) {
-        return 0;
+    public void getSession(String api_token, int sessionId, com.android.volley.Response.Listener<String> sessionListFetcherListener, com.android.volley.Response.ErrorListener errorListener) {
+        GetRequestWithHeaders request = new GetRequestWithHeaders(this.url + String.format(GET_SESSION, sessionId), sessionListFetcherListener, errorListener);
+        request.addApiToken(api_token);
+        requestQueue.add(request);
     }
 
-    @Override
-    public SkydivingSessionData getSession(String api_token) {
-        return null;
-    }
-
-    @Override
-    public String getApiToken(Account account, int id) {
-        return null;
-    }
 
     @Override
     public void submitSession(String apiToken, String json, com.android.volley.Response.Listener<JSONObject> listener,
@@ -88,12 +84,42 @@ public class SdcServiceImpl implements SdcService{
 
     }
 
+    @Override
+    public void getSessionList(String apiToken, com.android.volley.Response.Listener<String> sessionListFetcherListener, com.android.volley.Response.ErrorListener errorListener) {
+        GetRequestWithHeaders request = new GetRequestWithHeaders(
+                this.url + GET_SESSIONS, sessionListFetcherListener, errorListener
+        );
+        request.addApiToken(apiToken);
+
+        requestQueue.add(request);
+
+    }
+
     private class JsonObjectRequestWithHeaders extends JsonObjectRequest {
 
         private Map<String, String> headers;
 
         public JsonObjectRequestWithHeaders(String url, JSONObject jsonRequest, com.android.volley.Response.Listener<JSONObject> listener, com.android.volley.Response.ErrorListener errorListener) {
             super(Request.Method.POST, url, jsonRequest, listener, errorListener);
+            headers = new HashMap<String, String>();
+        }
+
+        private void addApiToken(String apiToken) {
+            headers.put("Authorization", "Token " + apiToken);
+        }
+
+        @Override
+        public Map<String, String> getHeaders() {
+            return headers;
+        }
+    }
+
+    private class GetRequestWithHeaders extends StringRequest {
+
+        private Map<String, String> headers;
+
+        public GetRequestWithHeaders(String url, com.android.volley.Response.Listener<String> listener, com.android.volley.Response.ErrorListener errorListener) {
+            super(Request.Method.GET, url, listener, errorListener);
             headers = new HashMap<String, String>();
         }
 

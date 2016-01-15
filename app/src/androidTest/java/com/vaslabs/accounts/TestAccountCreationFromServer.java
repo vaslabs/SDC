@@ -59,7 +59,7 @@ public class TestAccountCreationFromServer extends AndroidTestCase {
 
 
     public void setUp() throws Exception {
-        sdcService = new SdcServiceLocalImpl();
+        sdcService = new SdcServiceLocalImpl(mContext);
         accountManager = new AccountManager(mContext);
         account = accountManager.getAccount();
         countDownLatch = new CountDownLatch(1);
@@ -79,14 +79,4 @@ public class TestAccountCreationFromServer extends AndroidTestCase {
         assertEquals(previousApitoken, this.apiToken);
     }
 
-    public void test_get_number_of_sessions_from_server() {
-        int numberOfSessions = sdcService.getNumberOfSessions(apiToken);
-        assertEquals(0, numberOfSessions);
-    }
-
-    private class SdcServiceLocalImpl extends SdcServiceImpl {
-        public SdcServiceLocalImpl() {
-            super("10.0.2.2:8000", "http://", getContext());
-        }
-    }
 }

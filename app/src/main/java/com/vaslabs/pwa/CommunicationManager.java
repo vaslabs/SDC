@@ -199,12 +199,4 @@ public class CommunicationManager {
             Log.e("CommunicationManager", e.toString());
         }
     }
-
-    public int getNumberOfSessions() {
-        return sdcService.getNumberOfSessions(this.apitoken);
-    }
-
-    public SkydivingSessionData getSession() {
-        return sdcService.getSession(this.apitoken);
-    }
 }

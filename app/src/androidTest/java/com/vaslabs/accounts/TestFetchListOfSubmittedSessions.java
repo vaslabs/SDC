@@ -5,10 +5,11 @@ import android.util.Log;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
 import com.vaslabs.encryption.EncryptionManager;
+import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.logs.utils.LogUtils;
-import com.vaslabs.sdc.connectivity.SdcService;
-import com.vaslabs.sdc.connectivity.impl.SdcServiceImpl;
+import com.vaslabs.sdc.connectivity.SkydivingSessionListEntry;
 import com.vaslabs.sdc.ui.R;
 
 import org.json.JSONException;
@@ -21,30 +22,9 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Created by vnicolaou on 15/01/16.
  */
-public class TestTemporaryAccountSubmission extends AndroidTestCase {
-
-    private AccountManager accountManager;
-    private Account account;
-    private SdcService sdcService;
-    private String session;
-    private CountDownLatch countDownLatch;
+public class TestFetchListOfSubmittedSessions extends AndroidTestCase {
     private String apiToken;
-
-    private String message;
-
-    Response.Listener<JSONObject> submissionListener = new Response.Listener<JSONObject>() {
-
-        @Override
-        public void onResponse(JSONObject response) {
-            try {
-                message = response.getString("message");
-            } catch (JSONException e) {
-                Log.e("Message", e.getMessage());
-            }
-            countDownLatch.countDown();
-        }
-    };
-
+    private CountDownLatch countDownLatch;
     Response.Listener<JSONObject> createAccountResponseListener = new Response.Listener<JSONObject>() {
 
 
@@ -74,6 +54,29 @@ public class TestTemporaryAccountSubmission extends AndroidTestCase {
             fail(error.getMessage());
         }
     };
+    private Account account;
+    private AccountManager accountManager;
+    private SdcServiceLocalImpl sdcService;
+    private Response.Listener<String> sessionListFetcherListener = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String jsonString) {
+            Gson gson = new Gson();
+            sessionEntries = gson.fromJson(jsonString, SkydivingSessionListEntry[].class);
+            countDownLatch.countDown();
+
+        }
+    };
+
+    private SkydivingSessionData sessionData;
+    private Response.Listener<String> sessionFetcherListener = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String jsonString) {
+            Gson gson = new Gson();
+            sessionData = gson.fromJson(jsonString, SkydivingSessionData.class);
+            countDownLatch.countDown();
+
+        }
+    };
 
     public void setUp() throws InterruptedException {
         account = getAccount();
@@ -83,11 +86,22 @@ public class TestTemporaryAccountSubmission extends AndroidTestCase {
         countDownLatch.await();
     }
 
-    public void test_temporary_account_submission() throws InterruptedException {
+    SkydivingSessionListEntry[] sessionEntries;
+    public void test_get_list_of_sessions() throws InterruptedException {
         countDownLatch = new CountDownLatch(1);
-        sdcService.submitSession(apiToken, getSession(), submissionListener, errorListener);
+        sdcService.getSessionList(apiToken, sessionListFetcherListener, errorListener);
         countDownLatch.await();
-        assertEquals("OK", message);
+        assertEquals(1, sessionEntries.length);
+        assertEquals(2, sessionEntries[0].getId());
+        assertEquals("2016-01-15T17:01:14.047Z", sessionEntries[0].getDate());
+    }
+
+    public void test_get_session() throws InterruptedException {
+        countDownLatch = new CountDownLatch(1);
+        sdcService.getSession(apiToken, 2, sessionFetcherListener, errorListener);
+        SkydivingSessionData expectedSession = getSession();
+        countDownLatch.await();
+        assertEquals(expectedSession.allEntries()[17].getTimestamp(), sessionData.allEntries()[17].getTimestamp());
     }
 
     private Account getAccount() {
@@ -99,13 +113,14 @@ public class TestTemporaryAccountSubmission extends AndroidTestCase {
         }
     }
 
-    private String getSession() {
+    private SkydivingSessionData getSession() {
         InputStreamReader jsonReader = new InputStreamReader(
                 mContext.getResources().openRawResource(R.raw.sample_log));
 
         try {
             String jsonString = LogUtils.parse(jsonReader);
-            return jsonString;
+            Gson gson = new Gson();
+            return gson.fromJson(jsonString, SkydivingSessionData.class);
 
         } catch (IOException e) {
             fail(e.toString());
