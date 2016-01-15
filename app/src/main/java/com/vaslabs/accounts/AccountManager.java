@@ -29,14 +29,13 @@ public class AccountManager {
     }
 
     public boolean isLoggedIn() {
-        return false;/*
         String token = null;
         try {
             token = API.getApiToken(mContext);
         } catch (IOException e) {
             return false;
         }
-        return token != null;*/
+        return token != null;
 
     }
 

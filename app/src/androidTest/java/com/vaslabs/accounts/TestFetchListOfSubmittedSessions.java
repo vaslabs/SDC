@@ -92,13 +92,13 @@ public class TestFetchListOfSubmittedSessions extends AndroidTestCase {
         sdcService.getSessionList(apiToken, sessionListFetcherListener, errorListener);
         countDownLatch.await();
         assertEquals(1, sessionEntries.length);
-        assertEquals(2, sessionEntries[0].getId());
-        assertEquals("2016-01-15T17:01:14.047Z", sessionEntries[0].getDate());
+        assertEquals(3, sessionEntries[0].getId());
+        assertEquals("2016-01-15T18:34:04.336Z", sessionEntries[0].getDate());
     }
 
     public void test_get_session() throws InterruptedException {
         countDownLatch = new CountDownLatch(1);
-        sdcService.getSession(apiToken, 2, sessionFetcherListener, errorListener);
+        sdcService.getSession(apiToken, 3, sessionFetcherListener, errorListener);
         SkydivingSessionData expectedSession = getSession();
         countDownLatch.await();
         assertEquals(expectedSession.allEntries()[17].getTimestamp(), sessionData.allEntries()[17].getTimestamp());
