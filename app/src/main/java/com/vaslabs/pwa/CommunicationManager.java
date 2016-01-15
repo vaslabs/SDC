@@ -11,9 +11,17 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import com.android.volley.VolleyError;
+import com.vaslabs.accounts.Account;
+import com.vaslabs.accounts.AccountManager;
+import com.vaslabs.accounts.RequestOutcome;
+import com.vaslabs.logbook.SkydivingSessionData;
+import com.vaslabs.sdc.connectivity.SdcService;
 import com.vaslabs.sdc.pwa.PWAInvalidCredentialsException;
 import com.vaslabs.sdc.ui.R;
 import com.vaslabs.sdc_dashboard.API.API;
@@ -28,6 +36,8 @@ public class CommunicationManager {
     private final Context context;
     private String apitoken = "";
     private final String host;
+    private SdcService sdcService;
+
     private CommunicationManager(Context context) {
         host = context.getString(R.string.remote_host);
         this.context = context;
@@ -134,8 +144,12 @@ public class CommunicationManager {
     public static Response submitLogs(String json, Context context) throws Exception {
 
         CommunicationManager cm = CommunicationManager.getInstance(context);
-        return cm.sendRequest(json, "/dashboard/submit");
-
+        RequestOutcome requestOutcome =  cm.sdcService.submitSession(cm.apitoken, json);
+        if (RequestOutcome.OK == requestOutcome) {
+            return new Response(new JSONArray("[" + requestOutcome.responseMessage + "]"), HttpStatus.SC_OK);
+        } else {
+            return new Response(null, HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        }
     }
 
 
@@ -176,5 +190,53 @@ public class CommunicationManager {
 
         return res;
 
+    }
+
+    public void manageAccountCreation() throws Exception {
+        AccountManager accountManager = new AccountManager(context);
+        Account account = accountManager.getAccount();
+        sdcService.createTemporaryAccount(account, new com.android.volley.Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    String token = response.getString("apitoken");
+                    try {
+                        API.saveApiToken(context, token);
+                        apitoken = token;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                } catch (JSONException e) {
+                    Log.e("COMM", e.getMessage());
+                }
+
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Volley", error.getMessage());
+            }
+        });
+
+    }
+
+    public void injectService(SdcService sdcService) {
+        this.sdcService = sdcService;
+    }
+
+    public void updateApiToken() {
+        try {
+            apitoken = API.getApiToken(context);
+        } catch (IOException e) {
+            Log.e("CommunicationManager", e.toString());
+        }
+    }
+
+    public int getNumberOfSessions() {
+        return sdcService.getNumberOfSessions(this.apitoken);
+    }
+
+    public SkydivingSessionData getSession() {
+        return sdcService.getSession(this.apitoken);
     }
 }
