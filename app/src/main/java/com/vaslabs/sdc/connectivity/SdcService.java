@@ -19,5 +19,6 @@ public interface SdcService {
 
     String getApiToken(Account account, int id);
 
-    RequestOutcome submitSession(String apiToken, String json);
+    void submitSession(String apiToken, String json, com.android.volley.Response.Listener<JSONObject> listener,
+                                 com.android.volley.Response.ErrorListener errorListener);
 }

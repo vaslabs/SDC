@@ -144,14 +144,9 @@ public class CommunicationManager {
     public static Response submitLogs(String json, Context context) throws Exception {
 
         CommunicationManager cm = CommunicationManager.getInstance(context);
-        RequestOutcome requestOutcome =  cm.sdcService.submitSession(cm.apitoken, json);
-        if (RequestOutcome.OK == requestOutcome) {
-            return new Response(new JSONArray("[" + requestOutcome.responseMessage + "]"), HttpStatus.SC_OK);
-        } else {
-            return new Response(null, HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        }
-    }
+        return cm.sendRequest(json, "/dashboard/submit");
 
+    }
 
     public Response sendRequest(String location) throws Exception {
         URL url = new URL( this.host + location );
@@ -192,33 +187,6 @@ public class CommunicationManager {
 
     }
 
-    public void manageAccountCreation() throws Exception {
-        AccountManager accountManager = new AccountManager(context);
-        Account account = accountManager.getAccount();
-        sdcService.createTemporaryAccount(account, new com.android.volley.Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    String token = response.getString("apitoken");
-                    try {
-                        API.saveApiToken(context, token);
-                        apitoken = token;
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                } catch (JSONException e) {
-                    Log.e("COMM", e.getMessage());
-                }
-
-            }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("Volley", error.getMessage());
-            }
-        });
-
-    }
 
     public void injectService(SdcService sdcService) {
         this.sdcService = sdcService;
