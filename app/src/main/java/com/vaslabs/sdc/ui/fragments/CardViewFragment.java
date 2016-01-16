@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 
 import com.vaslabs.logbook.LogbookSummary;
 import com.vaslabs.sdc.ui.R;
-import com.vaslabs.sdc.ui.charts.LogbookFetchTask;
 import com.vaslabs.sdc.ui.fragments.actions.ValidationActionManager;
 import com.vaslabs.sdc.ui.util.DividerItemDecoration;
 
@@ -97,7 +96,7 @@ public class CardViewFragment extends Fragment implements ICardViewFragment {
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
-        new LogbookFetchTask(recyclerView).execute();
+        //TODO
         FloatingActionButton startNewSessionFloatingActionButton = (FloatingActionButton)view.findViewById(R.id.fab_start_new);
         startNewSessionFloatingActionButton.setOnClickListener(new View.OnClickListener() {
 

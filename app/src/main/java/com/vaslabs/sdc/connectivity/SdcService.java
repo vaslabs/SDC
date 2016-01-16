@@ -2,8 +2,6 @@ package com.vaslabs.sdc.connectivity;
 
 import com.android.volley.Response;
 import com.vaslabs.accounts.Account;
-import com.vaslabs.accounts.RequestOutcome;
-import com.vaslabs.logbook.SkydivingSessionData;
 
 import org.json.JSONObject;
 
@@ -22,4 +20,6 @@ public interface SdcService {
                                  com.android.volley.Response.ErrorListener errorListener);
 
     void getSessionList(String apiToken, com.android.volley.Response.Listener<String> sessionListFetcherListener, com.android.volley.Response.ErrorListener errorListener);
+
+    void getSessionData(String apiToken, Response.Listener<String> sessionFetcherListener, Response.ErrorListener errorListener);
 }

@@ -9,20 +9,19 @@ import java.util.List;
  * Created by vnicolaou on 15/08/15.
  */
 public enum LogbookAPI implements ILogbookAPI {
+
     INSTANCE {
 
         @Override
         public List<Logbook> getLogbookEntries() throws Exception {
             return null;
         }
-    },
-    MOCK {
+
         @Override
-        public List<Logbook> getLogbookEntries() {
-            return null;
+        public void fetchSessions() {
+            
         }
     };
 
-    private static final String LOGBOOK_API = "/logbook/api_get/";
-
+    SkydivingSessionData[] sessionData;
 }

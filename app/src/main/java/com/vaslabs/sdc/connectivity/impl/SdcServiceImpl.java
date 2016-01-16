@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -27,6 +28,7 @@ public class SdcServiceImpl implements SdcService{
     private final String url;
     private static final String CREATE_ACCOUNT = "/create_account/";
     private static final String SUBMIT_SESSION = "/submit_session/";
+    private static final String GET_ALL_DATA = "/get_all_data/";
     private RequestQueue requestQueue;
 
     public SdcServiceImpl(String host, Context context) {
@@ -87,6 +89,13 @@ public class SdcServiceImpl implements SdcService{
 
         requestQueue.add(request);
 
+    }
+
+    @Override
+    public void getSessionData(String apiToken, Response.Listener<String> sessionFetcherListener, Response.ErrorListener errorListener) {
+        GetRequestWithHeaders request = new GetRequestWithHeaders(this.url + GET_ALL_DATA, sessionFetcherListener, errorListener);
+        request.addApiToken(apiToken);
+        requestQueue.add(request);
     }
 
     private class JsonObjectRequestWithHeaders extends JsonObjectRequest {

@@ -9,4 +9,5 @@ import java.util.List;
 public interface ILogbookAPI {
 
     List<Logbook> getLogbookEntries() throws Exception;
+    void fetchSessions();
 }
