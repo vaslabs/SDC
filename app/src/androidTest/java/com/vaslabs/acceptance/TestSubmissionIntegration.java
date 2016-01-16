@@ -74,7 +74,6 @@ public class TestSubmissionIntegration extends AndroidTestCase{
         testToken = this.getContext().getString(R.string.test_token);
         API.saveApiToken(this.getContext(), testToken);
 
-        prepareMockedData();
         sdcService = new SdcServiceLocalImpl(mContext);
 
         Response.Listener<JSONObject> submittedListener = new Response.Listener<JSONObject>() {
@@ -108,19 +107,17 @@ public class TestSubmissionIntegration extends AndroidTestCase{
             API.saveApiToken(this.getContext(), previousApiKey);
     }
 
-    private void prepareMockedData() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(mContext.getResources().openRawResource(R.raw.sample_log)));
+    private void prepareMockedData(int file) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(mContext.getResources().openRawResource(file)));
         String line;
         lines = new ArrayList<>();
         while ((line = br.readLine()) != null) {
             lines.add(line);
         }
-
-
-
     }
 
     public void test_that_data_can_be_submitted() throws Exception {
+        prepareMockedData(R.raw.sample_log);
 
         countDownLatch = new CountDownLatch(1);
         sdcService.getSessionList(testToken, sessionListListener, errorListener);
@@ -135,23 +132,15 @@ public class TestSubmissionIntegration extends AndroidTestCase{
         int expectedSize = currentSize + 1;
         assertEquals(expectedSize, sessionEntries.length);
     }
-/*
+
     public void test_multiple_sessions_of_single_day() throws Exception {
-        SDCLogManager logManager = SDCLogManager.getInstance(mContext);
         InputStreamReader isr = new InputStreamReader(mContext.getResources().openRawResource(R.raw.test_multiple_sessions));
         Gson gson = new Gson();
         SkydivingSessionData sessionData = gson.fromJson(isr, SkydivingSessionData.class);
         Map<DateStruct, SkydivingSessionData> sessionDates = SessionFilter.filter(sessionData);
         assertEquals(2, sessionDates.size());
-        Map<DateStruct, SkydivingSessionData> successfullySubmittedSessionDates = logManager.submitLogs(sessionDates);
-        sessionData = SessionFilter.mostRecent(successfullySubmittedSessionDates);
-        try {
-            logManager.saveLatestSession(sessionData);
-        } catch (IOException ioe) {
-            fail(ioe.toString());
-        }
     }
-    */
+
 
     private static class MockSdcLogManager extends SDCLogManager {
 
