@@ -1,8 +1,5 @@
 package com.vaslabs.logbook;
 
-import android.content.Context;
-
-import com.vaslabs.pwa.CommunicationManager;
 
 import java.util.List;
 

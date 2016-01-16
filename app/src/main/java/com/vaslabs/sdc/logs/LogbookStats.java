@@ -54,21 +54,8 @@ public final class LogbookStats {
     }
 
     public static SkydivingSessionData getLatestSession(Context context) {
-        Gson gson = new Gson();
-        InputStreamReader jsonReader = null;
-        try {
-            jsonReader = new InputStreamReader(
-                    context.openFileInput(SDCLogManager.LATEST_SESSION_JSON_FILE));
-        } catch (FileNotFoundException e) {
-            Toast.makeText(context, "No latest activity found!", Toast.LENGTH_SHORT).show();
-        }
-        SkydivingSessionData latestSessionData = gson.fromJson(jsonReader, SkydivingSessionData.class);
-        try {
-            jsonReader.close();
-        } catch (IOException e) {
-
-        }
-        return latestSessionData;
+        //TODO
+        return null;
     }
 
     private void calculateDeployment() {

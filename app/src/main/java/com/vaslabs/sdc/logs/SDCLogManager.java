@@ -1,42 +1,34 @@
 package com.vaslabs.sdc.logs;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
-import android.util.Log;
+import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.logs.utils.LogUtils;
 import com.vaslabs.logs.utils.SessionFilter;
-import com.vaslabs.pwa.CommunicationManager;
-import com.vaslabs.pwa.PWAServerError;
-import com.vaslabs.pwa.Response;
+import com.vaslabs.sdc.connectivity.SdcService;
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
+import com.vaslabs.sdc.ui.R;
+import com.vaslabs.sdc_dashboard.API.API;
 import com.vaslabs.structs.DateStruct;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 public class SDCLogManager {
 
     private static final int MIN_PERMITTED_SIZE = 200;
     private static SDCLogManager logManager = new SDCLogManager();
-
-    public static final String LATEST_SESSION_JSON_FILE = "latest.json";
 
     private Context context = null;
     private Response[] responses;
@@ -90,7 +82,7 @@ public class SDCLogManager {
 
     }
 
-    private String buildRequest( SkydivingSessionData sessionData ) throws JSONException {
+    private String buildRequest( SkydivingSessionData sessionData ) {
         Gson gson = new Gson();
         return gson.toJson(sessionData);
     }
@@ -99,63 +91,58 @@ public class SDCLogManager {
         return this.responses;
     }
 
-    public Map<DateStruct, SkydivingSessionData> submitLogs(Map<DateStruct, SkydivingSessionData> sessionDates) throws Exception {
-        Set<DateStruct> dates = sessionDates.keySet();
-        Map<DateStruct, SkydivingSessionData> successfulSessionData = new HashMap<DateStruct, SkydivingSessionData>();
-        SkydivingSessionData sessionData;
-        String json;
-        Response[] responses = new Response[dates.size()];
-        int counter = 0;
-        for (DateStruct key : dates) {
-            sessionData = sessionDates.get(key);
-            if (sessionData.gpsEntriesSize() + sessionData.barometerEntriesSize() < MIN_PERMITTED_SIZE) {
-                responses[counter++] = Response.SKIPPED_RESPONSE;
-                continue;
-            }
-            json = buildRequest(sessionData);
-            Response r = CommunicationManager.submitLogs(json, this.context);
-            JSONObject responseObj = (JSONObject) r.getBody();;
-            String message = responseObj.getString("message");
-            if (!"OK".equals(message))
-                throw new PWAServerError();
-            responses[counter++] = r;
-            successfulSessionData.put(key, sessionData);
-        }
-        this.responses = responses;
-        sessionDates.clear();
-        return successfulSessionData;
-    }
-
-    public void saveLatestSession(SkydivingSessionData sessionData) throws IOException {
-        Gson gson = new Gson();
-        String jsonString = gson.toJson(sessionData);
-        FileOutputStream fos = context.openFileOutput(LATEST_SESSION_JSON_FILE, Context.MODE_PRIVATE);
-
-        PrintWriter writer = new PrintWriter(fos);
-        writer.write(jsonString);
-        writer.close();
-    }
-
-    public void manageLogSubmission() throws Exception {
-        String jsonString = LogUtils.parse(this.loadLogs());
+    private Map<DateStruct, SkydivingSessionData> manageLogSubmission() throws IOException {
+        String jsonString = LogUtils.parse(loadLogs());
         Gson gson = new Gson();
         SkydivingSessionData sessionData = gson.fromJson(jsonString, SkydivingSessionData.class);
         Map<DateStruct, SkydivingSessionData> sessionDates = SessionFilter.filter(sessionData);
-        SDCLogManager logManager = SDCLogManager.getInstance(context);
-        Map<DateStruct, SkydivingSessionData> successfullySubmittedSessionDates = logManager.submitLogs(sessionDates);
-        sessionData = SessionFilter.mostRecent(successfullySubmittedSessionDates);
-        try {
-            this.saveLatestSession(sessionData);
-        } catch (IOException ioe) {
-            Log.e("SDLCLogManager", ioe.toString());
-        }
-
-        this.clearLogs();
+        return sessionDates;
     }
 
-    private void clearLogs() {
+    public void clearLogs() {
         context.deleteFile(PositionGraph.BAROMETER_LOG_FILE);
         context.deleteFile(PositionGraph.GPS_LOG_FILE);
         context.deleteFile(SkyDivingEnvironment.getLogFile());
     }
+
+    private int submitted = 0;
+    private int containsUpTo = 0;
+
+
+    private Response.Listener<JSONObject> submittedListener = new Response.Listener<JSONObject>() {
+        @Override
+        public void onResponse(JSONObject response) {
+            submitted++;
+            Toast.makeText(context, context.getString(R.string.submitted) + submitted, Toast.LENGTH_SHORT).show();
+            if (submitted >= containsUpTo) {
+                clearLogs();
+            }
+        }
+    };
+
+    Response.ErrorListener errorListener = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse (VolleyError error){
+            Toast.makeText(context, error.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    };
+
+    public void submitLogs(SdcService sdcService) {
+        try {
+            String apiToken = API.getApiToken(context);
+            Map<DateStruct, SkydivingSessionData> logs = this.manageLogSubmission();
+            if (logs == null || logs.size() == 0) {
+                Toast.makeText(context, context.getString(R.string.no_logs), Toast.LENGTH_SHORT).show();
+            }
+            containsUpTo = logs.size();
+            for (DateStruct ds : logs.keySet()) {
+                SkydivingSessionData skydivingSessionData = logs.get(ds);
+                String jsonData = buildRequest(skydivingSessionData);
+                sdcService.submitSession(apiToken, jsonData, submittedListener, errorListener);
+            }
+        } catch (IOException e) {
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
 }

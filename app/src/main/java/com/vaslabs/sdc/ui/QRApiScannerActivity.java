@@ -2,13 +2,9 @@ package com.vaslabs.sdc.ui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.vaslabs.pwa.CommunicationManager;
 import com.vaslabs.sdc_dashboard.API.API;
 
 import java.io.IOException;
@@ -43,8 +39,7 @@ public class QRApiScannerActivity extends Activity {
                 try {
                     API.saveApiToken(mContext, data);
                     Toast.makeText(mContext, "API has been set up with token: " + data, Toast.LENGTH_SHORT).show();
-                    CommunicationManager cm = CommunicationManager.getInstance(mContext);
-                    cm.updateApiToken();
+
                 } catch (IOException e) {
                     Toast.makeText(mContext, "Something went wrong: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }

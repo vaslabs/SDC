@@ -13,9 +13,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.vaslabs.logbook.LogbookSummary;
-import com.vaslabs.pwa.CommunicationManager;
 import com.vaslabs.sdc.SkydivingSessionService;
-import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
 import com.vaslabs.sdc.ui.fragments.CardViewFragment;
 import com.vaslabs.sdc.ui.fragments.ManageLogsFragment;
 import com.vaslabs.sdc.ui.fragments.actions.ActionManager;
@@ -55,7 +53,6 @@ public class Main2Activity extends AppCompatActivity
         actionManagerHolder.put(R.id.nav_logsmanagement, new LogsSubmissionActionManager());
         actionManagerHolder.put(R.id.nav_about, new AboutActionManager());
         actionManagerHolder.put(R.id.nav_stats, new StatsActionManager());
-        CommunicationManager.getInstance(this);
         start();
     }
 

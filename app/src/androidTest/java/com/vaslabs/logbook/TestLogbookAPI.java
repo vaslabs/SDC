@@ -2,17 +2,7 @@ package com.vaslabs.logbook;
 
 import android.test.AndroidTestCase;
 
-import com.vaslabs.pwa.CommunicationManager;
-import com.vaslabs.pwa.Response;
-import com.vaslabs.sdc_dashboard.API.API;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.mockito.Mockito;
-
-import java.lang.reflect.Constructor;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,13 +16,9 @@ public class TestLogbookAPI extends AndroidTestCase{
         super.setUp();
         System.setProperty("dexmaker.dexcache", this.mContext.getCacheDir().toString());
         logbookAPI = LogbookAPI.INSTANCE;
-        CommunicationManager.getInstance(this.mContext);
     }
 
     public void test_connectivity() throws Exception {
-        CommunicationManager cm = CommunicationManager.getInstance();
-        Response response = cm.sendRequest("/logbook/api_get/");
-        assertTrue(response.getBody().toString().contains("latitude"));
     }
 
     public void test_logbook_details_object_mock_data() throws Exception {

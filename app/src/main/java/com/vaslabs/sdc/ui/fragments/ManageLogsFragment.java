@@ -2,24 +2,20 @@ package com.vaslabs.sdc.ui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.vaslabs.pwa.CommunicationManager;
-import com.vaslabs.pwa.Response;
+import com.vaslabs.accounts.Account;
+import com.vaslabs.accounts.AccountManager;
+import com.vaslabs.sdc.connectivity.SdcService;
 import com.vaslabs.sdc.logs.SDCLogManager;
 import com.vaslabs.sdc.ui.R;
-
-import org.apache.http.HttpStatus;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,7 +34,8 @@ public class ManageLogsFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private TextView logsTextView;
-
+    private SdcService sdcService;
+    private Account account;
 
     public ManageLogsFragment() {
         // Required empty public constructor
@@ -74,7 +71,8 @@ public class ManageLogsFragment extends Fragment {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new SubmitLogs(v.getContext()).execute();
+                    SDCLogManager sdcLogManager = SDCLogManager.getInstance(getActivity());
+                    sdcLogManager.submitLogs(sdcService);
                 }
             });
             logsTextView.setText(content.toString());
@@ -82,8 +80,17 @@ public class ManageLogsFragment extends Fragment {
             logsTextView.setText(e.toString());
             fab.hide();
         }
+        AccountManager accountManager = new AccountManager(getActivity());
+        try {
+            account = accountManager.getAccount();
+        } catch (Exception e) {
+            account = null;
+            Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+        }
         return view;
     }
+
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -106,65 +113,5 @@ public class ManageLogsFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
     }
-}
 
-class SubmitLogs extends AsyncTask<Void, Void, String> {
-
-    private Context context;
-    protected SubmitLogs(Context context) {
-        this.context = context;
-    }
-    private String message;
-    @Override
-    protected String doInBackground(Void... params) {
-        CommunicationManager.getInstance(context);
-        SDCLogManager lm = SDCLogManager.getInstance(context);
-        try {
-            lm.manageLogSubmission();
-        }
-        catch (Exception e) {
-            Log.e("Submitting logs", e.toString());
-            return e.toString();
-        }
-        String message = null;
-        try {
-            Response[] responses = lm.getResponses();
-            message = buildMessage(responses);
-            this.message = message;
-            return message;
-        } catch (Exception e) {
-            Log.e("Submitting logs", e.toString());
-            this.message = e.toString();
-            return e.toString();
-        }
-    }
-
-    private String buildMessage(Response[] responses) {
-        int skipped = 0;
-        int notOk = 0;
-        for (Response response : responses) {
-
-            if (response.getCode() == Response.SKIPPED)
-            {
-                skipped++;
-            } else if (response.getCode() != HttpStatus.SC_OK ) {
-                notOk++;
-            }
-        }
-        if (notOk == 0 && skipped == 0)
-            return "OK";
-        else if (skipped > 0) {
-            return "Skipped: " + skipped + " sessions because of not enough data entries";
-        }
-        return "" + notOk + " out of " + (responses.length - skipped) + " failed submission";
-    }
-
-    @Override
-    protected void onPostExecute(String status) {
-        if ("OK".equals(status)) {
-            Toast.makeText(context, "Success: Logs have been submitted. " + this.message, Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(context, "Error: " + status + ". ", Toast.LENGTH_LONG).show();
-        }
-    }
 }

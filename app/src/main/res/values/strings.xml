@@ -99,4 +99,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_stats">Last session charts</string>
     <string name="website">http://skydiver.ninja</string>
+    <string name="no_logs">No logs for submission found.</string>
+    <string name="submitted">Sessions submitted: </string>
 </resources>

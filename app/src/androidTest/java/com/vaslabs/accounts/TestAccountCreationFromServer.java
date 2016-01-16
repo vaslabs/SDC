@@ -6,17 +6,13 @@ import android.util.Log;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.vaslabs.encryption.EncryptionManager;
-import com.vaslabs.pwa.CommunicationManager;
 import com.vaslabs.sdc.connectivity.SdcService;
-import com.vaslabs.sdc.connectivity.impl.SdcServiceImpl;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-import javax.xml.transform.ErrorListener;
 
 /**
  * Created by vnicolaou on 14/01/16.
