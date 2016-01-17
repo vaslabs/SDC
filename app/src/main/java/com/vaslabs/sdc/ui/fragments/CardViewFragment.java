@@ -88,6 +88,7 @@ public class CardViewFragment extends Fragment implements ICardViewFragment {
                 SkydivingSessionData[] skydivingSessionDatas = gson.fromJson(response, SkydivingSessionData[].class);
                 CacheManager.getInstance(getActivity()).cache(apiToken, response);
                 Main2Activity.sessions = skydivingSessionDatas;
+                prepareUI();
             } catch (Exception e) {
                 Toast.makeText(getActivity(), getString(R.string.error_fetching_data) + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -207,8 +208,10 @@ public class CardViewFragment extends Fragment implements ICardViewFragment {
         }
         SdcService sdcService = Main2Activity.sdcService;
         SkydivingSessionData[] skydivingSessionData = CacheManager.getInstance(getActivity()).getSessionData();
-        if (skydivingSessionData == null)
+        if (skydivingSessionData == null) {
             sdcService.getSessionData(apiToken, sessionFetcherListener, errorListener);
+            Toast.makeText(getActivity(), getString(R.string.fetching_data), Toast.LENGTH_LONG).show();
+        }
         else {
             Main2Activity.sessions = skydivingSessionData;
             prepareUI();
