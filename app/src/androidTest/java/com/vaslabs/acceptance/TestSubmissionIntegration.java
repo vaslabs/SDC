@@ -66,13 +66,8 @@ public class TestSubmissionIntegration extends AndroidTestCase{
     @Override
     public void setUp() throws Exception {
         System.setProperty("dexmaker.dexcache", this.mContext.getCacheDir().toString());
-        try {
-            previousApiKey = API.getApiToken(this.getContext());
-        } catch (Exception e) {
 
-        }
-        testToken = this.getContext().getString(R.string.test_token);
-        API.saveApiToken(this.getContext(), testToken);
+        testToken = API.getApiToken(mContext);
 
         sdcService = new SdcServiceLocalImpl(mContext);
 
@@ -122,7 +117,7 @@ public class TestSubmissionIntegration extends AndroidTestCase{
         countDownLatch = new CountDownLatch(1);
         sdcService.getSessionList(testToken, sessionListListener, errorListener);
         countDownLatch.await();
-        int currentSize = sessionEntries.length;
+        int currentSize = sessionEntries == null?0:sessionEntries.length;
         countDownLatch = new CountDownLatch(1);
         mockedLogManager.submitLogs(sdcService);
         countDownLatch.await();

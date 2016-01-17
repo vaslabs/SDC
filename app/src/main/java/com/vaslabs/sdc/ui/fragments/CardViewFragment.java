@@ -88,20 +88,22 @@ public class CardViewFragment extends Fragment implements ICardViewFragment {
                 SkydivingSessionData[] skydivingSessionDatas = gson.fromJson(response, SkydivingSessionData[].class);
                 CacheManager.getInstance(getActivity()).cache(apiToken, response);
                 Main2Activity.sessions = skydivingSessionDatas;
-                prepareUI();
             } catch (Exception e) {
-                Toast.makeText(getActivity(), getString(R.string.error_fetching_data), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), getString(R.string.error_fetching_data) + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
         }
     };
 
     private void prepareUI() {
+        if (Main2Activity.sessions == null || Main2Activity.sessions.length == 0)
+            Toast.makeText(getActivity(), getString(R.string.nologsmessage), Toast.LENGTH_SHORT).show();
         LogbookStats[] logbookStats = LogbookStats.generateLogbookStats(Main2Activity.sessions);
         LogbookSummary logbookSummary = LogbookSummary.fromLogbookEntries(logbookStats);
         CardViewAdapter cardViewAdapter = new CardViewAdapter(LogbookSummaryEntry.fromLogbookSummary(logbookSummary, getActivity()));
         recyclerView.setAdapter(cardViewAdapter);
         recyclerView.getAdapter().notifyDataSetChanged();
+        prepareUI();
     }
 
     /**

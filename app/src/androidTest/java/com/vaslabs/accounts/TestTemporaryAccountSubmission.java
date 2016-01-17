@@ -10,6 +10,7 @@ import com.vaslabs.logs.utils.LogUtils;
 import com.vaslabs.sdc.connectivity.SdcService;
 import com.vaslabs.sdc.connectivity.impl.SdcServiceImpl;
 import com.vaslabs.sdc.ui.R;
+import com.vaslabs.sdc_dashboard.API.API;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,6 +56,7 @@ public class TestTemporaryAccountSubmission extends AndroidTestCase {
                 EncryptionManager encryptionManager = new EncryptionManager();
                 try {
                     apiToken = encryptionManager.decrypt(apiToken, getContext());
+                    API.saveApiToken(getContext(), apiToken);
                 } catch (Exception e) {
                     Log.e("encryption", e.getMessage());
                 }
@@ -77,9 +79,11 @@ public class TestTemporaryAccountSubmission extends AndroidTestCase {
     public void setUp() throws InterruptedException {
         account = getAccount();
         sdcService = new SdcServiceLocalImpl(mContext);
-        countDownLatch = new CountDownLatch(1);
-        sdcService.createTemporaryAccount(account, createAccountResponseListener, errorListener);
-        countDownLatch.await();
+        if (account instanceof TemporaryAccount) {
+            countDownLatch = new CountDownLatch(1);
+            sdcService.createTemporaryAccount(account, createAccountResponseListener, errorListener);
+            countDownLatch.await();
+        }
     }
 
     public void test_temporary_account_submission() throws InterruptedException {

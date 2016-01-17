@@ -50,7 +50,6 @@ public class TestAccountCreationFromServer extends AndroidTestCase {
         @Override
         public void onErrorResponse (VolleyError error){
             countDownLatch.countDown();
-            fail(error.getMessage());
         }
     };
 

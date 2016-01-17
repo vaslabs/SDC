@@ -138,6 +138,8 @@ public class SDCLogManager {
             containsUpTo = logs.size();
             for (DateStruct ds : logs.keySet()) {
                 SkydivingSessionData skydivingSessionData = logs.get(ds);
+                if (skydivingSessionData.barometerEntriesSize() < 200)
+                    continue;
                 String jsonData = buildRequest(skydivingSessionData);
                 sdcService.submitSession(apiToken, jsonData, submittedListener, errorListener);
             }
