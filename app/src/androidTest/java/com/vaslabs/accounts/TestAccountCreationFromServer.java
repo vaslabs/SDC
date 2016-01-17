@@ -37,6 +37,7 @@ public class TestAccountCreationFromServer extends AndroidTestCase {
                 } catch (Exception e) {
                     Log.e("encryption", e.getMessage());
                 }
+
             } catch (JSONException e) {
                 fail(e.getMessage());
                 apiToken = null;

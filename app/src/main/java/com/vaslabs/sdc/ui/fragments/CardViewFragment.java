@@ -103,7 +103,6 @@ public class CardViewFragment extends Fragment implements ICardViewFragment {
         CardViewAdapter cardViewAdapter = new CardViewAdapter(LogbookSummaryEntry.fromLogbookSummary(logbookSummary, getActivity()));
         recyclerView.setAdapter(cardViewAdapter);
         recyclerView.getAdapter().notifyDataSetChanged();
-        prepareUI();
     }
 
     /**
