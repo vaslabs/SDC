@@ -93,4 +93,14 @@ public class CacheManager {
 
 
     }
+
+    public static void clearCache(Context context, String apiToken) {
+        try {
+            File file = new File(context.getCacheDir(), String.valueOf(apiToken.hashCode()));
+            file.delete();
+        } catch (Exception e) {
+            Log.e("CacheManager", e.getMessage());
+        }
+
+    }
 }

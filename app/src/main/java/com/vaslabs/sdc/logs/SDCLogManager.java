@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.logs.utils.LogUtils;
 import com.vaslabs.logs.utils.SessionFilter;
+import com.vaslabs.sdc.cache.CacheManager;
 import com.vaslabs.sdc.connectivity.SdcService;
 import com.vaslabs.sdc.connectivity.SkyDivingEnvironment;
 import com.vaslabs.sdc.ui.R;
@@ -140,6 +141,7 @@ public class SDCLogManager {
                 String jsonData = buildRequest(skydivingSessionData);
                 sdcService.submitSession(apiToken, jsonData, submittedListener, errorListener);
             }
+            CacheManager.clearCache(context, apiToken);
         } catch (IOException e) {
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
         }

@@ -9,6 +9,7 @@ import com.vaslabs.sdc.entries.GpsEntries;
 import com.vaslabs.sdc.entries.GpsEntry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -70,19 +71,26 @@ public class SkydivingSessionData {
     }
 
     public BarometerEntries getBarometerEntries() {
-        return new BarometerEntries(barometerEntries);
+        BarometerEntries barometerEntries = new BarometerEntries(this.barometerEntries);
+        barometerEntries.sort();
+        return barometerEntries;
     }
 
     public GpsEntries getGpsEntries() {
-        return new GpsEntries(gpsEntries);
+        GpsEntries gpsEntries = new GpsEntries(this.gpsEntries);
+        gpsEntries.sort();
+        return gpsEntries;
     }
 
     public ConnectionEntries getConnectionEntries() {
-        return new ConnectionEntries(connectionEntries);
+        ConnectionEntries ces = new ConnectionEntries(connectionEntries);
+        ces.sort();
+        return ces;
     }
 
     public GpsEntry[] getGpsEntriesAsArray() {
         GpsEntry[] array = new GpsEntry[this.gpsEntries.size()];
+        Arrays.sort(array);
         return this.gpsEntries.toArray(array);
     }
 

@@ -17,9 +17,11 @@ import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.sdc.SkydivingSessionService;
 import com.vaslabs.sdc.connectivity.SdcService;
 import com.vaslabs.sdc.connectivity.impl.SdcServiceImpl;
+import com.vaslabs.sdc.ui.fragments.AccountFragment;
 import com.vaslabs.sdc.ui.fragments.CardViewFragment;
 import com.vaslabs.sdc.ui.fragments.ManageLogsFragment;
 import com.vaslabs.sdc.ui.fragments.actions.ActionManager;
+import com.vaslabs.sdc.ui.fragments.actions.DefaultActionManager;
 import com.vaslabs.sdc.ui.fragments.actions.LogbookSummaryActionManager;
 import com.vaslabs.sdc.ui.fragments.actions.LogsSubmissionActionManager;
 
@@ -58,6 +60,7 @@ public class Main2Activity extends AppCompatActivity
         actionManagerHolder.put(R.id.nav_logsmanagement, new LogsSubmissionActionManager());
         actionManagerHolder.put(R.id.nav_about, new AboutActionManager());
         actionManagerHolder.put(R.id.nav_stats, new StatsActionManager());
+        actionManagerHolder.put(R.id.nav_account, new AccountActionManager());
         start();
     }
 
