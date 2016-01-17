@@ -7,6 +7,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.vaslabs.encryption.EncryptionManager;
 import com.vaslabs.sdc.connectivity.SdcService;
+import com.vaslabs.sdc_dashboard.API.API;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,15 +58,16 @@ public class TestAccountCreationFromServer extends AndroidTestCase {
     public void setUp() throws Exception {
         sdcService = new SdcServiceLocalImpl(mContext);
         accountManager = new AccountManager(mContext);
+        API.deleteToken(mContext);
         account = accountManager.getAccount();
         countDownLatch = new CountDownLatch(1);
         sdcService.createTemporaryAccount(account, createAccountResponseListener, errorListener);
         countDownLatch.await();
-        assertEquals(32, apiToken.length());
     }
 
     public void test_create_temporary_account_duplicate_gets_same_token() throws Exception {
         Account account = accountManager.getAccount();
+        assertTrue(account instanceof TemporaryAccount);
         assertEquals(this.account, account);
         countDownLatch = new CountDownLatch(1);
         String previousApitoken = apiToken;

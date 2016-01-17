@@ -37,6 +37,8 @@ import com.vaslabs.sdc_dashboard.API.API;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 /**
  * A fragment representing a list of Items.
  * <p/>
@@ -68,6 +70,7 @@ public class CardViewFragment extends Fragment implements ICardViewFragment {
                 EncryptionManager encryptionManager = new EncryptionManager();
                 try {
                     apiToken = encryptionManager.decrypt(apiToken, getActivity());
+                    API.saveApiToken(getActivity(), apiToken);
                     initSessionData();
                 } catch (Exception e) {
                     Log.e("encryption", e.getMessage());
@@ -170,7 +173,6 @@ public class CardViewFragment extends Fragment implements ICardViewFragment {
             Account account = accountManager.getAccount();
             if (account instanceof SDCAccount) {
                 apiToken = account.getKey();
-                API.saveApiToken(this.getActivity(), apiToken);
                 initSessionData();
             }
             else {
@@ -196,8 +198,12 @@ public class CardViewFragment extends Fragment implements ICardViewFragment {
     }
 
     private void initSessionData() {
-        if (apiToken == null)
+        try {
+            apiToken = API.getApiToken(getActivity());
+        } catch (IOException e) {
+            Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
             return;
+        }
         SdcService sdcService = Main2Activity.sdcService;
         SkydivingSessionData[] skydivingSessionData = CacheManager.getInstance(getActivity()).getSessionData();
         if (skydivingSessionData == null)

@@ -35,7 +35,7 @@ public class AccountManager {
         } catch (IOException e) {
             return false;
         }
-        return token != null;
+        return token != null && token.length() >= 32 && token.length() <= 45;
 
     }
 
