@@ -14,6 +14,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.vaslabs.accounts.Account;
+import com.vaslabs.accounts.AccountManager;
+import com.vaslabs.sdc.connectivity.SdcService;
+import com.vaslabs.sdc.ui.Main2Activity;
 import com.vaslabs.sdc.ui.R;
 import com.vaslabs.sdc.ui.fragments.actions.ActionManager;
 import com.vaslabs.sdc.ui.fragments.actions.DefaultActionManager;
@@ -25,6 +29,7 @@ public class StatsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Map<Integer, ActionManager> actionManagerHolder = new HashMap<Integer, ActionManager>();
+    private String apiToken;
 
 
     @Override

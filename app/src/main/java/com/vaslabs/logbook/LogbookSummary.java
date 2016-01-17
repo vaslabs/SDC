@@ -1,5 +1,7 @@
 package com.vaslabs.logbook;
 
+import com.vaslabs.sdc.logs.LogbookStats;
+
 import java.util.Date;
 import java.util.List;
 
@@ -39,22 +41,22 @@ public final class LogbookSummary {
         return averageTopSpeed;
     }
 
-    public static LogbookSummary fromLogbookEntries(List<Logbook> logbookEntries) {
+    public static LogbookSummary fromLogbookEntries(LogbookStats[] logbookStats) {
         LogbookSummary ls = new LogbookSummary();
         int countTopSpeed=0, countAverageExitAltitude=0, countAverageDeployAltitude=0, countAverageSpeed=0;
-        for (Logbook l : logbookEntries) {
+        for (LogbookStats l : logbookStats) {
             if (ls.latestJumpDate < l.getTimeInMillis())
                 ls.latestJumpDate = l.getTimeInMillis();
-            if (l.getMetrics().getDeploymentAltitude() != 0) {
-                ls.averageDeployAltitude += l.getMetrics().getDeploymentAltitude();
+            if (l.getDeploymentAltitude() != 0) {
+                ls.averageDeployAltitude += l.getDeploymentAltitude();
                 countAverageDeployAltitude++;
             }
-            if (l.getMetrics().getMaxVelocity() != 0) {
-                ls.averageTopSpeed += l.getMetrics().getMaxVelocity();
+            if (l.getMaximumSpeed() != 0) {
+                ls.averageTopSpeed += l.getMaximumSpeed();
                 countTopSpeed++;
             }
-            if (l.getMetrics().getExitAltitude() != 0) {
-                ls.averageExitAltitude += l.getMetrics().getExitAltitude();
+            if (l.getExitAltitude() != 0) {
+                ls.averageExitAltitude += l.getExitAltitude();
                 countAverageExitAltitude++;
             }
         }
@@ -67,7 +69,7 @@ public final class LogbookSummary {
             ls.averageExitAltitude /= countAverageExitAltitude;
         }
 
-        ls.numberOfJumps = logbookEntries.size();
+        ls.numberOfJumps = logbookStats.length;
 
         return ls;
     }

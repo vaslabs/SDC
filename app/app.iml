@@ -122,6 +122,7 @@
     <orderEntry type="library" exported="" name="vtrends-1.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-basement-8.1.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-maps-8.1.0" level="project" />
+    <orderEntry type="library" exported="" name="library-aar-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-nearby-8.1.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-core-1.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-panorama-8.1.0" level="project" />

@@ -34,7 +34,7 @@ import lecho.lib.hellocharts.view.LineChartView;
 /**
  * A fragment containing a line chart.
  */
-public abstract class MainFragment extends Fragment {
+public abstract class MainFragment extends Fragment implements Axisable {
 
     private LineChartView chart;
     private LineChartData data;
@@ -251,14 +251,14 @@ public abstract class MainFragment extends Fragment {
         data = new LineChartData(lines);
 
         if (hasAxes) {
-            Axis axisX = new Axis();
-            Axis axisY = new Axis().setHasLines(true);
-            if (hasAxesNames) {
+            //Axis axisX = new Axis();
+            //Axis axisY = new Axis().setHasLines(true);
+            /*if (hasAxesNames) {
                 axisX.setName("Axis X");
                 axisY.setName("Axis Y");
-            }
-            data.setAxisXBottom(axisX);
-            data.setAxisYLeft(axisY);
+            }*/
+            data.setAxisXBottom(getXAxis());
+            data.setAxisYLeft(getYAxis());
         } else {
             data.setAxisXBottom(null);
             data.setAxisYLeft(null);

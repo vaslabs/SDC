@@ -28,7 +28,7 @@ public class TestLogbookStats extends AndroidTestCase {
     }
 
     public void test_identifyFlyingEvents() {
-        SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(this.getContext());
+        SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession();
         SkydivingEventDetails[] skydivingEventDetailsArray = LogbookStats.identifyFlyingEvents(skydivingSessionData.getBarometerEntries());
         assertEquals(4, skydivingEventDetailsArray.length);
         assertEquals(skydivingEventDetailsArray[0].eventType, SkydivingEvent.TAKE_OFF);

@@ -19,7 +19,7 @@ import java.util.Map;
  * Created by vnicolaou on 11/11/15.
  */
 public class TestSplitSubmission extends AndroidTestCase {
-
+/*
     public void test_that_sessions_are_not_splitted() throws Exception {
         InputStreamReader isr = new InputStreamReader(mContext.getResources().openRawResource(R.raw.sample_split_log));
         Gson gson = new Gson();
@@ -32,6 +32,6 @@ public class TestSplitSubmission extends AndroidTestCase {
 
         SDCLogManager.getInstance(this.getContext()).saveLatestSession(sessionData);
     }
-
+*/
 
 }

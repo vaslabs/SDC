@@ -1,8 +1,5 @@
 package com.vaslabs.logbook;
 
-import android.content.Context;
-
-import com.vaslabs.pwa.CommunicationManager;
 
 import java.util.List;
 
@@ -12,4 +9,5 @@ import java.util.List;
 public interface ILogbookAPI {
 
     List<Logbook> getLogbookEntries() throws Exception;
+    void fetchSessions();
 }

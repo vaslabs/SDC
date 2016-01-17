@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.vaslabs.sdc.SkydivingSessionService;
 import com.vaslabs.sdc.ui.R;
-import com.vaslabs.sdc.ui.charts.LogbookFetchTask;
 import com.vaslabs.sdc.utils.BarometerValidator;
 import com.vaslabs.sdc.utils.EmergencyContactValidator;
 import com.vaslabs.sdc.utils.IValidator;

@@ -8,15 +8,36 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.google.gson.Gson;
+import com.vaslabs.accounts.Account;
+import com.vaslabs.accounts.AccountManager;
+import com.vaslabs.accounts.SDCAccount;
+import com.vaslabs.accounts.TemporaryAccount;
+import com.vaslabs.encryption.EncryptionManager;
 import com.vaslabs.logbook.LogbookSummary;
+import com.vaslabs.logbook.SkydivingSessionData;
+import com.vaslabs.sdc.cache.CacheManager;
+import com.vaslabs.sdc.connectivity.SdcService;
+import com.vaslabs.sdc.logs.LogbookStats;
+import com.vaslabs.sdc.types.LogbookSummaryEntry;
+import com.vaslabs.sdc.ui.Main2Activity;
 import com.vaslabs.sdc.ui.R;
-import com.vaslabs.sdc.ui.charts.LogbookFetchTask;
 import com.vaslabs.sdc.ui.fragments.actions.ValidationActionManager;
 import com.vaslabs.sdc.ui.util.DividerItemDecoration;
+import com.vaslabs.sdc_dashboard.API.API;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 
 /**
  * A fragment representing a list of Items.
@@ -33,6 +54,57 @@ public class CardViewFragment extends Fragment implements ICardViewFragment {
     private OnListFragmentInteractionListener mListener;
     protected RecyclerView recyclerView;
     protected View view;
+    private Response.ErrorListener errorListener = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_SHORT);
+        }
+    };
+    private String apiToken = null;
+
+    private Response.Listener<JSONObject> accountCreationListener = new Response.Listener<JSONObject>() {
+        @Override
+        public void onResponse(JSONObject response) {
+            try {
+                apiToken = response.getString("apitoken");
+                EncryptionManager encryptionManager = new EncryptionManager();
+                try {
+                    apiToken = encryptionManager.decrypt(apiToken, getActivity());
+                    API.saveApiToken(getActivity(), apiToken);
+                    initSessionData();
+                } catch (Exception e) {
+                    Log.e("encryption", e.getMessage());
+                }
+            } catch (JSONException e) {
+                apiToken = null;
+            }
+        }
+    };
+    private Response.Listener<String> sessionFetcherListener = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) {
+            try {
+                Gson gson = new Gson();
+                SkydivingSessionData[] skydivingSessionDatas = gson.fromJson(response, SkydivingSessionData[].class);
+                CacheManager.getInstance(getActivity()).cache(apiToken, response);
+                Main2Activity.sessions = skydivingSessionDatas;
+                prepareUI();
+            } catch (Exception e) {
+                Toast.makeText(getActivity(), getString(R.string.error_fetching_data) + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
+
+    private void prepareUI() {
+        if (Main2Activity.sessions == null || Main2Activity.sessions.length == 0)
+            Toast.makeText(getActivity(), getString(R.string.nologsmessage), Toast.LENGTH_SHORT).show();
+        LogbookStats[] logbookStats = LogbookStats.generateLogbookStats(Main2Activity.sessions);
+        LogbookSummary logbookSummary = LogbookSummary.fromLogbookEntries(logbookStats);
+        CardViewAdapter cardViewAdapter = new CardViewAdapter(LogbookSummaryEntry.fromLogbookSummary(logbookSummary, getActivity()));
+        recyclerView.setAdapter(cardViewAdapter);
+        recyclerView.getAdapter().notifyDataSetChanged();
+    }
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -97,7 +169,21 @@ public class CardViewFragment extends Fragment implements ICardViewFragment {
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
-        new LogbookFetchTask(recyclerView).execute();
+
+        AccountManager accountManager = new AccountManager(getActivity());
+        try {
+            Account account = accountManager.getAccount();
+            if (account instanceof SDCAccount) {
+                apiToken = account.getKey();
+                initSessionData();
+            }
+            else {
+                createAccount((TemporaryAccount)account);
+            }
+        } catch (Exception e) {
+            Toast.makeText(context, getString(R.string.error_creating_account) + ": " + e.getMessage(), Toast.LENGTH_LONG);
+        }
+
         FloatingActionButton startNewSessionFloatingActionButton = (FloatingActionButton)view.findViewById(R.id.fab_start_new);
         startNewSessionFloatingActionButton.setOnClickListener(new View.OnClickListener() {
 
@@ -106,6 +192,30 @@ public class CardViewFragment extends Fragment implements ICardViewFragment {
                 fabActionManager.manageAction(getActivity());
             }
         });
+    }
+
+    private void createAccount(TemporaryAccount account) {
+        SdcService sdcService = Main2Activity.sdcService;
+        sdcService.createTemporaryAccount(account, accountCreationListener, errorListener);
+    }
+
+    private void initSessionData() {
+        try {
+            apiToken = API.getApiToken(getActivity());
+        } catch (IOException e) {
+            Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        SdcService sdcService = Main2Activity.sdcService;
+        SkydivingSessionData[] skydivingSessionData = CacheManager.getInstance(getActivity()).getSessionData();
+        if (skydivingSessionData == null) {
+            sdcService.getSessionData(apiToken, sessionFetcherListener, errorListener);
+            Toast.makeText(getActivity(), getString(R.string.fetching_data), Toast.LENGTH_LONG).show();
+        }
+        else {
+            Main2Activity.sessions = skydivingSessionData;
+            prepareUI();
+        }
     }
 
     /**

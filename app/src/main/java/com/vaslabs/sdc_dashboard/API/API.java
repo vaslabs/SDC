@@ -3,6 +3,7 @@ package com.vaslabs.sdc_dashboard.API;
 import android.content.Context;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,5 +34,10 @@ public class API {
         } finally {
             fos.close();
         }
+    }
+
+    public static void deleteToken(Context context) {
+        File file = new File(context.getFilesDir(), API.API_TOKEN_FILE);
+        file.delete();
     }
 }
