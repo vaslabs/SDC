@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.vaslabs.logbook.SkydivingSessionData;
+import com.vaslabs.sdc.cache.CacheManager;
 import com.vaslabs.sdc.entries.AccelerationEntry;
 import com.vaslabs.sdc.entries.BarometerEntries;
 import com.vaslabs.sdc.entries.BarometerEntry;
@@ -14,6 +15,7 @@ import com.vaslabs.sdc.entries.VelocityEntry;
 import com.vaslabs.sdc.math.SDCMathUtils;
 import com.vaslabs.sdc.types.SkydivingEvent;
 import com.vaslabs.sdc.types.SkydivingEventDetails;
+import com.vaslabs.sdc.ui.Main2Activity;
 import com.vaslabs.sdc.ui.R;
 
 import java.io.FileNotFoundException;
@@ -71,9 +73,8 @@ public final class LogbookStats {
         return maxNegative;
     }
 
-    public static SkydivingSessionData getLatestSession(Context context) {
-        //TODO
-        return null;
+    public static SkydivingSessionData getLatestSession() {
+        return CacheManager.getLastSession();
     }
 
 

@@ -29,7 +29,7 @@ public class MapMySessionHelper {
 
     public static void onMapReady(GoogleMap mMap, Context context) {
 
-        SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(context);
+        SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession();
         try {
             createPolygons(skydivingSessionData, mMap);
         } catch (Exception e) {
@@ -47,6 +47,8 @@ public class MapMySessionHelper {
 
     private static void createPolygons(SkydivingSessionData skydivingSessionData, GoogleMap map) {
         SkydivingEventDetails[] skydivingEventDetails = LogbookStats.identifyFlyingEvents(skydivingSessionData.getBarometerEntries());
+        skydivingSessionData.getGpsEntries().sort();
+
         LatLng[] latLngArray = generatePath(skydivingSessionData, 0, skydivingEventDetails[0].timestamp);
         if (latLngArray.length > 0) {
             map.addPolygon(new PolygonOptions()
@@ -77,7 +79,6 @@ public class MapMySessionHelper {
 
     private static LatLng[] generatePath(SkydivingSessionData skydivingSessionData, long timestampLeft, long timestampRight ) {
         GpsEntries gpsEntries = skydivingSessionData.getGpsEntries();
-        gpsEntries.sort();
         List<LatLng> latLngList = new ArrayList<LatLng>();
         for (int i = 0; i < gpsEntries.size(); i++) {
             if (gpsEntries.getEntry(i).getTimestamp() > timestampRight)

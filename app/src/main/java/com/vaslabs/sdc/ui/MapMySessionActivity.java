@@ -50,7 +50,7 @@ public class MapMySessionActivity extends AppCompatActivity implements OnMapRead
 
     private void animateMySession() {
         this.fab.hide();
-        SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession(this);
+        SkydivingSessionData skydivingSessionData = LogbookStats.getLatestSession();
         GpsEntry[] gpsEntries = skydivingSessionData.getGpsEntriesAsArray();
         int speedUp = 1000;
         GpsEntry gpsEntry = gpsEntries[0];

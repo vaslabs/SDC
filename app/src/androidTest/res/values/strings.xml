@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="no_account">No account found. Creating temporary account...</string>
+    <string name="error_creating_account">Error creating account</string>
+    <string name="loading_last_session">Loading last session...</string>
+    <string name="error_fetching_data">Connecting with web service failed</string>
+</resources>

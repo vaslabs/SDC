@@ -13,7 +13,10 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.vaslabs.logbook.LogbookSummary;
+import com.vaslabs.logbook.SkydivingSessionData;
 import com.vaslabs.sdc.SkydivingSessionService;
+import com.vaslabs.sdc.connectivity.SdcService;
+import com.vaslabs.sdc.connectivity.impl.SdcServiceImpl;
 import com.vaslabs.sdc.ui.fragments.CardViewFragment;
 import com.vaslabs.sdc.ui.fragments.ManageLogsFragment;
 import com.vaslabs.sdc.ui.fragments.actions.ActionManager;
@@ -28,8 +31,9 @@ public class Main2Activity extends AppCompatActivity
         ManageLogsFragment.OnFragmentInteractionListener
 {
 
+    public static SkydivingSessionData[] sessions;
     private Map<Integer, ActionManager> actionManagerHolder = new HashMap<Integer, ActionManager>();
-
+    public static SdcService sdcService;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +43,7 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        sdcService = new SdcServiceImpl(getString(R.string.remote_host), this);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
