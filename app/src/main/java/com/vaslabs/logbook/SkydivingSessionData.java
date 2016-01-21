@@ -90,7 +90,6 @@ public class SkydivingSessionData {
 
     public GpsEntry[] getGpsEntriesAsArray() {
         GpsEntry[] array = new GpsEntry[this.gpsEntries.size()];
-        Arrays.sort(array);
         return this.gpsEntries.toArray(array);
     }
 
