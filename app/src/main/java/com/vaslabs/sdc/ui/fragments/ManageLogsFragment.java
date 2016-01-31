@@ -14,7 +14,9 @@ import android.widget.Toast;
 import com.vaslabs.accounts.Account;
 import com.vaslabs.accounts.AccountManager;
 import com.vaslabs.sdc.connectivity.SdcService;
+import com.vaslabs.sdc.connectivity.impl.SdcServiceImpl;
 import com.vaslabs.sdc.logs.SDCLogManager;
+import com.vaslabs.sdc.ui.Main2Activity;
 import com.vaslabs.sdc.ui.R;
 
 import java.io.IOException;
@@ -58,6 +60,7 @@ public class ManageLogsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_manage_logs, container, false);
 
+        sdcService = Main2Activity.sdcService;
         FloatingActionButton fab = (FloatingActionButton)view.findViewById(R.id.fab_submit);
         logsTextView = (TextView)view.findViewById(R.id.manage_logs_text_view);
         StringBuilder content = null;
