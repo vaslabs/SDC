@@ -47,7 +47,6 @@ public class MapMySessionHelper {
 
     private static void createPolygons(SkydivingSessionData skydivingSessionData, GoogleMap map) {
         SkydivingEventDetails[] skydivingEventDetails = LogbookStats.identifyFlyingEvents(skydivingSessionData.getBarometerEntries());
-        skydivingSessionData.getGpsEntries().sort();
 
         LatLng[] latLngArray = generatePath(skydivingSessionData, 0, skydivingEventDetails[0].timestamp);
         if (latLngArray.length > 0) {
@@ -55,25 +54,31 @@ public class MapMySessionHelper {
                     .add(latLngArray)
                     .strokeColor(SkydivingEvent.WALKING.color));
         }
+        latLngArray = generatePath(skydivingSessionData, skydivingEventDetails[0].timestamp, skydivingEventDetails[1].timestamp);
+        if (latLngArray.length > 0) {
+            map.addPolygon(new PolygonOptions()
+                    .add(latLngArray)
+                    .strokeColor(skydivingEventDetails[0].eventType.color));
+        }
         latLngArray = generatePath(skydivingSessionData, skydivingEventDetails[1].timestamp, skydivingEventDetails[2].timestamp);
         if (latLngArray.length > 0) {
             map.addPolygon(new PolygonOptions()
                     .add(latLngArray)
                     .strokeColor(skydivingEventDetails[1].eventType.color));
         }
+
         latLngArray = generatePath(skydivingSessionData, skydivingEventDetails[2].timestamp, skydivingEventDetails[3].timestamp);
         if (latLngArray.length > 0) {
             map.addPolygon(new PolygonOptions()
                     .add(latLngArray)
                     .strokeColor(skydivingEventDetails[2].eventType.color));
         }
-
         GpsEntries gpsEntries = skydivingSessionData.getGpsEntries();
         latLngArray = generatePath(skydivingSessionData, skydivingEventDetails[3].timestamp, gpsEntries.getEntry(gpsEntries.size() - 1).getTimestamp());
         if (latLngArray.length > 0) {
             map.addPolygon(new PolygonOptions()
                     .add(latLngArray)
-                    .strokeColor(SkydivingEvent.WALKING.color));
+                    .strokeColor(skydivingEventDetails[3].eventType.color));
         }
     }
 

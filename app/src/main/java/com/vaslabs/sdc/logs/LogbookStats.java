@@ -211,6 +211,7 @@ public final class LogbookStats {
     }
 
     private static SkydivingEventDetails getTakeOffEvent(BarometerEntry[] barometerEntries) {
+        Arrays.sort(barometerEntries);
         int maxBarometerEntryIndex = findMax(barometerEntries);
         for (int i = maxBarometerEntryIndex - 1; i >= 0; i--) {
             if (Math.abs(barometerEntries[i].getAltitude() - barometerEntries[0].getAltitude()) < 5f)
