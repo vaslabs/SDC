@@ -144,6 +144,7 @@ public class SDCLogManager {
                 sdcService.submitSession(apiToken, jsonData, submittedListener, errorListener);
             }
             CacheManager.clearCache(context, apiToken);
+            clearLogs();
         } catch (IOException e) {
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
         }
